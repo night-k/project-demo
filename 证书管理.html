@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 证书管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar-item {
+            transition: all 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .sidebar-item.active {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .input-field {
+            transition: all 0.3s;
+            border: 1px solid #d9d9d9;
+            background-color: #fff;
+        }
+
+        .input-field:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #40a9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24,144,255,0.4);
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-icon.blue { background-color: #e6f7ff; color: #1890ff; }
+        .stat-icon.green { background-color: #f6ffed; color: #52c41a; }
+        .stat-icon.orange { background-color: #fff7e6; color: #fa8c16; }
+        .stat-icon.red { background-color: #fff1f0; color: #ff4d4f; }
+
+        .stat-content { flex: 1; }
+        .stat-title { font-size: 14px; color: #666; margin-bottom: 4px; }
+        .stat-value { font-size: 28px; font-weight: 600; color: #262626; }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            position: relative;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        .data-table th,
+        .data-table td {
+            white-space: nowrap;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .data-table th {
+            background-color: #fafafa;
+            font-weight: 500;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #fafafa;
+        }
+
+        .operate-btn {
+            color: #1890ff;
+            cursor: pointer;
+            margin-right: 12px;
+            font-size: 13px;
+        }
+
+        .operate-btn:hover { color: #40a9ff; }
+
+        .operate-btn.danger {
+            color: #ff4d4f;
+        }
+
+        .operate-btn.danger:hover {
+            color: #ff7875;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        .modal.show { display: flex; }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 640px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            margin: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .form-label .required {
+            color: #ff4d4f;
+            margin-right: 4px;
+        }
+
+        /* 开关样式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #1890ff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        /* 标签样式 */
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .tag-success {
+            background-color: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .tag-warning {
+            background-color: #fffbe6;
+            color: #faad14;
+            border: 1px solid #ffe58f;
+        }
+
+        .tag-error {
+            background-color: #fff1f0;
+            color: #ff4d4f;
+            border: 1px solid #ffa39e;
+        }
+
+        .tag-default {
+            background-color: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #1890ff;
+        }
+
+        /* 条件显示区域 */
+        .conditional-section {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .conditional-section.hidden {
+            display: none;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-group .input-field {
+            flex: 1;
+        }
+
+        .input-group-append {
+            padding: 0 12px;
+            background-color: #fafafa;
+            border: 1px solid #d9d9d9;
+            border-radius: 0 6px 6px 0;
+            display: flex;
+            align-items: center;
+            color: #666;
+            font-size: 13px;
+            margin-left: -1px;
+        }
+
+        .input-field.with-append {
+            border-radius: 6px 0 0 6px;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20 flex-shrink-0">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
+            </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-bars"></i></a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-home"></i> 首页</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-desktop"></i> 工作台</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-project-diagram"></i> 流程管理</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-cogs"></i> 产品工艺</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-shopping-cart"></i> 销售管理</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-tasks"></i> 项目管理</a>
+                <a href="#" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600"><i class="fas fa-industry"></i> 生产管理</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-warehouse"></i> 库存管理</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 text-gray-500 hover:text-blue-600 relative">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>admin-admin</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 左侧边栏 -->
+        <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
+            <div class="p-4">
+                <div class="space-y-1">
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600">
+                        <i class="fas fa-ticket-alt w-5"></i>
+                        <span>工单管理</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600">
+                        <i class="fas fa-tasks w-5"></i>
+                        <span>任务管理</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600">
+                        <i class="fas fa-user-tie w-5"></i>
+                        <span>人才管理</span>
+                    </div>
+                    <div class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium">
+                        <i class="fas fa-certificate w-5"></i>
+                        <span>证书管理</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6 min-w-0">
+
+            <!-- 统计卡片区域 -->
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">证书规则总数</div>
+                        <div class="stat-value">24</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">已启用规则</div>
+                        <div class="stat-value">20</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">必须持证</div>
+                        <div class="stat-value">12</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">需校验有效期</div>
+                        <div class="stat-value">18</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 查询区域 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 mb-4">
+                <div class="grid grid-cols-5 gap-4 items-end">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">证书名称</label>
+                        <input type="text" id="filter_name" placeholder="请输入证书名称" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">证书类型</label>
+                        <select id="filter_type" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option value="">全部类型</option>
+                            <option value="safety">安全证</option>
+                            <option value="skill">技能证</option>
+                            <option value="manage">管理类</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">是否必须</label>
+                        <select id="filter_required" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option value="">全部</option>
+                            <option value="yes">是</option>
+                            <option value="no">否</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">是否启用</label>
+                        <select id="filter_enabled" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option value="">全部</option>
+                            <option value="yes">启用</option>
+                            <option value="no">停用</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="searchCerts()" class="btn-primary px-6 py-2 rounded-lg text-sm flex items-center gap-2 flex-1 justify-center">
+                            <i class="fas fa-search"></i> 查询
+                        </button>
+                        <button onclick="resetFilter()" class="px-6 py-2 rounded-lg text-sm border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors flex items-center gap-2">
+                            <i class="fas fa-trash-alt"></i> 重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作按钮区 -->
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button onclick="showAddModal()" class="btn-primary px-4 py-2 rounded-lg flex items-center gap-2 text-sm cursor-pointer">
+                        <i class="fas fa-plus"></i> 新增证书
+                    </button>
+                    <button class="px-4 py-2 rounded-lg border border-blue-500 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-file-import"></i> 批量导入
+                    </button>
+                    <button class="px-4 py-2 rounded-lg border border-green-500 text-green-600 bg-green-50 hover:bg-green-100 transition-colors text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-file-export"></i> 导出
+                    </button>
+                </div>
+                <div class="text-sm text-gray-500">
+                    <i class="fas fa-info-circle mr-1"></i> 
+                    必须持证规则将用于排程强校验，无证人员禁止上岗
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="table-wrapper shadow-sm border border-gray-100">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="w-10"><input type="checkbox" class="rounded border-gray-300"></th>
+                            <th class="w-10">#</th>
+                            <th>证书名称</th>
+                            <th>证书类型</th>
+                            <th>是否必须</th>
+                            <th>默认有效期</th>
+                            <th>校验有效期</th>
+                            <th>预警天数</th>
+                            <th>状态</th>
+                            <th class="text-center w-32">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="certTableBody">
+                        <tr>
+                            <td><input type="checkbox" class="rounded border-gray-300"></td>
+                            <td class="text-gray-600">1</td>
+                            <td>
+                                <div class="font-medium text-gray-800">特种作业操作证（焊工）</div>
+                                <div class="text-xs text-gray-500 mt-0.5">从事焊接作业必备证书</div>
+                            </td>
+                            <td><span class="status-tag tag-warning">技能证</span></td>
+                            <td><span class="status-tag tag-error">必须</span></td>
+                            <td class="text-gray-600">6年</td>
+                            <td><i class="fas fa-check-circle text-green-500"></i> <span class="text-sm text-gray-600">是</span></td>
+                            <td class="text-gray-600">30天</td>
+                            <td><span class="status-tag tag-success">启用</span></td>
+                            <td class="text-center">
+                                <span class="operate-btn" onclick="editCert(1)"><i class="fas fa-edit"></i> 编辑</span>
+                                <span class="operate-btn danger" onclick="toggleCertStatus(1)"><i class="fas fa-ban"></i> 停用</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="rounded border-gray-300"></td>
+                            <td class="text-gray-600">2</td>
+                            <td>
+                                <div class="font-medium text-gray-800">安全生产考核合格证（安全员C证）</div>
+                                <div class="text-xs text-gray-500 mt-0.5">专职安全生产管理人员</div>
+                            </td>
+                            <td><span class="status-tag tag-error">安全证</span></td>
+                            <td><span class="status-tag tag-error">必须</span></td>
+                            <td class="text-gray-600">3年</td>
+                            <td><i class="fas fa-check-circle text-green-500"></i> <span class="text-sm text-gray-600">是</span></td>
+                            <td class="text-gray-600">60天</td>
+                            <td><span class="status-tag tag-success">启用</span></td>
+                            <td class="text-center">
+                                <span class="operate-btn" onclick="editCert(2)"><i class="fas fa-edit"></i> 编辑</span>
+                                <span class="operate-btn danger" onclick="toggleCertStatus(2)"><i class="fas fa-ban"></i> 停用</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="rounded border-gray-300"></td>
+                            <td class="text-gray-600">3</td>
+                            <td>
+                                <div class="font-medium text-gray-800">职业技能等级证书（电工）</div>
+                                <div class="text-xs text-gray-500 mt-0.5">技能等级认定</div>
+                            </td>
+                            <td><span class="status-tag tag-warning">技能证</span></td>
+                            <td><span class="status-tag tag-default">非必须</span></td>
+                            <td class="text-gray-500">-</td>
+                            <td><i class="fas fa-times-circle text-gray-400"></i> <span class="text-sm text-gray-400">否</span></td>
+                            <td class="text-gray-400">-</td>
+                            <td><span class="status-tag tag-success">启用</span></td>
+                            <td class="text-center">
+                                <span class="operate-btn" onclick="editCert(3)"><i class="fas fa-edit"></i> 编辑</span>
+                                <span class="operate-btn danger" onclick="toggleCertStatus(3)"><i class="fas fa-ban"></i> 停用</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="rounded border-gray-300"></td>
+                            <td class="text-gray-600">4</td>
+                            <td>
+                                <div class="font-medium text-gray-800">特种设备作业证（叉车司机）</div>
+                                <div class="text-xs text-gray-500 mt-0.5">厂内机动车辆驾驶</div>
+                            </td>
+                            <td><span class="status-tag tag-warning">技能证</span></td>
+                            <td><span class="status-tag tag-default">非必须</span></td>
+                            <td class="text-gray-600">4年</td>
+                            <td><i class="fas fa-check-circle text-green-500"></i> <span class="text-sm text-gray-600">是</span></td>
+                            <td class="text-gray-600">30天</td>
+                            <td><span class="status-tag tag-default">停用</span></td>
+                            <td class="text-center">
+                                <span class="operate-btn" onclick="editCert(4)"><i class="fas fa-edit"></i> 编辑</span>
+                                <span class="operate-btn text-green-600" onclick="toggleCertStatus(4)"><i class="fas fa-check"></i> 启用</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+                        <!-- 分页 -->
+            <div class="flex items-center justify-end gap-4 mt-4">
+                <div class="flex items-center gap-1">
+                    <span class="text-sm text-gray-600">共 24 条</span>
+                    <select class="border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-blue-500 text-sm bg-white">
+                        <option>10 条/页</option>
+                        <option>20 条/页</option>
+                        <option>50 条/页</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 bg-gray-100 text-gray-400 text-sm cursor-not-allowed" disabled>
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-blue-500 text-white text-sm font-medium">1</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">2</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">3</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">4</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">5</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">6</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm">···</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">3</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-600">前往</span>
+                    <input type="text" value="1" class="w-14 px-3 py-1.5 border border-gray-300 rounded text-center focus:outline-none focus:border-blue-500 text-sm bg-white">
+                    <span class="text-sm text-gray-600">页</span>
+                </div>
+            </div>
+
+</main>
+    </div>
+
+    <!-- 新增/编辑证书弹窗 -->
+    <div id="certModal" class="modal">
+        <div class="modal-content fade-in">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+                <h3 class="text-lg font-bold text-gray-800" id="modalTitle">新增证书</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- 基础信息 -->
+                <div class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    基础信息
+                </div>
+                <div class="form-row">
+                    <div class="form-item">
+                        <label class="form-label"><span class="required">*</span>证书名称</label>
+                        <input type="text" id="cert_name" placeholder="请输入证书名称，如：焊工证" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label"><span class="required">*</span>证书类型</label>
+                        <select id="cert_type" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option value="">请选择类型</option>
+                            <option value="safety">安全证</option>
+                            <option value="skill">技能证</option>
+                            <option value="manage">管理类</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-item full-width">
+                        <label class="form-label">证书描述</label>
+                        <textarea id="cert_desc" rows="2" placeholder="请输入证书描述，用于说明适用场景..." class="input-field w-full px-3 py-2 rounded-lg text-sm resize-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- 规则配置 -->
+                <div class="section-title" style="margin-top: 24px;">
+                    <i class="fas fa-cog"></i>
+                    规则配置
+                </div>
+                <div class="form-row">
+                    <div class="form-item">
+                        <label class="form-label">是否必须证书</label>
+                        <div class="flex items-center gap-3 mt-2">
+                            <label class="switch">
+                                <input type="checkbox" id="is_required" onchange="updateRuleDesc()">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="text-sm text-gray-600" id="requiredText">非必须（ optional ）</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1" id="requiredHint">排程时不校验此证书</p>
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">是否校验有效期</label>
+                        <div class="flex items-center gap-3 mt-2">
+                            <label class="switch">
+                                <input type="checkbox" id="check_expiry" onchange="toggleExpirySection()">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="text-sm text-gray-600" id="expiryText">不校验有效期</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1" id="expiryHint">关闭后无需填写有效期</p>
+                    </div>
+                </div>
+
+                <!-- 有效期规则（条件显示） -->
+                <div id="expirySection" class="conditional-section hidden" style="margin-top: 16px; padding-top: 16px; border-top: 1px dashed #e8e8e8;">
+                    <div class="form-row">
+                        <div class="form-item">
+                            <label class="form-label"><span class="required">*</span>默认有效期</label>
+                            <div class="input-group">
+                                <input type="number" id="validity_num" placeholder="请输入数值" class="input-field with-append w-full px-3 py-2 text-sm" min="1">
+                                <select id="validity_unit" class="input-group-append" style="border-radius: 0 6px 6px 0; padding: 0 8px;">
+                                    <option value="year">年</option>
+                                    <option value="month">月</option>
+                                    <option value="day">天</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label"><span class="required">*</span>预警天数</label>
+                            <div class="input-group">
+                                <input type="number" id="warning_days" value="30" placeholder="默认30天" class="input-field with-append w-full px-3 py-2 text-sm" min="1">
+                                <span class="input-group-append">天</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">证书到期前提前预警</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 状态控制 -->
+                <div class="section-title" style="margin-top: 24px;">
+                    <i class="fas fa-toggle-on"></i>
+                    状态控制
+                </div>
+                <div class="form-row">
+                    <div class="form-item">
+                        <label class="form-label">是否启用</label>
+                        <div class="flex items-center gap-3 mt-2">
+                            <label class="switch">
+                                <input type="checkbox" id="is_enabled" checked onchange="updateEnableDesc()">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="text-sm text-gray-600" id="enableText">已启用</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">停用后不在人才证书选择列表中显示</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+                <div class="text-sm text-gray-500">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    带 <span class="text-red-500">*</span> 的为必填项
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="closeModal()" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-white transition-colors text-sm cursor-pointer">
+                        取消
+                    </button>
+                    <button onclick="saveCert()" class="btn-primary px-5 py-2 rounded-lg text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-save"></i> 保存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isEdit = false;
+        let editId = null;
+
+        // 显示新增弹窗
+        function showAddModal() {
+            isEdit = false;
+            editId = null;
+            document.getElementById('modalTitle').textContent = '新增证书';
+            document.getElementById('certModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            resetForm();
+        }
+
+        // 编辑证书
+        function editCert(id) {
+            isEdit = true;
+            editId = id;
+            document.getElementById('modalTitle').textContent = '编辑证书';
+            document.getElementById('certModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            
+            // 模拟填充数据
+            const mockData = {
+                1: { name: '特种作业操作证（焊工）', type: 'skill', desc: '从事焊接作业必备证书', required: true, checkExpiry: true, validityNum: 6, validityUnit: 'year', warningDays: 30, enabled: true },
+                2: { name: '安全生产考核合格证（安全员C证）', type: 'safety', desc: '专职安全生产管理人员', required: true, checkExpiry: true, validityNum: 3, validityUnit: 'year', warningDays: 60, enabled: true },
+                3: { name: '职业技能等级证书（电工）', type: 'skill', desc: '技能等级认定', required: false, checkExpiry: false, validityNum: '', validityUnit: 'year', warningDays: 30, enabled: true },
+                4: { name: '特种设备作业证（叉车司机）', type: 'skill', desc: '厂内机动车辆驾驶', required: false, checkExpiry: true, validityNum: 4, validityUnit: 'year', warningDays: 30, enabled: false }
+            };
+            
+            const data = mockData[id] || mockData[1];
+            document.getElementById('cert_name').value = data.name;
+            document.getElementById('cert_type').value = data.type;
+            document.getElementById('cert_desc').value = data.desc;
+            document.getElementById('is_required').checked = data.required;
+            document.getElementById('check_expiry').checked = data.checkExpiry;
+            document.getElementById('validity_num').value = data.validityNum;
+            document.getElementById('validity_unit').value = data.validityUnit;
+            document.getElementById('warning_days').value = data.warningDays;
+            document.getElementById('is_enabled').checked = data.enabled;
+            
+            updateRuleDesc();
+            toggleExpirySection();
+            updateEnableDesc();
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('certModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // 重置表单
+        function resetForm() {
+            document.getElementById('cert_name').value = '';
+            document.getElementById('cert_type').value = '';
+            document.getElementById('cert_desc').value = '';
+            document.getElementById('is_required').checked = false;
+            document.getElementById('check_expiry').checked = false;
+            document.getElementById('validity_num').value = '';
+            document.getElementById('validity_unit').value = 'year';
+            document.getElementById('warning_days').value = '30';
+            document.getElementById('is_enabled').checked = true;
+            
+            updateRuleDesc();
+            toggleExpirySection();
+            updateEnableDesc();
+        }
+
+        // 切换有效期区域显示
+        function toggleExpirySection() {
+            const isChecked = document.getElementById('check_expiry').checked;
+            const section = document.getElementById('expirySection');
+            const text = document.getElementById('expiryText');
+            const hint = document.getElementById('expiryHint');
+            
+            if (isChecked) {
+                section.classList.remove('hidden');
+                text.textContent = '校验有效期';
+                hint.textContent = '开启后人员需填写证书有效期';
+                text.classList.add('text-blue-600');
+            } else {
+                section.classList.add('hidden');
+                text.textContent = '不校验有效期';
+                hint.textContent = '关闭后无需填写有效期';
+                text.classList.remove('text-blue-600');
+            }
+        }
+
+        // 更新必须证书描述
+        function updateRuleDesc() {
+            const isChecked = document.getElementById('is_required').checked;
+            const text = document.getElementById('requiredText');
+            const hint = document.getElementById('requiredHint');
+            
+            if (isChecked) {
+                text.textContent = '必须持证（ required ）';
+                text.classList.add('text-red-600');
+                hint.textContent = '排程时强制校验，无证禁止上岗';
+                hint.classList.add('text-red-400');
+            } else {
+                text.textContent = '非必须（ optional ）';
+                text.classList.remove('text-red-600');
+                hint.textContent = '排程时不校验此证书';
+                hint.classList.remove('text-red-400');
+            }
+        }
+
+        // 更新启用状态描述
+        function updateEnableDesc() {
+            const isChecked = document.getElementById('is_enabled').checked;
+            const text = document.getElementById('enableText');
+            
+            if (isChecked) {
+                text.textContent = '已启用';
+                text.classList.add('text-green-600');
+                text.classList.remove('text-gray-400');
+            } else {
+                text.textContent = '已停用';
+                text.classList.remove('text-green-600');
+                text.classList.add('text-gray-400');
+            }
+        }
+
+        // 保存证书
+        function saveCert() {
+            const name = document.getElementById('cert_name').value;
+            const type = document.getElementById('cert_type').value;
+            
+            if (!name) {
+                alert('请填写证书名称');
+                document.getElementById('cert_name').focus();
+                return;
+            }
+            if (!type) {
+                alert('请选择证书类型');
+                document.getElementById('cert_type').focus();
+                return;
+            }
+            
+            // 如果开启有效期校验，检查有效期字段
+            if (document.getElementById('check_expiry').checked) {
+                const validityNum = document.getElementById('validity_num').value;
+                if (!validityNum || validityNum < 1) {
+                    alert('请填写默认有效期');
+                    document.getElementById('validity_num').focus();
+                    return;
+                }
+            }
+            
+            const action = isEdit ? '更新' : '新增';
+            alert(`${action}成功！`);
+            closeModal();
+        }
+
+        // 停用/启用证书
+        function toggleCertStatus(id) {
+            const row = event.target.closest('tr');
+            const statusCell = row.cells[8];
+            const actionCell = row.cells[9];
+            const currentStatus = statusCell.querySelector('.status-tag').textContent;
+            
+            if (currentStatus === '启用') {
+                if (confirm('确定要停用该证书规则吗？停用后不影响已持有该证书的人员，但新录入时将无法选择此证书。')) {
+                    statusCell.innerHTML = '<span class="status-tag tag-default">停用</span>';
+                    actionCell.innerHTML = `
+                        <span class="operate-btn" onclick="editCert(${id})"><i class="fas fa-edit"></i> 编辑</span>
+                        <span class="operate-btn text-green-600" onclick="toggleCertStatus(${id})"><i class="fas fa-check"></i> 启用</span>
+                    `;
+                }
+            } else {
+                statusCell.innerHTML = '<span class="status-tag tag-success">启用</span>';
+                actionCell.innerHTML = `
+                    <span class="operate-btn" onclick="editCert(${id})"><i class="fas fa-edit"></i> 编辑</span>
+                    <span class="operate-btn danger" onclick="toggleCertStatus(${id})"><i class="fas fa-ban"></i> 停用</span>
+                `;
+            }
+        }
+
+        // 查询功能
+        function searchCerts() {
+            const name = document.getElementById('filter_name').value;
+            const type = document.getElementById('filter_type').value;
+            const required = document.getElementById('filter_required').value;
+            const enabled = document.getElementById('filter_enabled').value;
+            
+            console.log('查询条件：', { name, type, required, enabled });
+            alert('查询功能演示：请查看控制台输出');
+        }
+
+        // 重置筛选
+        function resetFilter() {
+            document.getElementById('filter_name').value = '';
+            document.getElementById('filter_type').value = '';
+            document.getElementById('filter_required').value = '';
+            document.getElementById('filter_enabled').value = '';
+        }
+
+        // 点击弹窗外部关闭
+        document.getElementById('certModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateRuleDesc();
+            toggleExpirySection();
+            updateEnableDesc();
+        });
+    </script>
+</body>
+</html>

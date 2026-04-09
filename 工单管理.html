@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 工单管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar-item {
+            transition: all 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .sidebar-item.active {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .input-field {
+            transition: all 0.3s;
+            border: 1px solid #d9d9d9;
+        }
+
+        .input-field:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #40a9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24,144,255,0.4);
+        }
+
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .status-created {
+            background-color: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+
+        .status-issued {
+            background-color: #fff7e6;
+            color: #fa8c16;
+            border: 1px solid #ffd591;
+        }
+
+        .status-executing {
+            background-color: #fff1f0;
+            color: #ff4d4f;
+            border: 1px solid #ffa39e;
+        }
+
+        .status-completed {
+            background-color: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        /* 紧急程度标签 */
+        .urgency-normal {
+            background-color: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+
+        .urgency-urgent {
+            background-color: #fff2f0;
+            color: #ff4d4f;
+            border: 1px solid #ffccc7;
+            font-weight: 600;
+        }
+
+        .urgency-critical {
+            background-color: #fff1f0;
+            color: #cf1322;
+            border: 1px solid #ffa39e;
+            font-weight: 700;
+        }
+
+        .link-blue {
+            color: #1890ff;
+            cursor: pointer;
+        }
+
+        .link-blue:hover {
+            color: #40a9ff;
+            text-decoration: underline;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            margin: auto;
+            position: relative;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .operate-btn {
+            color: #1890ff;
+            cursor: pointer;
+            margin-right: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .operate-btn:hover {
+            color: #40a9ff;
+        }
+
+        .operate-btn.disabled {
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        /* 齐套检查样式 */
+        .kitting-check {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .kitting-title {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .kitting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background-color: #fff;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .kitting-status-sufficient {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background-color: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+            border-radius: 20px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .kitting-status-insufficient {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background-color: #fffbe6;
+            color: #faad14;
+            border: 1px solid #ffe58f;
+            border-radius: 20px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .kitting-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #e8e8e8;
+        }
+
+        .btn-warning {
+            background-color: #faad14;
+            color: white;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-warning:hover {
+            background-color: #ffc53d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(250,173,20,0.4);
+        }
+
+        .btn-success {
+            background-color: #52c41a;
+            color: white;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-success:hover {
+            background-color: #73d13d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(82,196,26,0.4);
+        }
+
+        /* 表格容器样式 - 关键修复 */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            position: relative;
+            border-radius: 8px;
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* 数据表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        .data-table th,
+        .data-table td {
+            white-space: nowrap;
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .data-table th {
+            background-color: #fafafa;
+            font-weight: 500;
+            color: #666;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #fafafa;
+        }
+
+        .text-ellipsis {
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        /* 操作列固定 */
+        .col-operation {
+            position: sticky;
+            right: 0;
+            background-color: #fff;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.05);
+            z-index: 5;
+        }
+
+        .data-table th.col-operation {
+            background-color: #fafafa;
+            z-index: 11;
+        }
+
+        .data-table tbody tr:hover td.col-operation {
+            background-color: #fafafa;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20 flex-shrink-0">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
+            </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-bars"></i>
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-home"></i> 首页
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-desktop"></i> 工作台
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-project-diagram"></i> 流程管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-cogs"></i> 产品工艺
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-shopping-cart"></i> 销售管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-tasks"></i> 项目管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600">
+                    <i class="fas fa-industry"></i> 生产管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-warehouse"></i> 库存管理
+                </a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 text-gray-500 hover:text-blue-600 relative">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>admin-admin</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 左侧边栏 -->
+        <aside class="w-64 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
+            <div class="p-4">
+                <div class="space-y-1">
+                    <div class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium">
+                        <i class="fas fa-ticket-alt w-5"></i>
+                        <span>工单管理</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6 min-w-0">
+
+            <!-- 查询区域 - 项目放在第一位 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 mb-4 flex-shrink-0">
+                <div class="grid grid-cols-4 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">项目</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>请选择 项目</option>
+                            <option>永城基地扩建项目</option>
+                            <option>华南充电器交付项目</option>
+                            <option>新能源电池组试制项目</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">工单编号</label>
+                        <input type="text" placeholder="请输入 工单编号" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">工单名称</label>
+                        <input type="text" placeholder="请输入 工单名称" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">进度</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>请选择 进度</option>
+                            <option>已创建</option>
+                            <option>已下发</option>
+                            <option>执行中</option>
+                            <option>已完成</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">紧急程度</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>请选择 紧急程度</option>
+                            <option>普通</option>
+                            <option>紧急</option>
+                            <option>特急</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button class="btn-primary px-6 py-2 rounded-lg text-sm flex items-center gap-2">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                        <button class="px-6 py-2 rounded-lg text-sm border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors flex items-center gap-2">
+                            <i class="fas fa-trash-alt"></i> 清空
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作按钮区 -->
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2 flex-shrink-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button onclick="showAddModal()" class="btn-primary px-4 py-2 rounded-lg flex items-center gap-2 text-sm cursor-pointer z-30">
+                        <i class="fas fa-plus"></i> 新增
+                    </button>
+                    <button class="px-4 py-2 rounded-lg border border-blue-300 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-file-invoice"></i> 生成采购单
+                    </button>
+                    <button class="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-cogs"></i> 工单工序管理
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:text-blue-600 hover:border-blue-500 transition-colors cursor-pointer" title="设置">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:text-blue-600 hover:border-blue-500 transition-colors cursor-pointer" title="刷新">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据表格区域 - 修复横向滚动 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 table-wrapper flex-shrink-0">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="w-10"><input type="checkbox" class="rounded border-gray-300"></th>
+                            <th class="w-10">#</th>
+                            <th>项目名称</th>
+                            <th>工单编号</th>
+                            <th>工单名称</th>
+                            <th>产品名称</th>
+                            <th>紧急程度</th>
+                            <th>工艺路线</th>
+                            <th>BOM</th>
+                            <th>客户</th>
+                            <th>作业地点</th>
+                            <th>负责人</th>
+                            <th>计划开始</th>
+                            <th>计划完成</th>
+                            <th>进度</th>
+                            <th>备注</th>
+                            <th class="col-operation text-center w-40">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" class="rounded border-gray-300"></td>
+                            <td class="text-gray-600">1</td>
+                            <td class="text-gray-800 font-medium">永城基地扩建项目</td>
+                            <td><span class="link-blue font-medium">T-HHHSCGD2604088</span></td>
+                            <td class="text-gray-800">088-[测试永城]</td>
+                            <td class="text-gray-800">测试永城</td>
+                            <td><span class="status-tag urgency-normal">普通</span></td>
+                            <td class="text-gray-600">标准装配工艺</td>
+                            <td class="text-gray-600">BOM-2024-001</td>
+                            <td class="text-gray-600">充电器公司</td>
+                            <td class="text-gray-600"><span class="text-ellipsis" title="深圳工厂A区">深圳工厂A区</span></td>
+                            <td class="text-gray-600">张经理</td>
+                            <td class="text-gray-600">2024-04-10</td>
+                            <td class="text-gray-600">2024-04-20</td>
+                            <td><span class="status-tag status-created">已创建</span></td>
+                            <td class="text-gray-500"><span class="text-ellipsis" title="首批试制">首批试制</span></td>
+                            <td class="col-operation text-center">
+                                <span class="operate-btn" onclick="editOrder(1)"><i class="fas fa-edit"></i> 编辑</span>
+                                <span class="operate-btn" onclick="deleteOrder(1)"><i class="fas fa-trash-alt"></i> 删除</span>
+                                <span class="operate-btn" onclick="copyOrder(1)"><i class="fas fa-copy"></i> 复制</span>
+                                <span class="operate-btn" onclick="issueTask(1)"><i class="fas fa-paper-plane"></i> 下发</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="rounded border-gray-300"></td>
+                            <td class="text-gray-600">2</td>
+                            <td class="text-gray-800 font-medium">华南充电器交付项目</td>
+                            <td><span class="link-blue font-medium">T-HHHSCGD2604012</span></td>
+                            <td class="text-gray-800">012-测试永城</td>
+                            <td class="text-gray-800">测试永城</td>
+                            <td><span class="status-tag urgency-urgent">紧急</span></td>
+                            <td class="text-gray-600">精密加工工艺</td>
+                            <td class="text-gray-600">BOM-2024-002</td>
+                            <td class="text-gray-600">新能源科技</td>
+                            <td class="text-gray-600"><span class="text-ellipsis" title="东莞工厂B区">东莞工厂B区</span></td>
+                            <td class="text-gray-600">李主管</td>
+                            <td class="text-gray-600">2024-04-08</td>
+                            <td class="text-gray-600">2024-04-15</td>
+                            <td><span class="status-tag status-created">已创建</span></td>
+                            <td class="text-gray-500"><span class="text-ellipsis" title="客户加急">客户加急</span></td>
+                            <td class="col-operation text-center">
+                                <span class="operate-btn" onclick="editOrder(2)"><i class="fas fa-edit"></i> 编辑</span>
+                                <span class="operate-btn" onclick="deleteOrder(2)"><i class="fas fa-trash-alt"></i> 删除</span>
+                                <span class="operate-btn" onclick="copyOrder(2)"><i class="fas fa-copy"></i> 复制</span>
+                                <span class="operate-btn" onclick="issueTask(2)"><i class="fas fa-paper-plane"></i> 下发</span>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #fff2f0;">
+                            <td><input type="checkbox" class="rounded border-gray-300"></td>
+                            <td class="text-gray-600">3</td>
+                            <td class="text-gray-800 font-medium">华南充电器交付项目</td>
+                            <td><span class="link-blue font-medium">T-HHHSCGD2603302</span></td>
+                            <td class="text-gray-800 font-medium">充电器工单</td>
+                            <td class="text-gray-800">充电器</td>
+                            <td><span class="status-tag urgency-critical">特急</span></td>
+                            <td class="text-gray-600">组装测试工艺</td>
+                            <td class="text-gray-600">BOM-2024-003</td>
+                            <td class="text-gray-600">智能设备厂</td>
+                            <td class="text-gray-600"><span class="text-ellipsis" title="苏州工厂C区">苏州工厂C区</span></td>
+                            <td class="text-gray-600">王工程师</td>
+                            <td class="text-gray-600">2024-04-01</td>
+                            <td class="text-gray-600">2024-04-10</td>
+                            <td><span class="status-tag status-executing">执行中</span></td>
+                            <td class="text-gray-500">-</td>
+                            <td class="col-operation text-center">
+                                <span class="operate-btn disabled"><i class="fas fa-edit"></i> 编辑</span>
+                                <span class="operate-btn disabled"><i class="fas fa-trash-alt"></i> 删除</span>
+                                <span class="operate-btn" onclick="copyOrder(3)"><i class="fas fa-copy"></i> 复制</span>
+                                <span class="operate-btn disabled"><i class="fas fa-paper-plane"></i> 下发</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="rounded border-gray-300"></td>
+                            <td class="text-gray-600">4</td>
+                            <td class="text-gray-800 font-medium">新能源电池组试制项目</td>
+                            <td><span class="link-blue font-medium">T-HHHSCGD2603273</span></td>
+                            <td class="text-gray-800">273-111</td>
+                            <td class="text-gray-800">111</td>
+                            <td><span class="status-tag urgency-normal">普通</span></td>
+                            <td class="text-gray-600">表面处理工艺</td>
+                            <td class="text-gray-600">BOM-2024-004</td>
+                            <td class="text-gray-600">新能源科技</td>
+                            <td class="text-gray-600"><span class="text-ellipsis" title="深圳工厂">深圳工厂</span></td>
+                            <td class="text-gray-600">刘班长</td>
+                            <td class="text-gray-600">2024-04-05</td>
+                            <td class="text-gray-600">2024-04-12</td>
+                            <td><span class="status-tag status-executing">执行中</span></td>
+                            <td class="text-gray-500"><span class="text-ellipsis" title="第二批">第二批</span></td>
+                            <td class="col-operation text-center">
+                                <span class="operate-btn disabled"><i class="fas fa-edit"></i> 编辑</span>
+                                <span class="operate-btn disabled"><i class="fas fa-trash-alt"></i> 删除</span>
+                                <span class="operate-btn" onclick="copyOrder(4)"><i class="fas fa-copy"></i> 复制</span>
+                                <span class="operate-btn disabled"><i class="fas fa-paper-plane"></i> 下发</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="rounded border-gray-300"></td>
+                            <td class="text-gray-600">5</td>
+                            <td class="text-gray-800 font-medium">新能源电池组试制项目</td>
+                            <td><span class="link-blue font-medium">T-HHHSCGD2603273-01</span></td>
+                            <td class="text-gray-800">111(1)</td>
+                            <td class="text-gray-800">111</td>
+                            <td><span class="status-tag urgency-urgent">紧急</span></td>
+                            <td class="text-gray-600">标准装配工艺</td>
+                            <td class="text-gray-600">BOM-2024-005</td>
+                            <td class="text-gray-600">智能设备厂</td>
+                            <td class="text-gray-600"><span class="text-ellipsis" title="东莞工厂">东莞工厂</span></td>
+                            <td class="text-gray-600">张经理</td>
+                            <td class="text-gray-600">2024-04-12</td>
+                            <td class="text-gray-600">2024-04-25</td>
+                            <td><span class="status-tag status-created">已创建</span></td>
+                            <td class="text-gray-500"><span class="text-ellipsis" title="备用订单">备用订单</span></td>
+                            <td class="col-operation text-center">
+                                <span class="operate-btn" onclick="editOrder(5)"><i class="fas fa-edit"></i> 编辑</span>
+                                <span class="operate-btn" onclick="deleteOrder(5)"><i class="fas fa-trash-alt"></i> 删除</span>
+                                <span class="operate-btn" onclick="copyOrder(5)"><i class="fas fa-copy"></i> 复制</span>
+                                <span class="operate-btn" onclick="issueTask(5)"><i class="fas fa-paper-plane"></i> 下发</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+                        <!-- 分页 -->
+            <div class="flex items-center justify-end gap-4 mt-4">
+                <div class="flex items-center gap-1">
+                    <span class="text-sm text-gray-600">共 157 条</span>
+                    <select class="border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-blue-500 text-sm bg-white">
+                        <option>10 条/页</option>
+                        <option>20 条/页</option>
+                        <option>50 条/页</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 bg-gray-100 text-gray-400 text-sm cursor-not-allowed" disabled>
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-blue-500 text-white text-sm font-medium">1</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">2</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">3</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">4</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">5</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">6</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm">···</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">16</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-600">前往</span>
+                    <input type="text" value="1" class="w-14 px-3 py-1.5 border border-gray-300 rounded text-center focus:outline-none focus:border-blue-500 text-sm bg-white">
+                    <span class="text-sm text-gray-600">页</span>
+                </div>
+            </div>
+
+</main>
+    </div>
+
+    <!-- 新增工单弹窗 -->
+    <div id="addModal" class="modal">
+        <div class="modal-content fade-in">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800">新增工单</h3>
+                <button onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-5">
+                <!-- 第一行：项目、工单名称 -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="text-red-500 mr-1">*</span>项目
+                        </label>
+                        <select id="projectSelect" class="input-field w-full px-3 py-2.5 rounded-lg text-sm bg-white">
+                            <option value="">请选择项目</option>
+                            <option value="1">永城基地扩建项目</option>
+                            <option value="2">华南充电器交付项目</option>
+                            <option value="3">新能源电池组试制项目</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="text-red-500 mr-1">*</span>工单名称
+                        </label>
+                        <input type="text" id="orderName" placeholder="请输入工单名称" class="input-field w-full px-3 py-2.5 rounded-lg text-sm">
+                    </div>
+                </div>
+
+                <!-- 第二行：产品/服务、紧急程度 -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="text-red-500 mr-1">*</span>产品/服务
+                        </label>
+                        <select id="productSelect" onchange="autoFillInfo()" class="input-field w-full px-3 py-2.5 rounded-lg text-sm bg-white">
+                            <option value="">请选择产品/服务</option>
+                            <option value="1" data-customer="充电器公司" data-location="深圳工厂">充电器-型号A</option>
+                            <option value="2" data-customer="新能源科技" data-location="东莞工厂">电池组-型号B</option>
+                            <option value="3" data-customer="智能设备厂" data-location="苏州工厂">控制板-型号C</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="text-red-500 mr-1">*</span>紧急程度
+                        </label>
+                        <select id="urgencySelect" class="input-field w-full px-3 py-2.5 rounded-lg text-sm bg-white">
+                            <option value="">请选择紧急程度</option>
+                            <option value="normal">普通</option>
+                            <option value="urgent">紧急</option>
+                            <option value="critical">特急</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 第三行：工艺路线、BOM -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="text-red-500 mr-1">*</span>工艺路线
+                        </label>
+                        <select id="processRoute" class="input-field w-full px-3 py-2.5 rounded-lg text-sm bg-white">
+                            <option value="">请选择工艺路线</option>
+                            <option>标准装配工艺</option>
+                            <option>精密加工工艺</option>
+                            <option>表面处理的工艺</option>
+                            <option>组装测试工艺</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="text-red-500 mr-1">*</span>BOM
+                        </label>
+                        <select id="bomSelect" onchange="checkKitting()" class="input-field w-full px-3 py-2.5 rounded-lg text-sm bg-white">
+                            <option value="">请选择BOM</option>
+                            <option value="BOM-2024-001">BOM-2024-001 (充电器-型号A)</option>
+                            <option value="BOM-2024-002">BOM-2024-002 (电池组-型号B)</option>
+                            <option value="BOM-2024-003">BOM-2024-003 (控制板-型号C)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 自动带出信息 -->
+                <div class="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">客户（自动带出）</label>
+                        <input type="text" id="customerName" readonly placeholder="选择项目后自动带出" class="w-full px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-gray-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            作业地点 <span class="text-gray-400 text-xs">（可修改）</span>
+                        </label>
+                        <input type="text" id="deliveryLocation" placeholder="选择项目后自动带出" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                </div>
+
+                <!-- 负责人和日期 -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="text-red-500 mr-1">*</span>负责人
+                        </label>
+                        <select id="managerSelect" class="input-field w-full px-3 py-2.5 rounded-lg text-sm bg-white">
+                            <option value="">请选择负责人</option>
+                            <option>张经理</option>
+                            <option>李主管</option>
+                            <option>王工程师</option>
+                            <option>刘班长</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <span class="text-red-500 mr-1">*</span>计划开始
+                            </label>
+                            <input type="date" id="startDate" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <span class="text-red-500 mr-1">*</span>计划完成
+                            </label>
+                            <input type="date" id="endDate" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 备注 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">备注</label>
+                    <textarea id="remarkText" rows="2" placeholder="请输入备注信息" class="input-field w-full px-3 py-2 rounded-lg text-sm resize-none"></textarea>
+                </div>
+
+                <!-- 物料齐套检查区域 -->
+                <div id="kittingCheckSection" class="kitting-check" style="display: none;">
+                    <div class="kitting-title">
+                        <i class="fas fa-boxes mr-2 text-blue-600"></i>物料齐套检查
+                    </div>
+                    <div id="kittingContent">
+                        <!-- 动态生成齐套检查结果 -->
+                    </div>
+                    <div class="kitting-actions">
+                        <button class="btn-warning px-4 py-2 rounded-lg text-sm flex items-center gap-2 cursor-pointer" onclick="generatePurchaseOrder()">
+                            <i class="fas fa-exclamation-triangle"></i> 生成采购单
+                        </button>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <button onclick="closeAddModal()" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors text-sm cursor-pointer">
+                    取消
+                </button>
+                <button onclick="saveOrder()" class="btn-primary px-5 py-2 rounded-lg text-sm flex items-center gap-2 cursor-pointer">
+                    <i class="fas fa-save"></i> 保存生成工单
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // BOM物料数据模拟
+        const bomMaterials = {
+            'BOM-2024-001': [
+                { name: '物料 A', required: 100, stock: 150 },
+                { name: '物料 B', required: 50, stock: 30 },
+                { name: '物料 C', required: 80, stock: 100 }
+            ],
+            'BOM-2024-002': [
+                { name: '锂电池芯', required: 200, stock: 180 },
+                { name: '保护板', required: 50, stock: 60 },
+                { name: '外壳组件', required: 50, stock: 20 }
+            ],
+            'BOM-2024-003': [
+                { name: 'PCB板', required: 100, stock: 120 },
+                { name: '芯片组', required: 100, stock: 100 },
+                { name: '电容电阻', required: 500, stock: 800 }
+            ]
+        };
+
+        // 显示新增弹窗
+        function showAddModal() {
+            document.getElementById('addModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            // 重置表单
+            document.getElementById('projectSelect').value = '';
+            document.getElementById('orderName').value = '';
+            document.getElementById('productSelect').value = '';
+            document.getElementById('urgencySelect').value = '';
+            document.getElementById('processRoute').value = '';
+            document.getElementById('bomSelect').value = '';
+            document.getElementById('customerName').value = '';
+            document.getElementById('deliveryLocation').value = '';
+            document.getElementById('managerSelect').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('remarkText').value = '';
+            document.getElementById('kittingCheckSection').style.display = 'none';
+        }
+
+        // 关闭新增弹窗
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // 自动带出客户和地点
+        function autoFillInfo() {
+            const select = document.getElementById('productSelect');
+            const option = select.options[select.selectedIndex];
+            if (option.value) {
+                document.getElementById('customerName').value = option.getAttribute('data-customer') || '';
+                document.getElementById('deliveryLocation').value = option.getAttribute('data-location') || '';
+            } else {
+                document.getElementById('customerName').value = '';
+                document.getElementById('deliveryLocation').value = '';
+            }
+            checkKitting();
+        }
+
+        // 齐套性检查
+        function checkKitting() {
+            const bomSelect = document.getElementById('bomSelect');
+            const bomValue = bomSelect.value;
+            const kittingSection = document.getElementById('kittingCheckSection');
+            const kittingContent = document.getElementById('kittingContent');
+
+            if (!bomValue) {
+                kittingSection.style.display = 'none';
+                return;
+            }
+
+            const materials = bomMaterials[bomValue] || [];
+            let html = '';
+            let allSufficient = true;
+
+            materials.forEach(material => {
+                const isSufficient = material.stock >= material.required;
+                if (!isSufficient) allSufficient = false;
+
+                const statusClass = isSufficient ? 'kitting-status-sufficient' : 'kitting-status-insufficient';
+                const icon = isSufficient ? 'fa-check-circle' : 'fa-exclamation-triangle';
+                const text = isSufficient ? `库存充足 (${material.stock} 件)` : `库存不足 (${material.stock} 件)`;
+                const shortage = material.required - material.stock;
+
+                html += `
+                    <div class="kitting-item">
+                        <span class="text-gray-700 font-medium">${material.name} - 需要 ${material.required} 件</span>
+                        <div class="flex items-center gap-2">
+                            ${!isSufficient ? `<span class="text-xs text-red-500 mr-2">缺 ${shortage} 件</span>` : ''}
+                            <span class="${statusClass}">
+                                <i class="fas ${icon}"></i> ${text}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const summaryClass = allSufficient ? 'text-green-600' : 'text-yellow-600';
+            const summaryText = allSufficient ? '✓ 物料齐全' : '⚠ 物料不齐，建议生成采购单';
+            html += `
+                <div class="mt-3 p-2 bg-white rounded border ${allSufficient ? 'border-green-200' : 'border-yellow-200'} text-center text-sm font-medium ${summaryClass}">
+                    ${summaryText}
+                </div>
+            `;
+
+            kittingContent.innerHTML = html;
+            kittingSection.style.display = 'block';
+        }
+
+        // 生成采购单
+        function generatePurchaseOrder() {
+            alert('已生成采购申请单，请前往采购管理查看！');
+        }
+
+        // 确认排程
+        function confirmSchedule() {
+            const bomSelect = document.getElementById('bomSelect');
+            const materials = bomMaterials[bomSelect.value] || [];
+            const allSufficient = materials.every(m => m.stock >= m.required);
+
+            if (!allSufficient) {
+                if (!confirm('物料库存不足，是否仍要确认排程？')) {
+                    return;
+                }
+            }
+            alert('排程已确认！');
+        }
+
+        // 保存工单
+        function saveOrder() {
+            const project = document.getElementById('projectSelect').value;
+            const orderName = document.getElementById('orderName').value;
+            const product = document.getElementById('productSelect').value;
+            const urgency = document.getElementById('urgencySelect').value;
+            const bom = document.getElementById('bomSelect').value;
+
+            if (!project) {
+                alert('请选择项目');
+                return;
+            }
+            if (!orderName) {
+                alert('请输入工单名称');
+                return;
+            }
+            if (!product) {
+                alert('请选择产品/服务');
+                return;
+            }
+            if (!urgency) {
+                alert('请选择紧急程度');
+                return;
+            }
+            if (!bom) {
+                alert('请选择BOM');
+                return;
+            }
+
+            alert('工单创建成功！\n\n工单编号：T-HHHSCGD2604089\n状态：已创建\n齐套检查：已完成\n\n请前往工单列表查看。');
+            closeAddModal();
+        }
+
+        // 编辑工单
+        function editOrder(id) {
+            alert('编辑工单：' + id);
+        }
+
+        // 删除工单
+        function deleteOrder(id) {
+            if (confirm('确定要删除该工单吗？')) {
+                alert('工单 ' + id + ' 已删除');
+            }
+        }
+
+        // 复制工单
+        function copyOrder(id) {
+            alert('已复制工单 ' + id + '，请修改后保存');
+        }
+
+        // 下发任务
+        function issueTask(id) {
+            if (confirm('确定要下发该工单任务吗？')) {
+                alert('工单 ' + id + ' 已下发，状态变为"已下发"');
+            }
+        }
+
+        // 点击弹窗外部关闭
+        document.getElementById('addModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddModal();
+            }
+        });
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAddModal();
+            }
+        });
+    </script>
+</body>
+</html>

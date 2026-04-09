@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 人才管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar-item {
+            transition: all 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .sidebar-item.active {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .input-field {
+            transition: all 0.3s;
+            border: 1px solid #d9d9d9;
+            background-color: #fff;
+        }
+
+        .input-field:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #40a9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24,144,255,0.4);
+        }
+
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .cert-valid {
+            background-color: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .cert-warning {
+            background-color: #fffbe6;
+            color: #faad14;
+            border: 1px solid #ffe58f;
+        }
+
+        .cert-expired {
+            background-color: #fff1f0;
+            color: #ff4d4f;
+            border: 1px solid #ffa39e;
+        }
+
+        .link-blue {
+            color: #1890ff;
+            cursor: pointer;
+        }
+
+        .link-blue:hover {
+            color: #40a9ff;
+            text-decoration: underline;
+        }
+
+        /* 统计卡片样式 */
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-icon.blue { background-color: #e6f7ff; color: #1890ff; }
+        .stat-icon.orange { background-color: #fff7e6; color: #fa8c16; }
+        .stat-icon.red { background-color: #fff1f0; color: #ff4d4f; }
+        .stat-icon.green { background-color: #f6ffed; color: #52c41a; }
+
+        .stat-content { flex: 1; }
+        .stat-title { font-size: 14px; color: #666; margin-bottom: 4px; }
+        .stat-value { font-size: 28px; font-weight: 600; color: #262626; }
+
+        /* 表格样式 */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            position: relative;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1400px;
+        }
+
+        .data-table th,
+        .data-table td {
+            white-space: nowrap;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .data-table th {
+            background-color: #fafafa;
+            font-weight: 500;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #fafafa;
+        }
+
+        .operate-btn {
+            color: #1890ff;
+            cursor: pointer;
+            margin-right: 12px;
+            font-size: 13px;
+        }
+
+        .operate-btn:hover { color: #40a9ff; }
+
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        .modal.show { display: flex; }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 960px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            margin: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tab导航样式 */
+        .modal-tabs {
+            display: flex;
+            border-bottom: 1px solid #f0f0f0;
+            background-color: #fafafa;
+            padding: 0 24px;
+            flex-shrink: 0;
+        }
+
+        .modal-tab {
+            padding: 14px 20px;
+            cursor: pointer;
+            color: #666;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .modal-tab:hover {
+            color: #1890ff;
+        }
+
+        .modal-tab.active {
+            color: #1890ff;
+            border-bottom-color: #1890ff;
+            background-color: #fff;
+            margin-bottom: -1px;
+        }
+
+        .modal-tab .badge {
+            position: absolute;
+            top: 8px;
+            right: 4px;
+            background-color: #ff4d4f;
+            color: white;
+            font-size: 10px;
+            padding: 0 6px;
+            border-radius: 10px;
+            line-height: 16px;
+        }
+
+        /* Tab内容区 */
+        .tab-content {
+            display: none;
+            padding: 24px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 表单项 */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .form-label .required {
+            color: #ff4d4f;
+            margin-right: 4px;
+        }
+
+        /* 证书列表 */
+        .cert-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #fafafa;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .cert-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-icon.edit {
+            background-color: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .btn-icon.delete {
+            background-color: #fff1f0;
+            color: #ff4d4f;
+        }
+
+        .btn-icon:hover {
+            opacity: 0.8;
+        }
+
+        /* 头像上传 */
+        .avatar-upload {
+            width: 100px;
+            height: 100px;
+            border: 2px dashed #d9d9d9;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #fafafa;
+        }
+
+        .avatar-upload:hover {
+            border-color: #1890ff;
+            background-color: #e6f7ff;
+        }
+
+        /* 切换开关 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 22px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #1890ff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        /* 详情视图 */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .detail-item {
+            background: #fafafa;
+            padding: 12px 16px;
+            border-radius: 6px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: #262626;
+            font-weight: 500;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #d9d9d9;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20 flex-shrink-0">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
+            </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-bars"></i></a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-home"></i> 首页</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-desktop"></i> 工作台</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-project-diagram"></i> 流程管理</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-cogs"></i> 产品工艺</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-shopping-cart"></i> 销售管理</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-tasks"></i> 项目管理</a>
+                <a href="#" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600"><i class="fas fa-industry"></i> 生产管理</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-warehouse"></i> 库存管理</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 text-gray-500 hover:text-blue-600 relative">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>admin-admin</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 左侧边栏 -->
+        <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
+            <div class="p-4">
+                <div class="space-y-1">
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600">
+                        <i class="fas fa-ticket-alt w-5"></i>
+                        <span>工单管理</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600">
+                        <i class="fas fa-tasks w-5"></i>
+                        <span>任务管理</span>
+                    </div>
+                    <div class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium">
+                        <i class="fas fa-user-tie w-5"></i>
+                        <span>人才管理</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6 min-w-0">
+
+            <!-- 统计卡片区域 -->
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">人才总数</div>
+                        <div class="stat-value">128</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">在职员工</div>
+                        <div class="stat-value">96</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">试用期</div>
+                        <div class="stat-value">12</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">证书异常</div>
+                        <div class="stat-value">3</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 查询区域 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 mb-4">
+                <div class="grid grid-cols-4 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">姓名/工号</label>
+                        <input type="text" placeholder="请输入姓名或工号" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">身份证号</label>
+                        <input type="text" placeholder="请输入身份证号" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">部门</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>请选择部门</option>
+                            <option>生产部</option>
+                            <option>技术部</option>
+                            <option>质量部</option>
+                            <option>安全部</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">岗位</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>请选择岗位</option>
+                            <option>工程师</option>
+                            <option>技术员</option>
+                            <option>操作工</option>
+                            <option>焊工</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">人员状态</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>请选择状态</option>
+                            <option>在职</option>
+                            <option>试用期</option>
+                            <option>离职</option>
+                            <option>停用</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">证书状态</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>请选择证书状态</option>
+                            <option>正常</option>
+                            <option>即将到期</option>
+                            <option>已过期</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button class="btn-primary px-6 py-2 rounded-lg text-sm flex items-center gap-2">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                        <button class="px-6 py-2 rounded-lg text-sm border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors flex items-center gap-2">
+                            <i class="fas fa-trash-alt"></i> 清空
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作按钮区 -->
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button onclick="showAddModal()" class="btn-primary px-4 py-2 rounded-lg flex items-center gap-2 text-sm cursor-pointer">
+                        <i class="fas fa-plus"></i> 新增人才
+                    </button>
+                    <button class="px-4 py-2 rounded-lg border border-blue-500 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-file-import"></i> 导入
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="table-wrapper shadow-sm border border-gray-100">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="w-10"><input type="checkbox" class="rounded border-gray-300"></th>
+                            <th class="w-10">#</th>
+                            <th>姓名</th>
+                            <th>工号</th>
+                            <th>性别</th>
+                            <th>部门</th>
+                            <th>岗位</th>
+                            <th>人员状态</th>
+                            <th>入职日期</th>
+                            <th>证书数量</th>
+                            <th>证书状态</th>
+                            <th class="text-center w-24">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" class="rounded border-gray-300"></td>
+                            <td class="text-gray-600">1</td>
+                            <td><span class="font-medium text-gray-800 link-blue" onclick="viewDetail(1)">张伟</span></td>
+                            <td class="text-gray-600">EMP2024001</td>
+                            <td class="text-gray-600">男</td>
+                            <td class="text-gray-800">技术部</td>
+                            <td class="text-gray-600">工程师</td>
+                            <td><span class="status-tag cert-valid">在职</span></td>
+                            <td class="text-gray-600">2023-01-15</td>
+                            <td class="text-gray-600">2</td>
+                            <td><span class="status-tag cert-valid">正常</span></td>
+                            <td class="text-center">
+                                <span class="operate-btn" onclick="viewDetail(1)"><i class="fas fa-eye"></i></span>
+                                <span class="operate-btn" onclick="editTalent(1)"><i class="fas fa-edit"></i></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="rounded border-gray-300"></td>
+                            <td class="text-gray-600">2</td>
+                            <td><span class="font-medium text-gray-800 link-blue" onclick="viewDetail(2)">李芳</span></td>
+                            <td class="text-gray-600">EMP2024002</td>
+                            <td class="text-gray-600">女</td>
+                            <td class="text-gray-800">安全部</td>
+                            <td class="text-gray-600">安全员</td>
+                            <td><span class="status-tag cert-warning">试用期</span></td>
+                            <td class="text-gray-600">2024-03-01</td>
+                            <td class="text-gray-600">1</td>
+                            <td><span class="status-tag cert-warning">即将到期</span></td>
+                            <td class="text-center">
+                                <span class="operate-btn" onclick="viewDetail(2)"><i class="fas fa-eye"></i></span>
+                                <span class="operate-btn" onclick="editTalent(2)"><i class="fas fa-edit"></i></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="rounded border-gray-300"></td>
+                            <td class="text-gray-600">3</td>
+                            <td><span class="font-medium text-gray-800 link-blue" onclick="viewDetail(3)">王强</span></td>
+                            <td class="text-gray-600">EMP2023003</td>
+                            <td class="text-gray-600">男</td>
+                            <td class="text-gray-800">生产部</td>
+                            <td class="text-gray-600">焊工</td>
+                            <td><span class="status-tag cert-valid">在职</span></td>
+                            <td class="text-gray-600">2021-03-12</td>
+                            <td class="text-gray-600">2</td>
+                            <td><span class="status-tag cert-expired">已过期</span></td>
+                            <td class="text-center">
+                                <span class="operate-btn" onclick="viewDetail(3)"><i class="fas fa-eye"></i></span>
+                                <span class="operate-btn" onclick="editTalent(3)"><i class="fas fa-edit"></i></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页 -->
+            <div class="flex items-center justify-end gap-4 mt-4">
+                <div class="flex items-center gap-1">
+                    <span class="text-sm text-gray-600">共 128 条</span>
+                    <select class="border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-blue-500 text-sm bg-white">
+                        <option>10 条/页</option>
+                        <option>20 条/页</option>
+                        <option>50 条/页</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 bg-gray-100 text-gray-400 text-sm cursor-not-allowed" disabled>
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-blue-500 text-white text-sm font-medium">1</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">2</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">3</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">4</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">5</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">6</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm">···</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">26</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-gray-100 text-gray-600 text-sm hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-600">前往</span>
+                    <input type="text" value="1" class="w-14 px-3 py-1.5 border border-gray-300 rounded text-center focus:outline-none focus:border-blue-500 text-sm bg-white">
+                    <span class="text-sm text-gray-600">页</span>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- 新增/编辑人才弹窗 - Tab分页版 -->
+    <div id="talentModal" class="modal">
+        <div class="modal-content fade-in">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+                <h3 class="text-lg font-bold text-gray-800" id="modalTitle">新增人才</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Tab导航 -->
+            <div class="modal-tabs">
+                <div class="modal-tab active" onclick="switchTab('basic')">基础信息</div>
+                <div class="modal-tab" onclick="switchTab('org')">组织信息</div>
+                <div class="modal-tab" onclick="switchTab('contract')">合同与用工</div>
+                <div class="modal-tab" onclick="switchTab('salary')">薪资信息</div>
+                <div class="modal-tab" onclick="switchTab('cert')">
+                    资质与证书
+                    <span class="badge" id="certBadge" style="display: none;">0</span>
+                </div>
+                <div class="modal-tab" onclick="switchTab('other')">附件与备注</div>
+            </div>
+
+            <div class="modal-body">
+                <!-- Tab 1: 基础信息 -->
+                <div id="tab-basic" class="tab-content active">
+                    <div class="flex gap-6 mb-6">
+                        <div class="flex-shrink-0">
+                            <label class="block text-sm text-gray-600 mb-2 text-center">个人照片</label>
+                            <div class="avatar-upload" onclick="document.getElementById('photoInput').click()">
+                                <i class="fas fa-camera text-gray-400 text-xl mb-1"></i>
+                                <span class="text-xs text-gray-400">点击上传</span>
+                            </div>
+                            <input type="file" id="photoInput" style="display: none;" accept="image/*">
+                        </div>
+                        <div class="flex-1">
+                            <div class="form-row">
+                                <div class="form-item">
+                                    <label class="form-label">工号 <span class="text-gray-400">(非必填)</span></label>
+                                    <input type="text" placeholder="系统自动生成" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-gray-50" disabled>
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label"><span class="required">*</span>姓名</label>
+                                    <input type="text" id="t_name" placeholder="请输入姓名" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label"><span class="required">*</span>性别</label>
+                                    <select id="t_gender" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                                        <option value="">请选择</option>
+                                        <option>男</option>
+                                        <option>女</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-item">
+                                    <label class="form-label"><span class="required">*</span>身份证号</label>
+                                    <input type="text" id="t_idcard" placeholder="请输入身份证号" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label"><span class="required">*</span>出生日期</label>
+                                    <input type="date" id="t_birth" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label"><span class="required">*</span>手机号</label>
+                                    <input type="tel" id="t_phone" placeholder="请输入手机号" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-item">
+                                    <label class="form-label">邮箱</label>
+                                    <input type="email" id="t_email" placeholder="请输入邮箱" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label"><span class="required">*</span>入职日期</label>
+                                    <input type="date" id="t_entry" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                                </div>
+                                <div class="form-item">
+                                    <label class="form-label"><span class="required">*</span>人员状态</label>
+                                    <select id="t_status" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                                        <option>在职</option>
+                                        <option>试用期</option>
+                                        <option>离职</option>
+                                        <option>停用</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-item">
+                                    <label class="form-label">离职日期</label>
+                                    <input type="date" id="t_leave" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                                </div>
+                                <div class="form-item"></div>
+                                <div class="form-item"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: 组织信息 -->
+                <div id="tab-org" class="tab-content">
+                    <div class="form-row">
+                        <div class="form-item">
+                            <label class="form-label"><span class="required">*</span>部门</label>
+                            <select id="t_dept" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                                <option value="">请选择部门</option>
+                                <option>生产部</option>
+                                <option>技术部</option>
+                                <option>质量部</option>
+                                <option>安全部</option>
+                                <option>设备部</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label"><span class="required">*</span>岗位</label>
+                            <select id="t_post" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                                <option value="">请选择岗位</option>
+                                <option>工程师</option>
+                                <option>技术员</option>
+                                <option>操作工</option>
+                                <option>焊工</option>
+                                <option>质检员</option>
+                                <option>安全员</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">直属上级</label>
+                            <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                                <option value="">请选择</option>
+                                <option>张经理</option>
+                                <option>李主管</option>
+                                <option>王主任</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-item">
+                            <label class="form-label"><span class="required">*</span>编制类型</label>
+                            <select id="t_type" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                                <option>正式</option>
+                                <option>外包</option>
+                                <option>兼职</option>
+                                <option>实习</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">工种</label>
+                            <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                                <option value="">请选择工种</option>
+                                <option>焊工</option>
+                                <option>电工</option>
+                                <option>操作工</option>
+                                <option>装配工</option>
+                                <option>质检工</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">技能等级</label>
+                            <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                                <option value="">请选择</option>
+                                <option>初级</option>
+                                <option>中级</option>
+                                <option>高级</option>
+                                <option>技师</option>
+                                <option>高级技师</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-item">
+                            <label class="form-label">是否具备上岗资格</label>
+                            <div class="flex items-center gap-3 mt-2">
+                                <label class="switch">
+                                    <input type="checkbox" id="t_qualified" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="text-sm text-gray-600" id="qualifyText">已具备</span>
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">是否可登录系统</label>
+                            <div class="flex items-center gap-3 mt-2">
+                                <label class="switch">
+                                    <input type="checkbox" id="t_login" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="text-sm text-gray-600" id="loginText">允许登录</span>
+                            </div>
+                        </div>
+                        <div class="form-item"></div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: 联系方式 -->
+                <div id="tab-contact" class="tab-content">
+                    <div class="form-row">
+                        <div class="form-item">
+                            <label class="form-label">紧急联系人</label>
+                            <input type="text" placeholder="请输入紧急联系人姓名" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">紧急联系人电话</label>
+                            <input type="tel" placeholder="请输入联系电话" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div class="form-item"></div>
+                    </div>
+                    <div class="form-row" style="grid-template-columns: 1fr;">
+                        <div class="form-item">
+                            <label class="form-label">家庭住址</label>
+                            <input type="text" placeholder="请输入家庭住址" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="form-row" style="grid-template-columns: 1fr;">
+                        <div class="form-item">
+                            <label class="form-label">通讯地址</label>
+                            <input type="text" placeholder="请输入通讯地址（可同家庭住址）" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: 合同与用工 -->
+                <div id="tab-contract" class="tab-content">
+                    <div class="form-row">
+                        <div class="form-item">
+                            <label class="form-label"><span class="required">*</span>合同类型</label>
+                            <select id="t_contract_type" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                                <option>劳动合同</option>
+                                <option>劳务合同</option>
+                                <option>外包合同</option>
+                                <option>实习协议</option>
+                            </select>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label"><span class="required">*</span>合同开始时间</label>
+                            <input type="date" id="t_contract_start" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label"><span class="required">*</span>合同结束时间</label>
+                            <input type="date" id="t_contract_end" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-item">
+                            <label class="form-label">试用期开始</label>
+                            <input type="date" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">试用期结束</label>
+                            <input type="date" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div class="form-item"></div>
+                    </div>
+                    <div class="form-row" style="grid-template-columns: 1fr;">
+                        <div class="form-item">
+                            <label class="form-label">合同附件</label>
+                            <div class="flex items-center gap-2 mt-1">
+                                <input type="file" class="input-field flex-1 px-3 py-2 rounded-lg text-sm text-xs">
+                                <button class="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm hover:bg-blue-100">
+                                    <i class="fas fa-upload"></i> 上传
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">支持 PDF、Word、图片格式，单个文件不超过10MB</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 5: 薪资信息 -->
+                <div id="tab-salary" class="tab-content">
+                    <div class="form-row">
+                        <div class="form-item">
+                            <label class="form-label">银行卡号</label>
+                            <input type="text" placeholder="请输入银行卡号" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">开户行</label>
+                            <input type="text" placeholder="请输入开户行名称" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">开户人姓名</label>
+                            <input type="text" placeholder="请输入开户人姓名" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <div class="flex items-start gap-2 text-sm text-blue-700">
+                            <i class="fas fa-info-circle mt-0.5"></i>
+                            <div>
+                                <p class="font-medium">薪资信息说明</p>
+                                <p class="text-blue-600 mt-1">详细薪资结构（基本工资、绩效、补贴等）请在【薪资管理】模块中维护。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 6: 资质与证书 -->
+                <div id="tab-cert" class="tab-content">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="text-sm text-gray-600">
+                            已添加 <span class="font-bold text-blue-600" id="certCount">0</span> 个证书
+                        </div>
+                        <button onclick="showAddCertForm()" class="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm flex items-center gap-2 hover:bg-blue-100 transition-colors">
+                            <i class="fas fa-plus"></i> 添加证书
+                        </button>
+                    </div>
+
+                    <!-- 证书列表 -->
+                    <div id="certListContainer">
+                        <div class="cert-list-item">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-800">特种作业操作证（电工）</div>
+                                    <div class="text-xs text-gray-500 mt-1">证书编号：T31010120240001 | 发证机关：应急管理局</div>
+                                    <div class="text-xs text-gray-500">有效期：2024-01-15 至 2030-01-14</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="status-tag cert-valid">正常</span>
+                                <div class="cert-actions">
+                                    <button class="btn-icon edit"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-icon delete" onclick="deleteCert(this)"><i class="fas fa-trash-alt"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 添加证书表单 -->
+                    <div id="addCertForm" class="mt-4 p-4 border border-blue-200 rounded-lg bg-blue-50" style="display: none;">
+                        <div class="font-medium text-gray-800 mb-3">添加证书</div>
+                        <div class="form-row">
+                            <div class="form-item">
+                                <label class="form-label"><span class="required">*</span>证书名称</label>
+                                <select id="certName" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                                    <option value="">请选择</option>
+                                    <option>特种作业操作证（电工）</option>
+                                    <option>特种作业操作证（焊工）</option>
+                                    <option>特种作业操作证（高空作业）</option>
+                                    <option>特种设备作业证（叉车）</option>
+                                    <option>特种设备作业证（起重机械）</option>
+                                    <option>安全生产考核合格证（安全员A证）</option>
+                                    <option>安全生产考核合格证（安全员B证）</option>
+                                    <option>安全生产考核合格证（安全员C证）</option>
+                                    <option>职业资格证书（初级）</option>
+                                    <option>职业资格证书（中级）</option>
+                                    <option>职业资格证书（高级）</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label"><span class="required">*</span>证书编号</label>
+                                <input type="text" id="certNo" placeholder="请输入证书编号" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label"><span class="required">*</span>发证机关</label>
+                                <input type="text" id="certOrg" placeholder="如：应急管理局" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-item">
+                                <label class="form-label"><span class="required">*</span>发证日期</label>
+                                <input type="date" id="certIssue" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label"><span class="required">*</span>有效期至</label>
+                                <input type="date" id="certExpire" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">证书附件</label>
+                                <input type="file" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white text-xs">
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-2 mt-4">
+                            <button onclick="cancelAddCert()" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-white text-sm">取消</button>
+                            <button onclick="saveNewCert()" class="btn-primary px-4 py-2 rounded-lg text-sm">保存证书</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 7: 附件与备注 -->
+                <div id="tab-other" class="tab-content">
+                    <div class="form-row" style="grid-template-columns: repeat(2, 1fr);">
+                        <div class="form-item">
+                            <label class="form-label">身份证扫描件（正面）</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer bg-gray-50">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-sm text-gray-600">点击上传或拖拽文件到此处</p>
+                                <p class="text-xs text-gray-400 mt-1">支持 JPG、PNG、PDF 格式</p>
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <label class="form-label">身份证扫描件（反面）</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer bg-gray-50">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-sm text-gray-600">点击上传或拖拽文件到此处</p>
+                                <p class="text-xs text-gray-400 mt-1">支持 JPG、PNG、PDF 格式</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row" style="grid-template-columns: 1fr;">
+                        <div class="form-item">
+                            <label class="form-label">其他附件</label>
+                            <input type="file" multiple class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                            <p class="text-xs text-gray-400 mt-1">可上传学历证明、离职证明等其他材料</p>
+                        </div>
+                    </div>
+                    <div class="form-row" style="grid-template-columns: 1fr;">
+                        <div class="form-item">
+                            <label class="form-label">备注</label>
+                            <textarea id="t_remark" rows="4" placeholder="请输入备注信息..." class="input-field w-full px-3 py-2 rounded-lg text-sm resize-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
+                <div class="text-sm text-gray-500">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    带 <span class="text-red-500">*</span> 的为必填项
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="closeModal()" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-white transition-colors text-sm cursor-pointer">
+                        取消
+                    </button>
+                    <button onclick="saveTalent()" class="btn-primary px-5 py-2 rounded-lg text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-save"></i> 保存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 查看详情弹窗 -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content fade-in" style="max-width: 800px;">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">张</div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">张伟</h3>
+                        <p class="text-sm text-gray-500">工号：EMP2024001 | 技术部-工程师</p>
+                    </div>
+                </div>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <div class="modal-tabs">
+                <div class="modal-tab active" onclick="switchDetailTab('d-basic')">基础信息</div>
+                <div class="modal-tab" onclick="switchDetailTab('d-org')">组织信息</div>
+                <div class="modal-tab" onclick="switchDetailTab('d-contract')">合同信息</div>
+                <div class="modal-tab" onclick="switchDetailTab('d-cert')">资质证书 <span class="badge">2</span></div>
+            </div>
+
+            <div class="modal-body p-6">
+                <!-- 详情-基础信息 -->
+                <div id="d-tab-basic" class="tab-content active">
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">姓名</div>
+                            <div class="detail-value">张伟</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">性别</div>
+                            <div class="detail-value">男</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">出生日期</div>
+                            <div class="detail-value">1990-01-01</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">身份证号</div>
+                            <div class="detail-value">310101199001011234</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">手机号</div>
+                            <div class="detail-value">13800138000</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">邮箱</div>
+                            <div class="detail-value">zhangwei@example.com</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">入职日期</div>
+                            <div class="detail-value">2023-01-15</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">人员状态</div>
+                            <div class="detail-value"><span class="status-tag cert-valid">在职</span></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">员工编号</div>
+                            <div class="detail-value">EMP2024001</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 详情-组织信息 -->
+                <div id="d-tab-org" class="tab-content">
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">部门</div>
+                            <div class="detail-value">技术部</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">岗位</div>
+                            <div class="detail-value">工程师</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">直属上级</div>
+                            <div class="detail-value">张经理</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">编制类型</div>
+                            <div class="detail-value">正式</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">工种</div>
+                            <div class="detail-value">电工</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">技能等级</div>
+                            <div class="detail-value">高级</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">上岗资格</div>
+                            <div class="detail-value"><i class="fas fa-check-circle text-green-500"></i> 已具备</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">系统登录</div>
+                            <div class="detail-value"><i class="fas fa-check-circle text-green-500"></i> 允许登录</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 详情-合同信息 -->
+                <div id="d-tab-contract" class="tab-content">
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">合同类型</div>
+                            <div class="detail-value">劳动合同</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">合同开始</div>
+                            <div class="detail-value">2023-01-15</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">合同结束</div>
+                            <div class="detail-value text-orange-600">2026-01-14</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">试用期开始</div>
+                            <div class="detail-value">2023-01-15</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">试用期结束</div>
+                            <div class="detail-value">2023-04-14</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">合同附件</div>
+                            <div class="detail-value"><a href="#" class="link-blue"><i class="fas fa-file-pdf"></i> 劳动合同.pdf</a></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">银行卡号</div>
+                            <div class="detail-value">6222 0222 0000 1234 567</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">开户行</div>
+                            <div class="detail-value">中国工商银行</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">开户人</div>
+                            <div class="detail-value">张伟</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 详情-资质证书 -->
+                <div id="d-tab-cert" class="tab-content">
+                    <div class="space-y-3">
+                        <div class="cert-list-item" style="background: white; border: 1px solid #e8e8e8;">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xl">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-800 text-base">特种作业操作证（电工）</div>
+                                    <div class="text-sm text-gray-500 mt-1">证书编号：T31010120240001</div>
+                                    <div class="text-sm text-gray-500">发证机关：应急管理局 | 发证日期：2024-01-15</div>
+                                    <div class="text-sm text-gray-500">有效期至：2030-01-14</div>
+                                </div>
+                            </div>
+                            <span class="status-tag cert-valid" style="padding: 4px 12px; font-size: 13px;">正常</span>
+                        </div>
+                        <div class="cert-list-item" style="background: white; border: 1px solid #e8e8e8;">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xl">
+                                    <i class="fas fa-fire"></i>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-800 text-base">特种作业操作证（焊工）</div>
+                                    <div class="text-sm text-gray-500 mt-1">证书编号：T31010120230002</div>
+                                    <div class="text-sm text-gray-500">发证机关：应急管理局 | 发证日期：2023-06-01</div>
+                                    <div class="text-sm text-gray-500">有效期至：2029-05-31</div>
+                                </div>
+                            </div>
+                            <span class="status-tag cert-valid" style="padding: 4px 12px; font-size: 13px;">正常</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <button onclick="closeDetailModal()" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-white transition-colors text-sm cursor-pointer">
+                    关闭
+                </button>
+                <button onclick="editFromDetail()" class="btn-primary px-5 py-2 rounded-lg text-sm flex items-center gap-2 cursor-pointer">
+                    <i class="fas fa-edit"></i> 编辑
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'basic';
+        let certCount = 0;
+
+        // Tab切换
+        function switchTab(tabName) {
+            // 隐藏所有tab内容
+            document.querySelectorAll('.tab-content').forEach(el => {
+                if (el.parentElement.classList.contains('modal-body')) {
+                    el.classList.remove('active');
+                }
+            });
+            // 移除所有tab激活状态
+            document.querySelectorAll('.modal-tab').forEach(el => {
+                el.classList.remove('active');
+            });
+            // 激活当前tab
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.target.classList.add('active');
+            currentTab = tabName;
+        }
+
+        // 详情Tab切换
+        function switchDetailTab(tabName) {
+            document.querySelectorAll('#detailModal .tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('#detailModal .modal-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName.replace('d-', 'd-tab-')).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 显示新增弹窗
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = '新增人才';
+            document.getElementById('talentModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            resetForm();
+        }
+
+        // 编辑人才
+        function editTalent(id) {
+            document.getElementById('modalTitle').textContent = '编辑人才';
+            document.getElementById('talentModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            // 模拟填充数据
+            document.getElementById('t_name').value = '张伟';
+            document.getElementById('t_gender').value = '男';
+            document.getElementById('t_idcard').value = '310101199001011234';
+        }
+
+        // 查看详情
+        function viewDetail(id) {
+            document.getElementById('detailModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('talentModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // 从详情页编辑
+        function editFromDetail() {
+            closeDetailModal();
+            editTalent(1);
+        }
+
+        // 重置表单
+        function resetForm() {
+            document.querySelectorAll('.tab-content.active input').forEach(el => {
+                if (el.type !== 'file') el.value = '';
+            });
+            document.querySelectorAll('.tab-content.active select').forEach(el => el.selectedIndex = 0);
+            certCount = 0;
+            updateCertCount();
+        }
+
+        // 保存人才
+        function saveTalent() {
+            const name = document.getElementById('t_name').value;
+            if (!name) {
+                alert('请填写姓名');
+                switchTab('basic');
+                document.getElementById('t_name').focus();
+                return;
+            }
+            alert('保存成功！');
+            closeModal();
+        }
+
+        // 显示添加证书表单
+        function showAddCertForm() {
+            document.getElementById('addCertForm').style.display = 'block';
+        }
+
+        // 取消添加证书
+        function cancelAddCert() {
+            document.getElementById('addCertForm').style.display = 'none';
+            document.getElementById('certName').value = '';
+            document.getElementById('certNo').value = '';
+            document.getElementById('certOrg').value = '';
+            document.getElementById('certIssue').value = '';
+            document.getElementById('certExpire').value = '';
+        }
+
+        // 保存新证书
+        function saveNewCert() {
+            const name = document.getElementById('certName').value;
+            const no = document.getElementById('certNo').value;
+            if (!name || !no) {
+                alert('请填写证书名称和编号');
+                return;
+            }
+
+            // 添加到列表
+            const container = document.getElementById('certListContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'cert-list-item';
+            newItem.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium text-gray-800">${name}</div>
+                        <div class="text-xs text-gray-500 mt-1">证书编号：${no} | 发证机关：${document.getElementById('certOrg').value || '-'}</div>
+                        <div class="text-xs text-gray-500">有效期：${document.getElementById('certIssue').value || '-'} 至 ${document.getElementById('certExpire').value || '-'}</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="status-tag cert-valid">正常</span>
+                    <div class="cert-actions">
+                        <button class="btn-icon edit"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon delete" onclick="deleteCert(this)"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newItem);
+
+            certCount++;
+            updateCertCount();
+            cancelAddCert();
+        }
+
+        // 删除证书
+        function deleteCert(btn) {
+            if (confirm('确定要删除这个证书吗？')) {
+                btn.closest('.cert-list-item').remove();
+                certCount--;
+                updateCertCount();
+            }
+        }
+
+        // 更新证书计数
+        function updateCertCount() {
+            document.getElementById('certCount').textContent = certCount;
+            const badge = document.getElementById('certBadge');
+            if (certCount > 0) {
+                badge.textContent = certCount;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // 开关状态文字更新
+        document.getElementById('t_qualified')?.addEventListener('change', function() {
+            document.getElementById('qualifyText').textContent = this.checked ? '已具备' : '未具备';
+        });
+        document.getElementById('t_login')?.addEventListener('change', function() {
+            document.getElementById('loginText').textContent = this.checked ? '允许登录' : '禁止登录';
+        });
+
+        // 点击弹窗外部关闭
+        document.getElementById('talentModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDetailModal();
+        });
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeDetailModal();
+            }
+        });
+    </script>
+</body>
+</html>
