@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 人员能力画像</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .score-circle {
+            background: conic-gradient(#1890ff 0% 75%, #e6f7ff 75% 100%);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: rotate-in 1s ease-out;
+        }
+
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .score-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        @keyframes rotate-in {
+            from { transform: rotate(-180deg) scale(0.8); opacity: 0; }
+            to { transform: rotate(0) scale(1); opacity: 1; }
+        }
+
+        .dimension-card {
+            border-left: 4px solid;
+            padding: 16px;
+            background: white;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.3s;
+        }
+
+        .dimension-card.exam { border-left-color: #1890ff; }
+        .dimension-card.train { border-left-color: #52c41a; }
+        .dimension-card.cert { border-left-color: #fa8c16; }
+        .dimension-card.other { border-left-color: #ff4d4f; }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border-bottom: 2px solid transparent;
+            color: #666;
+            font-weight: 500;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: #1890ff;
+            background: rgba(24,144,255,0.05);
+        }
+
+        .tab-btn.active {
+            color: #1890ff;
+            border-bottom-color: #1890ff;
+            background: rgba(24,144,255,0.05);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease-out;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .record-row {
+            transition: all 0.2s;
+        }
+
+        .record-row:hover {
+            background: #fafafa;
+            transform: scale(1.01);
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .tag-add { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+        .tag-deduct { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; }
+        .tag-expired { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; }
+        .tag-valid { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+        .tag-warning { background: #fffbe6; color: #faad14; border: 1px solid #ffe58f; }
+
+        .add-btn {
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(24,144,255,0.3);
+        }
+
+        .modal {
+            backdrop-filter: blur(4px);
+        }
+
+        .employee-selector {
+            position: relative;
+            min-width: 200px;
+        }
+
+        .employee-search-input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        .employee-search-input:focus {
+            outline: none;
+            border-color: #1890ff;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
+        }
+
+        .employee-search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+
+        .rank-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .score-level-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 32px;
+        }
+
+        .score-level-tag.excellent {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .score-level-tag.medium {
+            background: #fffbe6;
+            color: #faad14;
+            border: 1px solid #ffe58f;
+        }
+
+        .score-level-tag.bad {
+            background: #fff1f0;
+            color: #ff4d4f;
+            border: 1px solid #ffa39e;
+        }
+
+        .stat-divider {
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, #e0e0e0, transparent);
+            margin: 0 16px;
+        }
+
+        .btn-action {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-view {
+            color: #1890ff;
+            background: #e6f7ff;
+            border-color: #91d5ff;
+        }
+
+        .btn-view:hover {
+            background: #1890ff;
+            color: white;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20 flex-shrink-0">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
+            </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-home"></i> 首页</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-desktop"></i> 工作台</a>
+                <a href="#" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600"><i class="fas fa-user-tie"></i> 人才画像</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-chart-line"></i> 能力评价规则</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 text-gray-500 hover:text-blue-600 relative">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>管理员</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
+            <div class="p-4">
+                <div class="space-y-1">
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-users w-5"></i>
+                        <span>人员管理</span>
+                    </div>
+                    <div class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-blue-600 bg-blue-50 border-r-3 border-blue-600">
+                        <i class="fas fa-id-card w-5"></i>
+                        <span>人员画像</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-clipboard-check w-5"></i>
+                        <span>技能考核</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-certificate w-5"></i>
+                        <span>证书管理</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6 min-w-0">
+            
+            <!-- 顶部员工信息卡 -->
+            <div class="card p-6 mb-6">
+                <div class="flex items-center justify-between">
+                    <!-- 左侧：员工信息 -->
+                    <div class="flex items-center gap-6 flex-1">
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg flex-shrink-0">
+                            张
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-4 mb-3 flex-wrap">
+                                <h1 class="text-2xl font-bold text-gray-800">张伟</h1>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">高级电工</span>
+                                    <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">生产一部</span>
+                                </div>
+                                
+                                <div class="employee-selector ml-4">
+                                    <i class="fas fa-search employee-search-icon"></i>
+                                    <input type="text" id="employeeSearch" placeholder="搜索并切换员工..." 
+                                        class="employee-search-input">
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2">
+                                        <i class="fas fa-chevron-down text-gray-400 text-xs cursor-pointer hover:text-blue-600"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-6 text-sm text-gray-500 mb-3 flex-wrap">
+                                <span class="flex items-center gap-1"><i class="fas fa-calendar-alt text-blue-400"></i> 入职时间：2019-03-15</span>
+                                <span class="flex items-center gap-1"><i class="fas fa-user-clock text-blue-400"></i> 工龄：5年</span>
+                                <span class="flex items-center gap-1"><i class="fas fa-phone text-blue-400"></i> 138****1234</span>
+                                <span class="flex items-center gap-1"><i class="fas fa-envelope text-blue-400"></i> zhangwei@company.com</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-2 text-sm">
+                                <span class="text-gray-500">上次评分更新：</span>
+                                <span class="font-medium text-gray-800">2024-01-15 14:30:00</span>
+                                <button onclick="refreshScore()" class="ml-3 text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 transition-all hover:scale-105">
+                                    <i class="fas fa-sync-alt hover:rotate-180 transition-transform duration-500"></i> 重新计算
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧：评分统计 -->
+                    <div class="flex items-center gap-6 pl-6 border-l border-gray-200 flex-shrink-0">
+                        <div class="text-center">
+                            <div class="score-circle mb-1">
+                                <div class="score-content">
+                                    <div class="text-2xl font-bold text-gray-800" id="totalScoreDisplay">87.5</div>
+                                    <div class="text-xs text-gray-500">总分</div>
+                                </div>
+                            </div>
+                            <div id="scoreLevelTag" class="score-level-tag medium">良</div>
+                        </div>
+                        
+                        <div class="stat-divider h-16"></div>
+                        
+                        <div class="text-center min-w-[80px]">
+                            <div class="text-sm text-gray-500 mb-1">部门排名</div>
+                            <div class="rank-badge mb-1">#3</div>
+                            <div class="text-xs text-gray-400">共45人</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主体内容区 -->
+            <div class="grid grid-cols-12 gap-6 mb-6">
+                <!-- 左侧：能力画像 -->
+                <div class="col-span-7 space-y-6">
+                    
+                    <!-- 雷达图与维度拆解 -->
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-chart-pie text-blue-600"></i>
+                                能力结构分析
+                            </h3>
+                            <div class="flex items-center gap-4 text-sm">
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-blue-500"></span>考试 40%</span>
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-green-500"></span>培训 30%</span>
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-orange-500"></span>证书 30%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-6">
+                            <!-- 雷达图 -->
+                            <div id="radarChart" style="height: 300px;"></div>
+                            
+                            <!-- 维度得分详情 -->
+                            <div class="space-y-3">
+                                <div class="dimension-card exam">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-8 h-8 rounded bg-blue-100 text-blue-600 flex items-center justify-center">
+                                                <i class="fas fa-graduation-cap"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-semibold text-gray-800 text-sm">考试维度</div>
+                                                <div class="text-xs text-gray-500">权重 40%</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-xl font-bold text-blue-600">34.0</div>
+                                            <div class="text-xs text-gray-500">原始分85×40%</div>
+                                        </div>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill bg-blue-500" style="width: 85%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>平均分85分</span>
+                                        <span>4次考试记录</span>
+                                    </div>
+                                </div>
+
+                                <div class="dimension-card train">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-8 h-8 rounded bg-green-100 text-green-600 flex items-center justify-center">
+                                                <i class="fas fa-chalkboard-teacher"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-semibold text-gray-800 text-sm">培训维度</div>
+                                                <div class="text-xs text-gray-500">权重 30%</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-xl font-bold text-green-600">24.0</div>
+                                            <div class="text-xs text-gray-500">完成率80%×100×30%</div>
+                                        </div>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill bg-green-500" style="width: 80%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>完成率80%</span>
+                                        <span>8/10项培训</span>
+                                    </div>
+                                </div>
+
+                                <div class="dimension-card cert">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-8 h-8 rounded bg-orange-100 text-orange-600 flex items-center justify-center">
+                                                <i class="fas fa-certificate"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-semibold text-gray-800 text-sm">证书维度</div>
+                                                <div class="text-xs text-gray-500">权重 30%</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-xl font-bold text-orange-600">21.0</div>
+                                            <div class="text-xs text-gray-500">持证分值70×30%</div>
+                                        </div>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill bg-orange-500" style="width: 70%"></div>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                        <span>累计分值70分</span>
+                                        <span>3个证书</span>
+                                    </div>
+                                </div>
+
+                                <div class="dimension-card other">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-8 h-8 rounded bg-red-100 text-red-600 flex items-center justify-center">
+                                                <i class="fas fa-plus-minus"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-semibold text-gray-800 text-sm">其他加减分</div>
+                                                <div class="text-xs text-gray-500">人工录入</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-xl font-bold text-red-600">+8.5</div>
+                                            <div class="text-xs text-gray-500">净加分</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2 mt-2">
+                                        <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded"><i class="fas fa-plus-circle mr-1"></i>+12.0</span>
+                                        <span class="text-xs text-red-600 bg-red-50 px-2 py-1 rounded"><i class="fas fa-minus-circle mr-1"></i>-3.5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧：评分配置与快捷操作 -->
+                <div class="col-span-5 space-y-6">
+                    <!-- 评分配置 -->
+                    <div class="card p-6">
+                        <h4 class="font-semibold text-gray-800 mb-5 flex items-center gap-2">
+                            <i class="fas fa-cog text-gray-500"></i>
+                            评分配置与统计
+                        </h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <div class="text-sm text-gray-500 mb-1">基础分基准</div>
+                                <div class="text-lg font-bold text-gray-800">60分</div>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <div class="text-sm text-gray-500 mb-1">封顶分数</div>
+                                <div class="text-lg font-bold text-gray-800">150分</div>
+                            </div>
+                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                <div class="text-sm text-blue-600 mb-1">当前原始分</div>
+                                <div class="text-xl font-bold text-blue-700">119.0</div>
+                            </div>
+                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                <div class="text-sm text-blue-600 mb-1">最终得分</div>
+                                <div class="text-xl font-bold text-blue-700">119.0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-5 pt-5 border-t border-gray-100">
+                            <div class="text-sm font-medium text-gray-700 mb-3">得分明细</div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">考试维度 (40%)</span>
+                                    <span class="font-medium text-blue-600">34.0分</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">培训维度 (30%)</span>
+                                    <span class="font-medium text-green-600">24.0分</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">证书维度 (30%)</span>
+                                    <span class="font-medium text-orange-600">21.0分</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">其他加减分</span>
+                                    <span class="font-medium text-red-600">+8.5分</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 快捷操作 -->
+                    <div class="card p-6">
+                        <h4 class="font-semibold text-gray-800 mb-5 flex items-center gap-2">
+                            <i class="fas fa-bolt text-yellow-500"></i>
+                            快捷操作
+                        </h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="openAddModal('加分')" class="add-btn py-4 rounded-lg flex items-center justify-center gap-2 font-medium text-lg">
+                                <i class="fas fa-plus-circle"></i>
+                                录入加分
+                            </button>
+                            <button onclick="openAddModal('扣分')" class="py-4 rounded-lg flex items-center justify-center gap-2 font-medium text-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all border border-red-200">
+                                <i class="fas fa-minus-circle"></i>
+                                录入扣分
+                            </button>
+                        </div>
+                        
+                        <div class="mt-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-lightbulb text-yellow-600 mt-0.5"></i>
+                                <div class="text-sm text-yellow-800">
+                                    <p class="font-medium mb-1">操作提示</p>
+                                    <p class="text-xs opacity-90">加分/扣分记录将实时影响员工综合评分，请确保录入信息准确无误。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 详细数据区 -->
+            <div class="card">
+                <div class="border-b border-gray-200">
+                    <div class="flex overflow-x-auto px-6">
+                        <button class="tab-btn active" onclick="switchTab('exam', this)">
+                            <i class="fas fa-graduation-cap mr-2"></i>考试记录
+                            <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-600 rounded-full text-xs">4</span>
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('train', this)">
+                            <i class="fas fa-chalkboard-teacher mr-2"></i>培训记录
+                            <span class="ml-2 px-2 py-0.5 bg-green-100 text-green-600 rounded-full text-xs">10</span>
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('cert', this)">
+                            <i class="fas fa-certificate mr-2"></i>证书记录
+                            <span class="ml-2 px-2 py-0.5 bg-orange-100 text-orange-600 rounded-full text-xs">3</span>
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('adjust', this)">
+                            <i class="fas fa-plus-minus mr-2"></i>加减分记录
+                            <span class="ml-2 px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-xs">5</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <!-- 考试记录 Tab -->
+                    <div id="tab-exam" class="tab-content">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">考试名称</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">考试时间</th>
+                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">分数</th>
+                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">是否补考</th>
+                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">状态</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">操作人</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800">月度技能考核-电气安全</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2024-01-15 09:00</td>
+                                        <td class="px-4 py-4 text-center"><span class="text-lg font-bold text-green-600">92</span></td>
+                                        <td class="px-4 py-4 text-center"><span class="text-gray-400">-</span></td>
+                                        <td class="px-4 py-4 text-center"><span class="tag tag-valid">已通过</span></td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">王考官</td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800">季度技能认证-PLC编程</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2023-12-20 14:00</td>
+                                        <td class="px-4 py-4 text-center"><span class="text-lg font-bold text-orange-500">78</span></td>
+                                        <td class="px-4 py-4 text-center"><span class="tag tag-warning">首次</span></td>
+                                        <td class="px-4 py-4 text-center"><span class="tag tag-valid">已通过</span></td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">李主管</td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800">季度技能认证-PLC编程（补考）</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2023-12-25 10:00</td>
+                                        <td class="px-4 py-4 text-center"><span class="text-lg font-bold text-green-600">88</span></td>
+                                        <td class="px-4 py-4 text-center"><span class="tag tag-add">补考通过</span></td>
+                                        <td class="px-4 py-4 text-center"><span class="tag tag-valid">已通过</span></td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">李主管</td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800">安全生产知识测试</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2023-11-10 09:30</td>
+                                        <td class="px-4 py-4 text-center"><span class="text-lg font-bold text-green-600">95</span></td>
+                                        <td class="px-4 py-4 text-center"><span class="text-gray-400">-</span></td>
+                                        <td class="px-4 py-4 text-center"><span class="tag tag-valid">已通过</span></td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">安全部</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 p-4 bg-blue-50 rounded-lg flex items-center justify-between">
+                            <div class="text-sm text-blue-800">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                考试平均分：<strong>85分</strong> | 考试次数：4次 | 补考次数：1次
+                            </div>
+                            <button class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                查看全部 <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 培训记录 Tab - 完整Demo -->
+                    <div id="tab-train" class="tab-content hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">培训名称</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">培训时间</th>
+                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">完成率</th>
+                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">状态</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">培训类型</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">新员工入职培训</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2024-01-05 ~ 2024-01-07</td>
+                                        <td class="px-4 py-4 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <div class="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-green-500" style="width: 100%"></div>
+                                                </div>
+                                                <span class="text-sm font-bold text-green-600">100%</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-4 text-center">
+                                            <span class="tag tag-valid"><i class="fas fa-check mr-1"></i>已完成</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-600"><span class="px-2 py-1 bg-red-100 text-red-600 rounded text-xs font-medium">必修</span></td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">安全生产规范培训</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2024-01-10 14:00</td>
+                                        <td class="px-4 py-4 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <div class="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-red-500" style="width: 0%"></div>
+                                                </div>
+                                                <span class="text-sm font-bold text-red-600">0%</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-4 text-center">
+                                            <span class="tag tag-deduct"><i class="fas fa-times mr-1"></i>缺勤</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-600"><span class="px-2 py-1 bg-red-100 text-red-600 rounded text-xs font-medium">必修</span></td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">新设备操作培训-CNC机床</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2024-01-08 09:00</td>
+                                        <td class="px-4 py-4 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <div class="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-red-500" style="width: 0%"></div>
+                                                </div>
+                                                <span class="text-sm font-bold text-red-600">0%</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-4 text-center">
+                                            <span class="tag tag-deduct"><i class="fas fa-times mr-1"></i>缺勤</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-600"><span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">选修</span></td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">ISO质量管理体系基础</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2024-01-12 13:30</td>
+                                        <td class="px-4 py-4 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <div class="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-green-500" style="width: 100%"></div>
+                                                </div>
+                                                <span class="text-sm font-bold text-green-600">100%</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-4 text-center">
+                                            <span class="tag tag-valid"><i class="fas fa-check mr-1"></i>已完成</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-600"><span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">选修</span></td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">急救技能培训</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2023-12-28 09:00</td>
+                                        <td class="px-4 py-4 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <div class="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-green-500" style="width: 100%"></div>
+                                                </div>
+                                                <span class="text-sm font-bold text-green-600">100%</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-4 text-center">
+                                            <span class="tag tag-valid"><i class="fas fa-check mr-1"></i>已完成</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-600"><span class="px-2 py-1 bg-red-100 text-red-600 rounded text-xs font-medium">必修</span></td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">电气设备维护进阶</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2023-12-15 14:00</td>
+                                        <td class="px-4 py-4 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <div class="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-yellow-400" style="width: 60%"></div>
+                                                </div>
+                                                <span class="text-sm font-bold text-yellow-600">60%</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-4 text-center">
+                                            <span class="tag tag-warning"><i class="fas fa-clock mr-1"></i>进行中</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-600"><span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">选修</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 grid grid-cols-4 gap-4">
+                            <div class="p-4 bg-green-50 rounded-lg text-center border border-green-200">
+                                <div class="text-2xl font-bold text-green-600">8</div>
+                                <div class="text-sm text-gray-600">已完成培训</div>
+                            </div>
+                            <div class="p-4 bg-red-50 rounded-lg text-center border border-red-200">
+                                <div class="text-2xl font-bold text-red-600">2</div>
+                                <div class="text-sm text-gray-600">缺勤/未完成</div>
+                            </div>
+                            <div class="p-4 bg-blue-50 rounded-lg text-center border border-blue-200">
+                                <div class="text-2xl font-bold text-blue-600">80%</div>
+                                <div class="text-sm text-gray-600">整体完成率</div>
+                            </div>
+                            <div class="p-4 bg-orange-50 rounded-lg text-center border border-orange-200">
+                                <div class="text-2xl font-bold text-orange-600">-4.0</div>
+                                <div class="text-sm text-gray-600">培训维度失分</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 证书记录 Tab -->
+                    <div id="tab-cert" class="tab-content hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">证书名称</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">证书类型</th>
+                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">获得日期</th>
+                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">有效期至</th>
+                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">分值</th>
+                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">状态</th>
+                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">特种作业操作证（低压电工）</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">特种作业</td>
+                                        <td class="px-4 py-4 text-center text-sm text-gray-600">2019-03-15</td>
+                                        <td class="px-4 py-4 text-center text-sm font-medium text-red-600">2024-03-15</td>
+                                        <td class="px-4 py-4 text-center text-sm font-bold text-orange-600">+30</td>
+                                        <td class="px-4 py-4 text-center">
+                                            <span class="tag tag-expired">即将过期</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-center">
+                                            <button class="btn-action btn-view">查看详情</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">职业资格证书（高级电工）</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">职业资格</td>
+                                        <td class="px-4 py-4 text-center text-sm text-gray-600">2021-06-20</td>
+                                        <td class="px-4 py-4 text-center text-sm text-gray-600">长期有效</td>
+                                        <td class="px-4 py-4 text-center text-sm font-bold text-orange-600">+25</td>
+                                        <td class="px-4 py-4 text-center">
+                                            <span class="tag tag-valid">有效</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-center">
+                                            <button class="btn-action btn-view">查看详情</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">安全生产考核合格证</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">安全资质</td>
+                                        <td class="px-4 py-4 text-center text-sm text-gray-600">2022-09-10</td>
+                                        <td class="px-4 py-4 text-center text-sm text-gray-600">2025-09-10</td>
+                                        <td class="px-4 py-4 text-center text-sm font-bold text-orange-600">+15</td>
+                                        <td class="px-4 py-4 text-center">
+                                            <span class="tag tag-valid">有效</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-center">
+                                            <button class="btn-action btn-view">查看详情</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-info-circle text-orange-500 mt-1"></i>
+                                <div class="text-sm text-orange-800">
+                                    <p class="font-semibold mb-1">证书分值计算规则：</p>
+                                    <p>1. 每个有效证书按配置分值累计计分；2. 过期证书分值自动失效；3. 同类型证书不重复计分。</p>
+                                    <p class="mt-1">当前累计分值：<strong>70分</strong> × 权重30% = <strong>21分</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 加减分记录 Tab - 完整Demo -->
+                    <div id="tab-adjust" class="tab-content hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">类型</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">事项名称</th>
+                                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">分值</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">详细原因</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">操作时间</th>
+                                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">操作人</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4">
+                                            <span class="tag tag-add"><i class="fas fa-plus mr-1"></i>加分</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">技术创新奖</td>
+                                        <td class="px-4 py-4 text-center text-lg font-bold text-green-600">+5.0</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600 max-w-xs truncate" title="提出设备改进方案，优化电气线路布局，提升生产效率15%，降低能耗8%">提出设备改进方案，优化电气线路布局，提升生产效率15%，降低能耗8%</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2024-01-10 16:30</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">生产部经理</td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4">
+                                            <span class="tag tag-add"><i class="fas fa-plus mr-1"></i>加分</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">技能竞赛获奖</td>
+                                        <td class="px-4 py-4 text-center text-lg font-bold text-green-600">+3.0</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">公司年度电工技能竞赛第二名，实操成绩优异</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2023-12-25 09:00</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">HR部门</td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4">
+                                            <span class="tag tag-add"><i class="fas fa-plus mr-1"></i>加分</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">师带徒奖励</td>
+                                        <td class="px-4 py-4 text-center text-lg font-bold text-green-600">+2.0</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">成功带教2名新员工（李明、王强），考核全部通过</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2023-12-01 10:00</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">车间主任</td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4">
+                                            <span class="tag tag-add"><i class="fas fa-plus mr-1"></i>加分</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">季度全勤奖</td>
+                                        <td class="px-4 py-4 text-center text-lg font-bold text-green-600">+2.0</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2023年第四季度无迟到、早退、缺勤记录</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2024-01-05 09:00</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">行政部</td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4">
+                                            <span class="tag tag-deduct"><i class="fas fa-minus mr-1"></i>扣分</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">安全违规</td>
+                                        <td class="px-4 py-4 text-center text-lg font-bold text-red-600">-2.0</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">未佩戴安全帽进入高压作业区域，违反安全操作规程</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2023-11-20 14:20</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">安全员</td>
+                                    </tr>
+                                    <tr class="record-row">
+                                        <td class="px-4 py-4">
+                                            <span class="tag tag-deduct"><i class="fas fa-minus mr-1"></i>扣分</span>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-800 font-medium">考勤异常</td>
+                                        <td class="px-4 py-4 text-center text-lg font-bold text-red-600">-1.5</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">累计迟到3次（每次10-15分钟），早退2次</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">2023-11-15 17:00</td>
+                                        <td class="px-4 py-4 text-sm text-gray-600">行政部</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 grid grid-cols-3 gap-4">
+                            <div class="p-4 bg-green-50 rounded-lg text-center border border-green-200">
+                                <div class="text-2xl font-bold text-green-600">+12.0</div>
+                                <div class="text-sm text-gray-600">累计加分</div>
+                                <div class="text-xs text-gray-400 mt-1">共4条记录</div>
+                            </div>
+                            <div class="p-4 bg-red-50 rounded-lg text-center border border-red-200">
+                                <div class="text-2xl font-bold text-red-600">-3.5</div>
+                                <div class="text-sm text-gray-600">累计扣分</div>
+                                <div class="text-xs text-gray-400 mt-1">共2条记录</div>
+                            </div>
+                            <div class="p-4 bg-blue-50 rounded-lg text-center border border-blue-200">
+                                <div class="text-2xl font-bold text-blue-600">+8.5</div>
+                                <div class="text-sm text-gray-600">净加分值</div>
+                                <div class="text-xs text-gray-400 mt-1">已计入总分</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-8"></div>
+        </main>
+    </div>
+
+    <!-- 录入弹窗 -->
+    <div id="addModal" class="modal fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-lg p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-gray-800" id="modalTitle">录入加分记录</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="addForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">事项名称</label>
+                    <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="请输入事项名称">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">分值</label>
+                        <input type="number" step="0.5" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="请输入分值">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">类型</label>
+                        <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" id="modalType">
+                            <option value="add">加分</option>
+                            <option value="deduct">扣分</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">详细原因</label>
+                    <textarea rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none" placeholder="请详细描述加分或扣分的原因..."></textarea>
+                </div>
+                
+                <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t">
+                    <button type="button" onclick="closeModal()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all">取消</button>
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">保存记录</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 评分等级阈值配置（与人才评分规则保持一致）
+        const scoreThresholds = {
+            bad: 60,        // < 60 为差
+            excellent: 90   // > 90 为优，中间为良
+        };
+
+        // 根据分数获取等级
+        function getScoreLevel(score) {
+            if (score < scoreThresholds.bad) {
+                return { label: '差', class: 'bad' };
+            } else if (score > scoreThresholds.excellent) {
+                return { label: '优', class: 'excellent' };
+            } else {
+                return { label: '良', class: 'medium' };
+            }
+        }
+
+        // 渲染评分等级标签
+        function renderScoreLevel() {
+            const scoreEl = document.getElementById('totalScoreDisplay');
+            const tagEl = document.getElementById('scoreLevelTag');
+            if (!scoreEl || !tagEl) return;
+            
+            const score = parseFloat(scoreEl.textContent) || 0;
+            const level = getScoreLevel(score);
+            
+            tagEl.textContent = level.label;
+            tagEl.className = 'score-level-tag ' + level.class;
+        }
+
+        // 初始化雷达图
+        const radarChart = echarts.init(document.getElementById('radarChart'));
+        const radarOption = {
+            tooltip: {
+                trigger: 'item'
+            },
+            radar: {
+                indicator: [
+                    { name: '考试成绩', max: 100 },
+                    { name: '培训完成', max: 100 },
+                    { name: '证书资质', max: 100 },
+                    { name: '加分项', max: 20 },
+                    { name: '扣分项', max: 20 }
+                ],
+                shape: 'polygon',
+                splitNumber: 4,
+                axisName: {
+                    color: '#666'
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#e0e0e0'
+                    }
+                },
+                splitArea: {
+                    show: true,
+                    areaStyle: {
+                        color: ['#f8f9fa', '#fff']
+                    }
+                }
+            },
+            series: [{
+                name: '能力维度',
+                type: 'radar',
+                data: [
+                    {
+                        value: [85, 80, 70, 12, 3.5],
+                        name: '当前能力',
+                        areaStyle: {
+                            color: 'rgba(24,144,255,0.2)'
+                        },
+                        lineStyle: {
+                            color: '#1890ff',
+                            width: 2
+                        },
+                        itemStyle: {
+                            color: '#1890ff'
+                        }
+                    }
+                ]
+            }]
+        };
+        radarChart.setOption(radarOption);
+
+        // 响应式
+        window.addEventListener('resize', () => {
+            radarChart.resize();
+        });
+
+        // Tab切换
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.querySelectorAll('.tab-btn').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            btn.classList.add('active');
+        }
+
+        // 默认显示考试记录
+        document.addEventListener('DOMContentLoaded', function() {
+            // 进度条动画
+            setTimeout(() => {
+                document.querySelectorAll('.progress-fill').forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 100);
+                });
+            }, 300);
+        });
+
+        // 打开弹窗
+        function openAddModal(type) {
+            const modal = document.getElementById('addModal');
+            const title = document.getElementById('modalTitle');
+            const typeSelect = document.getElementById('modalType');
+            
+            title.textContent = type === '加分' ? '录入加分记录' : '录入扣分记录';
+            typeSelect.value = type === '加分' ? 'add' : 'deduct';
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            const modal = document.getElementById('addModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // 表单提交
+        document.getElementById('addForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('记录保存成功！');
+            closeModal();
+        });
+
+        // 刷新评分
+        function refreshScore() {
+            const btn = event.currentTarget;
+            const icon = btn.querySelector('i');
+            icon.classList.add('fa-spin');
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+                alert('评分已重新计算！');
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

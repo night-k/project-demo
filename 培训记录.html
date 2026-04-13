@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 培训结果录入</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .search-input {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+            width: 100%;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24,144,255,0.1);
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+
+        .btn-default {
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s;
+            border: 1px solid #d9d9d9;
+            background: white;
+            cursor: pointer;
+            color: #666;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-default:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .btn-success {
+            background: #52c41a;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-success:hover {
+            background: #389e0d;
+        }
+
+        .record-row {
+            transition: all 0.2s;
+        }
+
+        .record-row:hover {
+            background: #fafafa;
+        }
+
+        .record-row.selected {
+            background: #e6f7ff;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .tag-completed { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+        .tag-absent { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; }
+        .tag-ongoing { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+        .tag-pending { background: #fffbe6; color: #faad14; border: 1px solid #ffe58f; }
+
+        .modal {
+            backdrop-filter: blur(4px);
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .query-form {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 4px;
+            border: 1px solid #f0f0f0;
+            margin-bottom: 12px;
+        }
+
+        .query-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .query-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .query-label {
+            font-size: 14px;
+            color: #333;
+            white-space: nowrap;
+            font-weight: 400;
+        }
+
+        .query-input {
+            width: 200px;
+        }
+
+        .operation-bar {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            border: 1px solid #f0f0f0;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .table-header {
+            background: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 12px 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .page-btn {
+            min-width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #d9d9d9;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .page-btn.active {
+            background: #1890ff;
+            color: white;
+            border-color: #1890ff;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .batch-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: white;
+            min-width: 160px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            border-radius: 4px;
+            z-index: 10;
+            top: 100%;
+            left: 0;
+            margin-top: 4px;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .dropdown-item i {
+            margin-right: 8px;
+            width: 16px;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1400px) {
+            .query-input {
+                width: 180px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .query-input {
+                width: 160px;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20 flex-shrink-0">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
+            </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-home"></i> 首页</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-desktop"></i> 工作台</a>
+                <a href="#" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600"><i class="fas fa-user-tie"></i> 人才画像</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-chart-line"></i> 能力评价规则</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 text-gray-500 hover:text-blue-600 relative">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>管理员</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
+            <div class="p-4">
+                <div class="space-y-1">
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-users w-5"></i>
+                        <span>人员管理</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-id-card w-5"></i>
+                        <span>人员画像</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-clipboard-check w-5"></i>
+                        <span>技能考核</span>
+                    </div>
+                    <div class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-blue-600 bg-blue-50 border-r-3 border-blue-600">
+                        <i class="fas fa-chalkboard-teacher w-5"></i>
+                        <span>培训结果录入</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-certificate w-5"></i>
+                        <span>证书管理</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-4 min-w-0">
+            
+            <!-- 查询条件区 - 支持换行 -->
+            <div class="query-form">
+                <div class="query-container">
+                    <div class="query-item">
+                        <span class="query-label">培训名称：</span>
+                        <input type="text" class="search-input query-input" placeholder="请输入培训名称" id="searchTraining">
+                    </div>
+                    <div class="query-item">
+                        <span class="query-label">员工信息：</span>
+                        <input type="text" class="search-input query-input" placeholder="姓名/工号/部门" id="searchEmployee">
+                    </div>
+                    <div class="query-item">
+                        <span class="query-label">培训时间：</span>
+                        <select class="search-input" style="width: 140px;" id="searchTime">
+                            <option value="">全部时间</option>
+                            <option value="today">今天</option>
+                            <option value="week">本周</option>
+                            <option value="month">本月</option>
+                            <option value="quarter">本季度</option>
+                        </select>
+                    </div>
+                    <div class="query-item">
+                        <span class="query-label">完成状态：</span>
+                        <select class="search-input" style="width: 120px;" id="searchStatus">
+                            <option value="">全部状态</option>
+                            <option value="completed">已完成</option>
+                            <option value="absent">缺勤</option>
+                            <option value="ongoing">进行中</option>
+                            <option value="pending">未开始</option>
+                        </select>
+                    </div>
+                    <div class="query-item" style="margin-left: auto;">
+                        <button onclick="searchData()" class="btn-primary">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                        <button onclick="resetSearch()" class="btn-default" style="margin-left: 8px;">
+                            <i class="fas fa-undo"></i> 清空
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作按钮区 - 删除批量录入，改为导入 -->
+            <div class="operation-bar">
+                <div class="flex items-center gap-2">
+                    <button onclick="openSingleModal()" class="btn-primary">
+                        <i class="fas fa-plus"></i> 新增
+                    </button>
+                    <!-- 替换批量录入为导入 -->
+                    <button onclick="openImportModal()" class="btn-success">
+                        <i class="fas fa-file-import"></i> 导入
+                    </button>
+                    <div style="width: 1px; height: 20px; background: #e8e8e8; margin: 0 8px;"></div>
+                    <div class="batch-dropdown">
+                        <button class="btn-default" onclick="toggleDropdown()">
+                            <i class="fas fa-cogs"></i> 批量操作 <i class="fas fa-caret-down ml-1"></i>
+                        </button>
+                        <div class="dropdown-content" id="batchDropdown">
+                            <div class="dropdown-item" onclick="batchComplete()">
+                                <i class="fas fa-check-circle text-green-500"></i> 标记完成
+                            </div>
+                            <div class="dropdown-item" onclick="batchAbsent()">
+                                <i class="fas fa-times-circle text-red-500"></i> 标记缺勤
+                            </div>
+                            <div class="dropdown-item" onclick="batchDelete()">
+                                <i class="fas fa-trash-alt text-gray-500"></i> 批量删除
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500" id="selectedCount">已选择 0 项</span>
+                    <button class="btn-default" onclick="exportData()">
+                        <i class="fas fa-download"></i> 导出
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="data-table">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="px-4 py-3 text-left w-12">
+                                    <input type="checkbox" class="w-4 h-4 accent-blue-600" id="selectAll" onchange="toggleSelectAll()">
+                                </th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 w-12">#</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">培训名称</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">员工信息</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">部门</th>
+                                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">培训时间</th>
+                                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">状态</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">备注</th>
+                                <th class="px-4 py-3 text-center text-sm font-semibold text-gray-700">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200" id="dataTable">
+                            <tr class="record-row" data-id="1">
+                                <td class="px-4 py-3">
+                                    <input type="checkbox" class="w-4 h-4 accent-blue-600 row-checkbox" onchange="updateSelectedCount()">
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">1</td>
+                                <td class="px-4 py-3 text-sm text-gray-800 font-medium">安全生产规范培训</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs font-bold">张</div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-800">张伟</div>
+                                            <div class="text-xs text-gray-500">EMP001</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">生产一部</td>
+                                <td class="px-4 py-3 text-center text-sm text-gray-600">2024-01-15 14:00</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="tag tag-completed">已完成</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">考核成绩优秀</td>
+                                <td class="px-4 py-3 text-center">
+                                    <button onclick="editRecord(1)" class="text-blue-600 hover:text-blue-800 text-sm font-medium mr-3">编辑</button>
+                                    <button onclick="deleteRecord(1)" class="text-red-600 hover:text-red-800 text-sm font-medium">删除</button>
+                                </td>
+                            </tr>
+                            <tr class="record-row" data-id="2">
+                                <td class="px-4 py-3">
+                                    <input type="checkbox" class="w-4 h-4 accent-blue-600 row-checkbox" onchange="updateSelectedCount()">
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">2</td>
+                                <td class="px-4 py-3 text-sm text-gray-800 font-medium">安全生产规范培训</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xs font-bold">李</div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-800">李明</div>
+                                            <div class="text-xs text-gray-500">EMP002</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">生产一部</td>
+                                <td class="px-4 py-3 text-center text-sm text-gray-600">2024-01-15 14:00</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="tag tag-absent">缺勤</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">请假未参加</td>
+                                <td class="px-4 py-3 text-center">
+                                    <button onclick="editRecord(2)" class="text-blue-600 hover:text-blue-800 text-sm font-medium mr-3">编辑</button>
+                                    <button onclick="deleteRecord(2)" class="text-red-600 hover:text-red-800 text-sm font-medium">删除</button>
+                                </td>
+                            </tr>
+                            <tr class="record-row" data-id="3">
+                                <td class="px-4 py-3">
+                                    <input type="checkbox" class="w-4 h-4 accent-blue-600 row-checkbox" onchange="updateSelectedCount()">
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">3</td>
+                                <td class="px-4 py-3 text-sm text-gray-800 font-medium">CNC机床操作培训</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-xs font-bold">王</div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-800">王芳</div>
+                                            <div class="text-xs text-gray-500">EMP003</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">生产二部</td>
+                                <td class="px-4 py-3 text-center text-sm text-gray-600">2024-01-16 09:00</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="tag tag-ongoing">进行中</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">理论已完成，实操待考核</td>
+                                <td class="px-4 py-3 text-center">
+                                    <button onclick="editRecord(3)" class="text-blue-600 hover:text-blue-800 text-sm font-medium mr-3">编辑</button>
+                                    <button onclick="deleteRecord(3)" class="text-red-600 hover:text-red-800 text-sm font-medium">删除</button>
+                                </td>
+                            </tr>
+                            <tr class="record-row" data-id="4">
+                                <td class="px-4 py-3">
+                                    <input type="checkbox" class="w-4 h-4 accent-blue-600 row-checkbox" onchange="updateSelectedCount()">
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">4</td>
+                                <td class="px-4 py-3 text-sm text-gray-800 font-medium">ISO质量管理体系</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-xs font-bold">赵</div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-800">赵强</div>
+                                            <div class="text-xs text-gray-500">EMP004</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">质量管理部</td>
+                                <td class="px-4 py-3 text-center text-sm text-gray-600">2024-01-17 13:30</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="tag tag-completed">已完成</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">通过认证考试</td>
+                                <td class="px-4 py-3 text-center">
+                                    <button onclick="editRecord(4)" class="text-blue-600 hover:text-blue-800 text-sm font-medium mr-3">编辑</button>
+                                    <button onclick="deleteRecord(4)" class="text-red-600 hover:text-red-800 text-sm font-medium">删除</button>
+                                </td>
+                            </tr>
+                            <tr class="record-row" data-id="5">
+                                <td class="px-4 py-3">
+                                    <input type="checkbox" class="w-4 h-4 accent-blue-600 row-checkbox" onchange="updateSelectedCount()">
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">5</td>
+                                <td class="px-4 py-3 text-sm text-gray-800 font-medium">急救技能培训</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-xs font-bold">刘</div>
+                                        <div>
+                                            <div class="text-sm font-medium text-gray-800">刘洋</div>
+                                            <div class="text-xs text-gray-500">EMP005</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">安全部</td>
+                                <td class="px-4 py-3 text-center text-sm text-gray-600">2024-01-18 10:00</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="tag tag-pending">未开始</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">待参加</td>
+                                <td class="px-4 py-3 text-center">
+                                    <button onclick="editRecord(5)" class="text-blue-600 hover:text-blue-800 text-sm font-medium mr-3">编辑</button>
+                                    <button onclick="deleteRecord(5)" class="text-red-600 hover:text-red-800 text-sm font-medium">删除</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 分页 -->
+                <div class="pagination">
+                    <span class="text-sm text-gray-500 mr-4">共 24 条</span>
+                    <select class="search-input" style="width: 100px; margin-right: 16px;">
+                        <option>10条/页</option>
+                        <option selected>20条/页</option>
+                        <option>50条/页</option>
+                    </select>
+                    <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <span class="text-gray-500 px-2">...</span>
+                    <button class="page-btn">5</button>
+                    <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 单条录入弹窗 -->
+    <div id="singleModal" class="modal fixed inset-0 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-lg p-6 shadow-2xl m-4">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-gray-800">录入培训结果</h3>
+                <button onclick="closeModal('singleModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="singleForm" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">选择培训 <span class="text-red-500">*</span></label>
+                        <select class="search-input w-full" required>
+                            <option value="">请选择培训项目</option>
+                            <option>安全生产规范培训</option>
+                            <option>CNC机床操作培训</option>
+                            <option>ISO质量管理体系</option>
+                            <option>急救技能培训</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">选择员工 <span class="text-red-500">*</span></label>
+                        <select class="search-input w-full" required>
+                            <option value="">请选择员工</option>
+                            <option>张伟 (EMP001)</option>
+                            <option>李明 (EMP002)</option>
+                            <option>王芳 (EMP003)</option>
+                            <option>赵强 (EMP004)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">培训时间</label>
+                        <input type="datetime-local" class="search-input w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">完成状态 <span class="text-red-500">*</span></label>
+                        <select class="search-input w-full" required>
+                            <option value="completed">已完成</option>
+                            <option value="absent">缺勤</option>
+                            <option value="ongoing">进行中</option>
+                            <option value="pending">未开始</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">备注说明</label>
+                    <textarea rows="3" class="search-input w-full resize-none" placeholder="请输入培训备注信息..."></textarea>
+                </div>
+
+                <div class="pt-4 border-t flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeModal('singleModal')" class="btn-default">取消</button>
+                    <button type="submit" class="btn-primary">保存录入</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 导入弹窗（替代原来的批量录入） -->
+    <div id="importModal" class="modal fixed inset-0 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg w-full max-w-lg p-6 shadow-2xl m-4">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold text-gray-800">导入培训结果</h3>
+                <button onclick="closeModal('importModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="importForm" class="space-y-4">
+                <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                        <div class="text-sm text-blue-800">
+                            <p class="font-medium mb-1">导入说明</p>
+                            <p class="text-xs opacity-90">请下载模板文件，按格式填写培训结果后上传。支持 Excel (.xlsx, .xls) 格式文件。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-file-excel text-green-500 text-2xl"></i>
+                        <div>
+                            <div class="text-sm font-medium text-gray-800">培训结果导入模板.xlsx</div>
+                            <div class="text-xs text-gray-500">标准模板文件</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-default text-sm">
+                        <i class="fas fa-download"></i> 下载模板
+                    </button>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">上传文件</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-600 mb-1">点击上传或拖拽文件到此处</p>
+                        <p class="text-xs text-gray-400">支持 .xlsx, .xls 格式，单次最多导入500条</p>
+                        <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls" onchange="handleFileSelect(this)">
+                    </div>
+                </div>
+
+                <div id="fileInfo" class="hidden p-3 bg-green-50 rounded-lg border border-green-200 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-file-excel text-green-500"></i>
+                        <span class="text-sm text-gray-700" id="fileName">培训数据.xlsx</span>
+                    </div>
+                    <button type="button" onclick="clearFile()" class="text-gray-400 hover:text-red-500">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="pt-4 border-t flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeModal('importModal')" class="btn-default">取消</button>
+                    <button type="submit" class="btn-success" id="btnImport" disabled>
+                        <i class="fas fa-file-import"></i> 确认导入
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 打开弹窗
+        function openSingleModal() {
+            document.getElementById('singleModal').classList.remove('hidden');
+            document.getElementById('singleModal').classList.add('flex');
+        }
+
+        // 打开导入弹窗（替代批量录入）
+        function openImportModal() {
+            document.getElementById('importModal').classList.remove('hidden');
+            document.getElementById('importModal').classList.add('flex');
+        }
+
+        // 关闭弹窗
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.getElementById(modalId).classList.remove('flex');
+            // 如果是导入弹窗，重置文件选择
+            if (modalId === 'importModal') {
+                clearFile();
+            }
+        }
+
+        // 点击遮罩关闭
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal(this.id);
+                }
+            });
+        });
+
+        // 文件选择处理
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('fileInfo').classList.remove('hidden');
+                document.getElementById('btnImport').disabled = false;
+            }
+        }
+
+        // 清除文件
+        function clearFile() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileInfo').classList.add('hidden');
+            document.getElementById('btnImport').disabled = true;
+        }
+
+        // 表单提交
+        document.getElementById('singleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('培训结果录入成功！');
+            closeModal('singleModal');
+        });
+
+        document.getElementById('importForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('文件上传成功！正在导入数据...\n预计导入 24 条培训记录');
+            closeModal('importModal');
+        });
+
+        // 全选功能
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.row-checkbox').forEach(cb => {
+                cb.checked = selectAll;
+            });
+            updateSelectedCount();
+        }
+
+        // 更新选中数量
+        function updateSelectedCount() {
+            const checked = document.querySelectorAll('.row-checkbox:checked').length;
+            document.getElementById('selectedCount').textContent = `已选择 ${checked} 项`;
+
+            // 更新行样式
+            document.querySelectorAll('.record-row').forEach(row => {
+                const checkbox = row.querySelector('.row-checkbox');
+                if (checkbox.checked) {
+                    row.classList.add('selected');
+                } else {
+                    row.classList.remove('selected');
+                }
+            });
+        }
+
+        // 下拉菜单切换
+        function toggleDropdown() {
+            document.getElementById('batchDropdown').classList.toggle('show');
+        }
+
+        // 点击其他地方关闭下拉菜单
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.batch-dropdown')) {
+                document.getElementById('batchDropdown').classList.remove('show');
+            }
+        });
+
+        // 批量标记完成
+        function batchComplete() {
+            const count = document.querySelectorAll('.row-checkbox:checked').length;
+            if (count === 0) {
+                alert('请先选择记录');
+                return;
+            }
+            if (confirm(`确定将选中的 ${count} 条记录标记为"已完成"吗？`)) {
+                alert('批量标记成功！');
+                document.getElementById('batchDropdown').classList.remove('show');
+            }
+        }
+
+        // 批量标记缺勤
+        function batchAbsent() {
+            const count = document.querySelectorAll('.row-checkbox:checked').length;
+            if (count === 0) {
+                alert('请先选择记录');
+                return;
+            }
+            if (confirm(`确定将选中的 ${count} 条记录标记为"缺勤"吗？`)) {
+                alert('批量标记成功！');
+                document.getElementById('batchDropdown').classList.remove('show');
+            }
+        }
+
+        // 批量删除
+        function batchDelete() {
+            const count = document.querySelectorAll('.row-checkbox:checked').length;
+            if (count === 0) {
+                alert('请先选择记录');
+                return;
+            }
+            if (confirm(`确定删除选中的 ${count} 条记录吗？此操作不可恢复！`)) {
+                alert('批量删除成功！');
+                document.getElementById('batchDropdown').classList.remove('show');
+            }
+        }
+
+        // 编辑记录
+        function editRecord(id) {
+            openSingleModal();
+            console.log('编辑记录:', id);
+        }
+
+        // 删除记录
+        function deleteRecord(id) {
+            if (confirm('确定删除这条培训记录吗？')) {
+                const row = document.querySelector(`tr[data-id="${id}"]`);
+                if (row) {
+                    row.remove();
+                    alert('删除成功！');
+                }
+            }
+        }
+
+        // 搜索功能
+        function searchData() {
+            console.log('执行搜索...');
+        }
+
+        // 重置搜索
+        function resetSearch() {
+            document.getElementById('searchTraining').value = '';
+            document.getElementById('searchEmployee').value = '';
+            document.getElementById('searchTime').value = '';
+            document.getElementById('searchStatus').value = '';
+        }
+
+        // 导出数据
+        function exportData() {
+            alert('正在导出培训记录数据...');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业项目管理系统 - 核心业务流程全景图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .nav-tab {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-tab:hover, .nav-tab.active {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .flow-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            min-height: 700px;
+        }
+
+        .flow-section {
+            display: none;
+        }
+
+        .flow-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: inline-block;
+        }
+
+        .flow-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .flow-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            min-width: 140px;
+            position: relative;
+        }
+
+        .flow-box:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .flow-box.sub {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            font-size: 0.9em;
+            padding: 12px 20px;
+        }
+
+        .flow-box.decision {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 50px;
+        }
+
+        .flow-box.document {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #333;
+        }
+
+        .flow-box.warning {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: #333;
+        }
+
+        .flow-box.info {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            border: 2px dashed #667eea;
+        }
+
+        .flow-box.dark {
+            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+        }
+
+        .arrow {
+            font-size: 24px;
+            color: #667eea;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .arrow-down {
+            display: block;
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        .branch-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .branch-label {
+            background: #e0e0e0;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .module-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .module-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .module-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .module-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+            color: #555;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .module-card li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+
+        .module-card li:last-child {
+            border-bottom: none;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+        }
+
+        .swimlane {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .swimlane-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .phase-indicator {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+            display: inline-block;
+        }
+
+        .note-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            color: #856404;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .flow-box {
+                min-width: 120px;
+                padding: 12px 18px;
+                font-size: 0.9em;
+            }
+
+            .branch-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 企业项目管理系统</h1>
+            <p>核心业务全流程管理 | 项目全生命周期闭环</p>
+        </div>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showSection('global')">🌐 全局流程</div>
+            <div class="nav-tab" onclick="showSection('project')">📋 项目立项</div>
+            <div class="nav-tab" onclick="showSection('schedule')">📅 计划排程</div>
+            <div class="nav-tab" onclick="showSection('production')">🏭 生产管控</div>
+            <div class="nav-tab" onclick="showSection('procurement')">📦 采购仓储</div>
+            <div class="nav-tab" onclick="showSection('quality')">🔍 质量管理</div>
+            <div class="nav-tab" onclick="showSection('finance')">💰 收支成本</div>
+            <div class="nav-tab" onclick="showSection('monitor')">📊 监控分析</div>
+        </div>
+
+        <div class="flow-container">
+
+            <!-- 全局核心业务流程（不包含HR、设备、协同办公） -->
+            <div id="global" class="flow-section active">
+                <h2 class="section-title">🌐 项目全生命周期核心业务流程</h2>
+
+                <div class="flow-chart">
+                    <!-- 第一阶段：项目立项 -->
+                    <div class="phase-indicator">🚀 第一阶段：项目立项与启动</div>
+                    <div class="flow-row">
+                        <div class="flow-box">商机获取<br>客户意向</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box">项目申请<br>创建立项</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box sub">录入基本信息<br>客户/类型/金额</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box sub">上传合同<br>设定额度</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box decision">立项审批</div>
+                    </div>
+                    <div class="arrow-down"><span class="arrow">⬇</span></div>
+
+                    <div class="branch-container">
+                        <div class="branch">
+                            <div class="branch-label">审批通过</div>
+                            <div class="flow-box document">生成项目编号<br>正式立项</div>
+                        </div>
+                        <div class="branch">
+                            <div class="branch-label">审批驳回</div>
+                            <div class="flow-box warning">返回修改<br>重新提交</div>
+                        </div>
+                    </div>
+                    <div class="arrow-down"><span class="arrow">⬇</span></div>
+
+                    <!-- 第二阶段：规划阶段 -->
+                    <div class="phase-indicator">📐 第二阶段：规划与准备</div>
+                    <div class="flow-row">
+                        <div class="flow-box">设定里程碑<br>3阶段节点</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box">计划排程<br>工艺+BOM</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box decision">齐套性检查</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box info">库存提醒<br>按需采购</div>
+                    </div>
+                    <div class="arrow-down"><span class="arrow">⬇</span></div>
+
+                    <div class="branch-container">
+                        <div class="branch">
+                            <div class="branch-label">库存充足</div>
+                            <div class="flow-box info">✅ 直接领用<br>生成工单</div>
+                        </div>
+                        <div class="branch">
+                            <div class="branch-label">库存不足</div>
+                            <div class="flow-box warning">⚠️ 提醒用户<br>可选采购</div>
+                            <div class="flow-box sub" style="margin-top:10px;">用户决策<br>是否采购</div>
+                        </div>
+                    </div>
+                    <div class="arrow-down"><span class="arrow">⬇</span></div>
+
+                    <div class="flow-row">
+                        <div class="flow-box sub">采购审批</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box sub">供应商接单</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box document">物资到货<br>质检入库</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box">生成工单<br>准备生产</div>
+                    </div>
+                    <div class="arrow-down"><span class="arrow">⬇</span></div>
+
+                    <!-- 第三阶段：实施阶段 -->
+                    <div class="phase-indicator">🔧 第三阶段：生产实施</div>
+                    <div class="flow-row">
+                        <div class="flow-box">工单执行<br>施工指导</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box sub">报工记录<br>工时/设备</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box decision">质量检验</div>
+                    </div>
+                    <div class="arrow-down"><span class="arrow">⬇</span></div>
+
+                    <div class="branch-container">
+                        <div class="branch">
+                            <div class="branch-label">合格</div>
+                            <div class="flow-box document">继续生产<br>工单完成</div>
+                        </div>
+                        <div class="branch">
+                            <div class="branch-label">不合格</div>
+                            <div class="flow-box warning">返工/报废<br>重新执行</div>
+                        </div>
+                    </div>
+                    <div class="arrow-down"><span class="arrow">⬇</span></div>
+
+                    <div class="flow-row">
+                        <div class="flow-box">生产完成<br>进度更新</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box">成本归集<br>物资/工时</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box">里程碑收款<br>自动提醒</div>
+                    </div>
+                    <div class="arrow-down"><span class="arrow">⬇</span></div>
+
+                    <!-- 第四阶段：收尾阶段 -->
+                    <div class="phase-indicator">🏁 第四阶段：验收与收尾</div>
+                    <div class="flow-row">
+                        <div class="flow-box">项目验收<br>成果交付</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box decision">验收审批</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box">项目关闭</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box sub">文档归档</div>
+                        <span class="arrow">➡</span>
+                        <div class="flow-box sub">知识沉淀</div>
+                    </div>
+                    <div class="arrow-down"><span class="arrow">⬇</span></div>
+
+                    <!-- 贯穿始终的监控 -->
+                    <div class="phase-indicator">📊 贯穿始终：监控与决策</div>
+                    <div class="flow-row">
+                        <div class="flow-box dark">健康度仪表盘<br>实时预警</div>
+                        <span class="arrow">⬄➡</span>
+                        <div class="flow-box dark">甘特图进度<br>超期预警</div>
+                        <span class="arrow">⬄➡</span>
+                        <div class="flow-box dark">成本分析<br>利润核算</div>
+                        <span class="arrow">⬄➡</span>
+                        <div class="flow-box dark">决策支持<br>数据报表</div>
+                    </div>
+
+                    <div style="margin-top: 30px; padding: 20px; background: #f0f4ff; border-radius: 10px; border-left: 4px solid #667eea;">
+                        <h3 style="color: #667eea; margin-bottom: 10px;">🔄 核心业务闭环说明</h3>
+                        <p style="color: #555; line-height: 1.6;">
+                            本流程图展示了项目管理的<strong>四大核心业务阶段</strong>，不包含人力资源、设备管理、协同办公等支撑模块：
+                            <br>• <strong>项目立项</strong>：从商机到正式立项，建立项目档案
+                            <br>• <strong>规划阶段</strong>：计划排程、齐套检查、按需采购、工单生成
+                            <br>• <strong>实施阶段</strong>：生产执行、质量管控、成本归集、进度跟踪
+                            <br>• <strong>收尾阶段</strong>：验收交付、项目关闭、知识沉淀
+                            <br>• <strong>监控分析</strong>：贯穿全生命周期的健康度监控与决策支持
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 项目立项流程（细化版） -->
+            <div id="project" class="flow-section">
+                <h2 class="section-title">📋 项目立项与审批流程（细化版）</h2>
+                <div class="flow-chart">
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📝 步骤1：项目申请创建</div>
+                        <div class="flow-row">
+                            <div class="flow-box">点击新建项目</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">选择项目类型<br>服务/工程/研发/其他</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">填写项目名称</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">👤 步骤2：客户信息录入</div>
+                        <div class="flow-row">
+                            <div class="flow-box">选择客户</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">从客户库选择<br>或新建客户</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">带出默认联系人</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">带出默认收款账户<br>可修改</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">💰 步骤3：项目额度设定</div>
+                        <div class="flow-row">
+                            <div class="flow-box">录入项目金额</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="flow-box sub">质保金设置<br>金额/账户/时间</div>
+                            </div>
+                            <div class="branch">
+                                <div class="flow-box sub">收款比例设置<br>比例/时间/自动计算</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📅 步骤4：里程碑设定（3阶段）</div>
+                        <div class="flow-row">
+                            <div class="flow-box document">📐 规划阶段<br>计划排程/齐套检查</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box document">🔧 实施阶段<br>生产执行/监控</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box document">🏁 收尾阶段<br>验收/关闭/归档</div>
+                        </div>
+                        <div class="note-box">
+                            每个阶段需设定：计划开始时间、计划结束时间、交付物、收款节点
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">👥 步骤5：项目参与人配置</div>
+                        <div class="flow-row">
+                            <div class="flow-box">从人才库选择</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">项目经理</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">技术人员</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">施工人员<br>细化到一线</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📎 步骤6：附件上传</div>
+                        <div class="flow-row">
+                            <div class="flow-box sub">项目合同</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">技术协议</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">相关资质</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">其他附件</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🔍 步骤7：审批流程</div>
+                        <div class="flow-row">
+                            <div class="flow-box">提交审批</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">部门经理审核</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">财务部审核<br>额度/预算</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">总经理审批</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="flow-box document">✅ 审批通过</div>
+                                <div class="flow-box" style="margin-top:10px;">生成项目编号<br>类型+yyMMdd+序号</div>
+                                <div class="flow-box document" style="margin-top:10px;">项目状态：进行中</div>
+                            </div>
+                            <div class="branch">
+                                <div class="flow-box warning">❌ 审批驳回</div>
+                                <div class="flow-box sub" style="margin-top:10px;">查看驳回原因</div>
+                                <div class="flow-box sub" style="margin-top:10px;">修改后重新提交</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 计划排程流程（细化版+修改逻辑） -->
+            <div id="schedule" class="flow-section">
+                <h2 class="section-title">📅 计划排程与采购协同流程（细化版）</h2>
+                <div class="flow-chart">
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🎯 步骤1：排程启动</div>
+                        <div class="flow-row">
+                            <div class="flow-box">项目立项完成</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">进入规划阶段</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">点击计划排程</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🔗 步骤2：工艺与BOM关联</div>
+                        <div class="flow-row">
+                            <div class="flow-box">选择项目</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">关联工艺路线<br>选择标准工艺</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">关联BOM清单<br>物料明细</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">设定生产数量</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🔍 步骤3：齐套性检查（关键节点）</div>
+                        <div class="flow-row">
+                            <div class="flow-box decision">系统自动计算<br>物料需求</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">对比库存</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="branch-label">库存充足</div>
+                                <div class="flow-box info">✅ 库存充足<br>标记记录</div>
+                                <div class="flow-box sub" style="margin-top:10px;">显示可用数量</div>
+                            </div>
+                            <div class="branch">
+                                <div class="branch-label">库存不足</div>
+                                <div class="flow-box warning">⚠️ 库存不足<br>提醒用户</div>
+                                <div class="flow-box sub" style="margin-top:10px;">显示缺料明细</div>
+                            </div>
+                        </div>
+                        <div class="note-box">
+                            <strong>业务规则：</strong>齐套检查仅做提醒，不限制流程。库存充足可直接领用，库存不足时<strong>用户按需决定是否采购</strong>，系统仅记录不强制。
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🤔 步骤4：用户决策（按需采购）</div>
+                        <div class="flow-row">
+                            <div class="flow-box decision">用户决策</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="branch-label">不采购</div>
+                                <div class="flow-box info">直接领用现有库存<br>或跳过</div>
+                                <div class="flow-box sub" style="margin-top:10px;">生成工单</div>
+                            </div>
+                            <div class="branch">
+                                <div class="branch-label">需要采购</div>
+                                <div class="flow-box">生成采购单</div>
+                                <div class="arrow-down" style="margin:5px 0;"><span class="arrow">⬇</span></div>
+                                <div class="flow-box sub">选择供应商</div>
+                                <div class="flow-box sub">录入单价<br>仓储不可见</div>
+                                <div class="flow-box sub">提交采购审批</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📦 步骤5：物资到货跟踪（如采购）</div>
+                        <div class="flow-row">
+                            <div class="flow-box">供应商发货</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">物流跟踪</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">物资到货</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">采购收货单</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🔍 步骤6：质检与入库（如采购）</div>
+                        <div class="flow-row">
+                            <div class="flow-box">来料质检<br>关联采购单</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">质检结果</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="branch-label">合格</div>
+                                <div class="flow-box document">采购入库<br>更新库存</div>
+                            </div>
+                            <div class="branch">
+                                <div class="branch-label">不合格</div>
+                                <div class="flow-box warning">退货/换货<br>异常处理</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🔧 步骤7：工单生成</div>
+                        <div class="flow-row">
+                            <div class="flow-box">物资准备确认</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">生成生产工单</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">分配生产资源</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box document">进入实施阶段<br>开始生产</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 生产管控流程（细化版） -->
+            <div id="production" class="flow-section">
+                <h2 class="section-title">🏭 生产执行与质量管控流程（细化版）</h2>
+                <div class="flow-chart">
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📋 步骤1：工单接收与准备</div>
+                        <div class="flow-row">
+                            <div class="flow-box">接收生产工单</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">查看施工指导书</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">确认物料清单</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">领料出库</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🔧 步骤2：生产执行</div>
+                        <div class="flow-row">
+                            <div class="flow-box">开始生产</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">按工序执行</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">记录设备使用</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">上传过程图文</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📝 步骤3：报工记录（细化）</div>
+                        <div class="grid-container">
+                            <div class="module-card">
+                                <h3>⏱️ 工时填报</h3>
+                                <ul>
+                                    <li>选择报工日期</li>
+                                    <li>选择工序节点</li>
+                                    <li>填写实际工时</li>
+                                    <li>系统自动关联岗位单价</li>
+                                    <li>计算人工成本</li>
+                                </ul>
+                            </div>
+                            <div class="module-card">
+                                <h3>🚗 设备使用</h3>
+                                <ul>
+                                    <li>选择车辆/设备</li>
+                                    <li>记录开始里程</li>
+                                    <li>记录结束里程</li>
+                                    <li>计算使用时长</li>
+                                    <li>归集设备成本</li>
+                                </ul>
+                            </div>
+                            <div class="module-card">
+                                <h3>📸 工作记录</h3>
+                                <ul>
+                                    <li>上传现场照片</li>
+                                    <li>填写文字说明</li>
+                                    <li>记录异常情况</li>
+                                    <li>关联地理位置</li>
+                                    <li>提交审核</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🔍 步骤4：质量检验（关键控制点）</div>
+                        <div class="flow-row">
+                            <div class="flow-box">工序完成</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">发起质检</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">选择质检方案</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">按检测项检验</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="flow-row">
+                            <div class="flow-box sub">录入实测值</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">系统自动判定</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="branch-label">合格</div>
+                                <div class="flow-box document">✅ 质检通过</div>
+                                <div class="flow-box sub" style="margin-top:10px;">进入下一工序</div>
+                                <div class="flow-box document" style="margin-top:10px;">或工单完成</div>
+                            </div>
+                            <div class="branch">
+                                <div class="branch-label">不合格</div>
+                                <div class="flow-box warning">❌ 质检不通过</div>
+                                <div class="arrow-down" style="margin:5px 0;"><span class="arrow">⬇</span></div>
+                                <div class="flow-box sub">触发不合格流程</div>
+                                <div class="arrow-down" style="margin:5px 0;"><span class="arrow">⬇</span></div>
+                                <div class="branch-container" style="gap:15px;">
+                                    <div class="flow-box sub">🔧 返工<br>重新生产</div>
+                                    <div class="flow-box sub">🔄 让步接收<br>特批处理</div>
+                                    <div class="flow-box sub">🗑️ 报废<br>成本计入</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📊 步骤5：工单完成与成本归集</div>
+                        <div class="flow-row">
+                            <div class="flow-box">所有工序完成</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">提交完工申请</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">工单审批</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box document">工单关闭</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="flow-row">
+                            <div class="flow-box">自动归集成本</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">物资消耗成本</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">人工工时成本</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">设备使用成本</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 采购仓储流程（细化版） -->
+            <div id="procurement" class="flow-section">
+                <h2 class="section-title">📦 采购与仓储管理流程（细化版）</h2>
+                <div class="flow-chart">
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📝 步骤1：采购需求产生</div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="branch-label">来源1</div>
+                                <div class="flow-box">计划排程<br>齐套检查生成</div>
+                            </div>
+                            <div class="branch">
+                                <div class="branch-label">来源2</div>
+                                <div class="flow-box">库存预警<br>补货提醒</div>
+                            </div>
+                            <div class="branch">
+                                <div class="branch-label">来源3</div>
+                                <div class="flow-box">手工创建<br>临时采购</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📋 步骤2：采购订单管理</div>
+                        <div class="flow-row">
+                            <div class="flow-box">创建采购订单</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">选择供应商</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">添加物料明细</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">录入单价<br>仓储不可见</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="flow-row">
+                            <div class="flow-box sub">设定交货期</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">选择收货仓库</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">提交审批</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🔍 步骤3：采购审批流程</div>
+                        <div class="flow-row">
+                            <div class="flow-box">提交审批</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">采购经理审核</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">财务审核<br>预算/价格</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">总经理审批<br>大额</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="flow-box document">✅ 审批通过</div>
+                                <div class="flow-box sub" style="margin-top:10px;">发送给供应商</div>
+                            </div>
+                            <div class="branch">
+                                <div class="flow-box warning">❌ 驳回</div>
+                                <div class="flow-box sub" style="margin-top:10px;">修改重提</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📦 步骤4：收货与质检</div>
+                        <div class="flow-row">
+                            <div class="flow-box">供应商送货</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">仓库收货</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">清点数量</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">来料质检</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="flow-row">
+                            <div class="flow-box sub">按质检方案检测</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">判定结果</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="branch-label">合格</div>
+                                <div class="flow-box document">采购入库</div>
+                                <div class="flow-box sub" style="margin-top:10px;">更新库存数量</div>
+                                <div class="flow-box sub" style="margin-top:10px;">更新库存金额</div>
+                            </div>
+                            <div class="branch">
+                                <div class="branch-label">不合格</div>
+                                <div class="flow-box warning">退货单</div>
+                                <div class="flow-box sub" style="margin-top:10px;">换货处理</div>
+                                <div class="flow-box sub" style="margin-top:10px;">索赔记录</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📊 步骤5：库存管理</div>
+                        <div class="grid-container">
+                            <div class="module-card">
+                                <h3>📥 入库管理</h3>
+                                <ul>
+                                    <li>采购入库</li>
+                                    <li>生产退料入库</li>
+                                    <li>其他入库</li>
+                                    <li>入库单审批</li>
+                                </ul>
+                            </div>
+                            <div class="module-card">
+                                <h3>📤 出库管理</h3>
+                                <ul>
+                                    <li>生产领料出库</li>
+                                    <li>采购退货出库</li>
+                                    <li>其他出库</li>
+                                    <li>出库单审批</li>
+                                </ul>
+                            </div>
+                            <div class="module-card">
+                                <h3>🔄 库存调整</h3>
+                                <ul>
+                                    <li>库存调拨</li>
+                                    <li>库存移库</li>
+                                    <li>库存盘点</li>
+                                    <li>盘盈盘亏处理</li>
+                                </ul>
+                            </div>
+                            <div class="module-card">
+                                <h3>⚠️ 库存预警</h3>
+                                <ul>
+                                    <li>安全库存设置</li>
+                                    <li>低于预警线提醒</li>
+                                    <li>超储预警</li>
+                                    <li>呆滞料预警</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">💰 步骤6：采购结算</div>
+                        <div class="flow-row">
+                            <div class="flow-box">收到发票</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">发票录入<br>关联采购单</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">发票验真</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">付款申请</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="flow-row">
+                            <div class="flow-box decision">付款审批</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box document">付款执行</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">付款凭证<br>关联项目成本</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 质量管理流程（细化版） -->
+            <div id="quality" class="flow-section">
+                <h2 class="section-title">🔍 质量管理体系流程（细化版）</h2>
+                <div class="flow-chart">
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">⚙️ 步骤1：质量基础配置</div>
+                        <div class="flow-row">
+                            <div class="flow-box">检测方案定义</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">设定检测项</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">设定标准值</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">设定上下限</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">设定判定规则</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📋 步骤2：质检方案应用</div>
+                        <div class="flow-row">
+                            <div class="flow-box">创建质检方案</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">选择检测方案</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">定义适用场景</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">关联物料/工艺</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🔍 步骤3：来料质检（IQC）</div>
+                        <div class="flow-row">
+                            <div class="flow-box">物资到货</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">收货单触发</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">来料质检单</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">关联采购单</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="flow-row">
+                            <div class="flow-box sub">按方案检测</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">录入实测值</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">自动判定</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="flow-box document">✅ 合格</div>
+                                <div class="flow-box sub" style="margin-top:10px;">允许入库</div>
+                            </div>
+                            <div class="branch">
+                                <div class="flow-box warning">❌ 不合格</div>
+                                <div class="flow-box sub" style="margin-top:10px;">退货/特采</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🔧 步骤4：过程质检（IPQC）</div>
+                        <div class="flow-row">
+                            <div class="flow-box">工序完成</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">工单触发质检</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">过程质检单</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">关联工单</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="flow-row">
+                            <div class="flow-box sub">首件检验</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">巡检</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">末件检验</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">判定</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">✅ 步骤5：成品质检（OQC）</div>
+                        <div class="flow-row">
+                            <div class="flow-box">工单完工</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">申请成品检</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">成品质检单</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">关联项目</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="flow-row">
+                            <div class="flow-box sub">全检/抽检</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">判定结果</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box document">质检报告</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">❌ 步骤6：不合格品处理</div>
+                        <div class="flow-row">
+                            <div class="flow-box warning">发现不合格</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">不合格品标识</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">隔离存放</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">不合格评审</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="flow-box sub">🔧 返工</div>
+                                <div class="flow-box sub" style="margin-top:10px;">重新生产</div>
+                                <div class="flow-box sub" style="margin-top:10px;">再次质检</div>
+                            </div>
+                            <div class="branch">
+                                <div class="flow-box sub">🔄 让步接收</div>
+                                <div class="flow-box sub" style="margin-top:10px;">特批流程</div>
+                                <div class="flow-box sub" style="margin-top:10px;">记录备案</div>
+                            </div>
+                            <div class="branch">
+                                <div class="flow-box sub">🗑️ 报废</div>
+                                <div class="flow-box sub" style="margin-top:10px;">成本计入</div>
+                                <div class="flow-box sub" style="margin-top:10px;">库存调整</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📊 步骤7：质量分析</div>
+                        <div class="flow-row">
+                            <div class="flow-box">质量数据统计</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">合格率分析</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">不良原因分析</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">供应商质量评分</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">质量改进</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 收支成本流程（细化版） -->
+            <div id="finance" class="flow-section">
+                <h2 class="section-title">💰 项目收支与成本核算流程（细化版）</h2>
+                <div class="flow-chart">
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📥 步骤1：收入管理</div>
+                        <div class="flow-row">
+                            <div class="flow-box">里程碑节点到达</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">系统自动提醒<br>应收款到期</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">收款登记</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="flow-row">
+                            <div class="flow-box sub">选择收款方式</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">录入收款金额</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">上传收款凭证</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">关联发票</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="flow-row">
+                            <div class="flow-box">增量收入添加</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">手动添加收入项</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">选择税率</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">自动计算税额</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📤 步骤2：支出管理</div>
+                        <div class="grid-container">
+                            <div class="module-card">
+                                <h3>📦 采购支出</h3>
+                                <ul>
+                                    <li>关联采购订单</li>
+                                    <li>发票录入</li>
+                                    <li>付款申请</li>
+                                    <li>付款审批</li>
+                                    <li>付款凭证存档</li>
+                                </ul>
+                            </div>
+                            <div class="module-card">
+                                <h3>💼 费用报销</h3>
+                                <ul>
+                                    <li>费用申请单</li>
+                                    <li>关联项目</li>
+                                    <li>发票上传</li>
+                                    <li>审批流程</li>
+                                    <li>付款执行</li>
+                                </ul>
+                            </div>
+                            <div class="module-card">
+                                <h3>🚗 车辆成本</h3>
+                                <ul>
+                                    <li>保养费用</li>
+                                    <li>维修费用</li>
+                                    <li>保险费用</li>
+                                    <li>加油费用</li>
+                                    <li>自动分摊</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🧮 步骤3：成本归集（实时）</div>
+                        <div class="flow-row">
+                            <div class="flow-box">成本自动归集</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="grid-container">
+                            <div class="module-card" style="border-left-color: #f093fb;">
+                                <h3 style="color: #f093fb;">📦 物资消耗成本</h3>
+                                <ul>
+                                    <li>领料出库自动归集</li>
+                                    <li>关联采购单价</li>
+                                    <li>加权平均计算</li>
+                                    <li>实时更新成本</li>
+                                </ul>
+                            </div>
+                            <div class="module-card" style="border-left-color: #4facfe;">
+                                <h3 style="color: #4facfe;">⏱️ 人工工时成本</h3>
+                                <ul>
+                                    <li>报工工时统计</li>
+                                    <li>分岗位计算</li>
+                                    <li>岗位工时单价</li>
+                                    <li>自动汇总</li>
+                                </ul>
+                            </div>
+                            <div class="module-card" style="border-left-color: #43e97b;">
+                                <h3 style="color: #43e97b;">🚗 车辆使用成本</h3>
+                                <ul>
+                                    <li>里程记录</li>
+                                    <li>油耗统计</li>
+                                    <li>费用分摊</li>
+                                    <li>成本归集</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📊 步骤4：成本核算与利润分析</div>
+                        <div class="flow-row">
+                            <div class="flow-box">成本汇总</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">实际成本计算</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">对比项目预算</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">预算偏差分析</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="flow-row">
+                            <div class="flow-box">项目收入</div>
+                            <span class="arrow">➖</span>
+                            <div class="flow-box">项目成本</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box document">项目利润</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">利润率计算</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="flow-row">
+                            <div class="flow-box">项目盈利分析</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">成本结构分析</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">盈亏原因分析</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📈 步骤5：财务报表</div>
+                        <div class="flow-row">
+                            <div class="flow-box">项目收支明细表</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">项目成本汇总表</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">项目利润表</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">项目资金流量表</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 监控分析流程（细化版） -->
+            <div id="monitor" class="flow-section">
+                <h2 class="section-title">📊 项目监控与决策支持流程（细化版）</h2>
+                <div class="flow-chart">
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📡 步骤1：数据采集</div>
+                        <div class="grid-container">
+                            <div class="module-card">
+                                <h3>📅 进度数据</h3>
+                                <ul>
+                                    <li>里程碑完成情况</li>
+                                    <li>工单完成进度</li>
+                                    <li>工序进度跟踪</li>
+                                    <li>实际vs计划</li>
+                                </ul>
+                            </div>
+                            <div class="module-card">
+                                <h3>💰 资金数据</h3>
+                                <ul>
+                                    <li>回款记录</li>
+                                    <li>付款记录</li>
+                                    <li>预算执行</li>
+                                    <li>现金流</li>
+                                </ul>
+                            </div>
+                            <div class="module-card">
+                                <h3>💵 成本数据</h3>
+                                <ul>
+                                    <li>物资消耗</li>
+                                    <li>人工成本</li>
+                                    <li>设备成本</li>
+                                    <li>费用支出</li>
+                                </ul>
+                            </div>
+                            <div class="module-card">
+                                <h3>🔍 质量数据</h3>
+                                <ul>
+                                    <li>质检合格率</li>
+                                    <li>不良品数量</li>
+                                    <li>返工次数</li>
+                                    <li>客户投诉</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🚦 步骤2：健康度评估</div>
+                        <div class="flow-row">
+                            <div class="flow-box">数据汇总</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">健康度计算</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">四维度评估</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="flow-box sub">📅 进度健康度<br>完成率/偏差</div>
+                            </div>
+                            <div class="branch">
+                                <div class="flow-box sub">💰 回款健康度<br>应收/实收</div>
+                            </div>
+                            <div class="branch">
+                                <div class="flow-box sub">💵 成本健康度<br>预算/实际</div>
+                            </div>
+                            <div class="branch">
+                                <div class="flow-box sub">🔍 质量健康度<br>合格率</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🚨 步骤3：预警机制</div>
+                        <div class="flow-row">
+                            <div class="flow-box">设定预警规则</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">阈值配置</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box decision">实时监控</div>
+                        </div>
+                        <div class="arrow-down"><span class="arrow">⬇</span></div>
+                        <div class="branch-container">
+                            <div class="branch">
+                                <div class="flow-box document" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">🟢 正常<br>无需处理</div>
+                            </div>
+                            <div class="branch">
+                                <div class="flow-box warning">🟡 预警<br>关注处理</div>
+                            </div>
+                            <div class="branch">
+                                <div class="flow-box" style="background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);">🔴 告警<br>紧急处理</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">📈 步骤4：可视化展示</div>
+                        <div class="flow-row">
+                            <div class="flow-box">项目甘特图</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">进度仪表盘</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">成本趋势图</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">质量统计图</div>
+                        </div>
+                    </div>
+
+                    <div class="swimlane">
+                        <div class="swimlane-title">🎯 步骤5：决策支持</div>
+                        <div class="flow-row">
+                            <div class="flow-box">数据分析</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">趋势预测</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box sub">风险识别</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box">决策建议</div>
+                            <span class="arrow">➡</span>
+                            <div class="flow-box document">管理报表</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.flow-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

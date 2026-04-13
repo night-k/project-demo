@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 能力评价规则配置</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .input-field {
+            transition: all 0.3s;
+            border: 1px solid #d9d9d9;
+            background-color: #fff;
+        }
+
+        .input-field:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
+            outline: none;
+        }
+
+        .input-field:disabled {
+            background-color: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #40a9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24,144,255,0.4);
+        }
+
+        .btn-default {
+            border: 1px solid #d9d9d9;
+            background-color: #fff;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .btn-default:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .btn-success {
+            background-color: #52c41a;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-success:hover {
+            background-color: #73d13d;
+        }
+
+        .btn-danger {
+            background-color: #ff4d4f;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-danger:hover {
+            background-color: #ff7875;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 16px;
+            background-color: #1890ff;
+            border-radius: 2px;
+        }
+
+        .dimension-card {
+            border-left: 4px solid #1890ff;
+            padding: 20px;
+            background: #fff;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .dimension-card.exam { border-left-color: #1890ff; }
+        .dimension-card.train { border-left-color: #52c41a; }
+        .dimension-card.cert { border-left-color: #fa8c16; }
+        .dimension-card.base { border-left-color: #722ed1; }
+
+        .dimension-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .dimension-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dimension-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .dimension-icon.blue { background-color: #e6f7ff; color: #1890ff; }
+        .dimension-icon.green { background-color: #f6ffed; color: #52c41a; }
+        .dimension-icon.orange { background-color: #fff7e6; color: #fa8c16; }
+        .dimension-icon.purple { background-color: #f9f0ff; color: #722ed1; }
+
+        .weight-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            background-color: #f0f0f0;
+            color: #666;
+        }
+
+        .weight-input-small {
+            width: 80px;
+            text-align: center;
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #1890ff;
+        }
+
+        .weight-input-small:disabled {
+            background-color: #f5f5f5;
+            color: #999;
+        }
+
+        .config-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed #f0f0f0;
+        }
+
+        .config-item:last-child {
+            border-bottom: none;
+        }
+
+        .config-label {
+            width: 140px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .config-value {
+            flex: 1;
+            font-weight: 500;
+            color: #262626;
+        }
+
+        .cert-config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .cert-config-table th,
+        .cert-config-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .cert-config-table th {
+            background-color: #fafafa;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .cert-config-table tbody tr:hover {
+            background-color: #fafafa;
+        }
+
+        .operate-btn {
+            color: #1890ff;
+            cursor: pointer;
+            margin-right: 12px;
+            font-size: 13px;
+        }
+
+        .operate-btn:hover { color: #40a9ff; }
+
+        .operate-btn.delete {
+            color: #ff4d4f;
+        }
+
+        .operate-btn.view {
+            color: #666;
+        }
+
+        .score-range-input {
+            width: 45px;
+            text-align: center;
+            padding: 2px 4px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .score-range-input:disabled {
+            background-color: transparent;
+            border: none;
+            color: inherit;
+            padding: 2px 0;
+            width: auto;
+        }
+
+        .preview-box {
+            background: linear-gradient(135deg, #f9f0ff 0%, #f0f5ff 100%);
+            border: 1px solid #d3adf7;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .score-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .score-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #f0f0f0;
+        }
+
+        .score-item.capped {
+            border-color: #ff4d4f;
+            background-color: #fff1f0;
+        }
+
+        .score-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 14px;
+        }
+
+        .score-icon.base { background-color: #f9f0ff; color: #722ed1; }
+        .score-icon.exam { background-color: #e6f7ff; color: #1890ff; }
+        .score-icon.train { background-color: #f6ffed; color: #52c41a; }
+        .score-icon.cert { background-color: #fff7e6; color: #fa8c16; }
+        .score-icon.deduct { background-color: #fff1f0; color: #ff4d4f; }
+        .score-icon.limit { background-color: #fff1f0; color: #ff4d4f; }
+
+        .score-content {
+            flex: 1;
+        }
+
+        .score-title {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .score-calc {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .score-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+        }
+
+        .score-value.capped {
+            color: #ff4d4f;
+        }
+
+        .operator {
+            text-align: center;
+            color: #999;
+            font-size: 20px;
+            font-weight: 300;
+            margin: -6px 0;
+        }
+
+        .final-score-box {
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .final-score-box.capped {
+            background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%);
+        }
+
+        .final-score-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .final-score-value {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .formula-text {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        .alert {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-error {
+            background-color: #fff1f0;
+            border: 1px solid #ffa39e;
+            color: #ff4d4f;
+        }
+
+        .alert-info {
+            background-color: #e6f7ff;
+            border: 1px solid #91d5ff;
+            color: #1890ff;
+        }
+
+        .alert-warning {
+            background-color: #fffbe6;
+            border: 1px solid #ffe58f;
+            color: #faad14;
+        }
+
+        .sidebar-item {
+            transition: all 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .sidebar-item.active {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .info-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            background-color: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .info-tag.red {
+            background-color: #fff1f0;
+            color: #ff4d4f;
+            border: 1px solid #ffa39e;
+        }
+
+        .formula-highlight {
+            background-color: #fff7e6;
+            border: 1px solid #ffd591;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #873800;
+            margin-top: 8px;
+        }
+
+        .limit-setting-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+        }
+
+        .limit-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .limit-input {
+            width: 100px;
+            padding: 6px 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 600;
+            color: #ff4d4f;
+        }
+
+        .limit-input:disabled {
+            background-color: #f5f5f5;
+            color: #999;
+        }
+
+        .limit-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .mode-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-left: 12px;
+        }
+
+        .mode-indicator.view {
+            background-color: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .mode-indicator.edit {
+            background-color: #fff7e6;
+            color: #fa8c16;
+            border: 1px solid #ffd591;
+        }
+
+        /* 弹窗样式 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20 flex-shrink-0">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
+            </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-bars"></i></a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-home"></i> 首页</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-desktop"></i> 工作台</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-project-diagram"></i> 流程管理</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-cogs"></i> 产品工艺</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-shopping-cart"></i> 销售管理</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-tasks"></i> 项目管理</a>
+                <a href="#" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600"><i class="fas fa-industry"></i> 生产管理</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-warehouse"></i> 库存管理</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 text-gray-500 hover:text-blue-600 relative">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>admin-admin</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
+            <div class="p-4">
+                <div class="space-y-1">
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600">
+                        <i class="fas fa-user-tie w-5"></i>
+                        <span>人才管理</span>
+                    </div>
+                    <div class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium">
+                        <i class="fas fa-chart-line w-5"></i>
+                        <span>能力评价规则</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600">
+                        <i class="fas fa-clipboard-check w-5"></i>
+                        <span>技能考核</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600">
+                        <i class="fas fa-certificate w-5"></i>
+                        <span>证书管理</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6 min-w-0">
+
+            <!-- 顶部方案管理 -->
+            <div class="card p-4 mb-6">
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <label class="text-sm font-medium text-gray-700 flex-shrink-0">当前方案：</label>
+                        <select id="schemeSelect" style="min-width: 160px;" class="input-field px-4 py-2 rounded-lg text-sm w-64" disabled>
+                            <option value="default">默认方案（基础60分）</option>
+                            <option value="strict">严格方案（基础50分）</option>
+                            <option value="loose">宽松方案（基础70分）</option>
+                        </select>
+                        <span id="modeBadge" class="mode-indicator view flex-shrink-0">
+                            <i class="fas fa-eye mr-1"></i> 查看模式
+                        </span>
+                        
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0 ml-4">
+                        <button id="newSchemeBtn" onclick="newScheme()" class="btn-primary px-4 py-2 rounded-lg text-sm flex items-center gap-2" disabled>
+                            <i class="fas fa-plus"></i> 新建方案
+                        </button>
+                        <button id="editBtn" onclick="enterEditMode()" class="btn-success px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+                            <i class="fas fa-edit"></i> 编辑
+                        </button>
+                        <button id="deleteBtn" onclick="deleteScheme()" class="btn-danger px-4 py-2 rounded-lg text-sm flex items-center gap-2" disabled>
+                            <i class="fas fa-trash-alt"></i> 删除
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 模式提示条 -->
+                <div id="modeAlert" class="alert alert-info mt-2">
+                    <i class="fas fa-info-circle"></i>
+                    <span>当前为查看模式，点击"编辑"按钮可修改配置参数</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6 mb-6">
+                <!-- 左侧：维度配置 -->
+                <div class="col-span-2 space-y-6">
+
+                    <!-- 基础分与封顶分配置 -->
+                    <div class="dimension-card base">
+                        <div class="dimension-header">
+                            <div class="dimension-title">
+                                <div class="dimension-icon purple">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                基础分与封顶配置
+                            </div>
+                        </div>
+                        <div class="limit-setting-row">
+                            <div style="flex: 1;">
+                                <div class="config-item" style="padding: 0;">
+                                    <span class="config-label">默认基础分</span>
+                                    <div class="config-value flex items-center gap-3">
+                                        <input type="number" id="baseScore" class="weight-input-small" value="60" min="0" max="100" onchange="updatePreview()" disabled>
+                                        <span class="text-gray-500">分</span>
+                                        <span class="info-tag" style="white-space: nowrap;">初始分数</span>
+                                    </div>
+                                </div>
+                                <div class="limit-hint">员工能力评价起始分数，在此基础上进行加减分计算</div>
+                            </div>
+                            <div style="width: 1px; height: 60px; background: #f0f0f0;"></div>
+                            <div style="flex: 1;">
+                                <div class="config-item" style="padding: 0;">
+                                    <span class="config-label">最终分数最大值</span>
+                                    <div class="config-value flex items-center gap-3">
+                                        <input type="number" id="maxScore" class="limit-input" value="150" min="0" max="200" onchange="updatePreview()" disabled>
+                                        <span class="text-gray-500">分</span>
+                                        <span class="info-tag red">封顶限制</span>
+                                    </div>
+                                </div>
+                                <div class="limit-hint">计算结果超过此值时按此值计，防止分数无限增长</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 分数段配置 -->
+                    <div class="dimension-card" id="scoreRangeCard" style="border-left-color: #13c2c2;">
+                        <div class="dimension-header">
+                            <div class="dimension-title">
+                                <div class="dimension-icon" style="background-color: #e6fffb; color: #13c2c2;">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                评分等级分段配置
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <span class="config-label">分数段设置</span>
+                            <div class="config-value">
+                                <div class="formula-highlight">
+                                    <i class="fas fa-chart-bar mr-2"></i>
+                                    设置评分等级分界点，用于人才评级和统计
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex items-center justify-between">
+                                    <!-- 差等级 -->
+                                    <div class="text-center flex-1">
+                                        <div class="text-red-500 font-bold text-lg mb-1">差</div>
+                                        <div class="text-xs text-gray-500 mb-2 flex items-center justify-center gap-1">
+                                            <span>&lt;</span>
+                                            <input type="number" id="badThreshold" class="score-range-input" value="60" min="0" max="100" onchange="validateScoreRanges()" disabled>
+                                        </div>
+                                        <div class="w-full h-2 bg-gradient-to-r from-red-400 to-red-500 rounded-full"></div>
+                                    </div>
+                                    
+                                    <!-- 分隔线 -->
+                                    <div class="px-4 text-gray-300">|</div>
+                                    
+                                    <!-- 良等级 -->
+                                    <div class="text-center flex-1">
+                                        <div class="text-orange-500 font-bold text-lg mb-1">良</div>
+                                        <div class="text-xs text-gray-500 mb-2 flex items-center justify-center gap-1">
+                                            <input type="number" id="goodMin" class="score-range-input" value="60" min="0" max="100" onchange="validateScoreRanges()" disabled>
+                                            <span>-</span>
+                                            <input type="number" id="goodMax" class="score-range-input" value="90" min="0" max="100" onchange="validateScoreRanges()" disabled>
+                                        </div>
+                                        <div class="w-full h-2 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full"></div>
+                                    </div>
+                                    
+                                    <!-- 分隔线 -->
+                                    <div class="px-4 text-gray-300">|</div>
+                                    
+                                    <!-- 优等级 -->
+                                    <div class="text-center flex-1">
+                                        <div class="text-green-500 font-bold text-lg mb-1">优</div>
+                                        <div class="text-xs text-gray-500 mb-2 flex items-center justify-center gap-1">
+                                            <span>&gt;</span>
+                                            <input type="number" id="excellentThreshold" class="score-range-input" value="90" min="0" max="100" onchange="validateScoreRanges()" disabled>
+                                        </div>
+                                        <div class="w-full h-2 bg-gradient-to-r from-green-400 to-green-500 rounded-full"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 分数段校验提示 -->
+                                <div id="rangeAlert" class="alert alert-error mt-3" style="display: none;">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>分数段设置有误：分界值必须是递增关系（差 &lt; 良 &lt; 优）</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 考试维度 -->
+                    <div class="dimension-card exam">
+                        <div class="dimension-header">
+                            <div class="dimension-title">
+                                <div class="dimension-icon blue">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                考试维度
+                            </div>
+                            <div class="weight-badge">
+                                权重 <input type="number" id="examWeight" class="weight-input-small ml-2" value="40" min="0" max="100" onchange="validateWeights()" disabled>%
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <span class="config-label">计分方式</span>
+                            <div class="config-value">
+                                <div class="formula-highlight">
+                                    <i class="fas fa-calculator mr-2"></i>
+                                    考试得分 = 多次考试平均分 × 权重
+                                </div>
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <span class="config-label">数据说明</span>
+                            <div class="config-value text-gray-500">
+                                系统自动统计员工所有考试记录，计算算术平均分作为原始分
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 培训维度 -->
+                    <div class="dimension-card train">
+                        <div class="dimension-header">
+                            <div class="dimension-title">
+                                <div class="dimension-icon green">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                </div>
+                                培训维度
+                            </div>
+                            <div class="weight-badge">
+                                权重 <input type="number" id="trainWeight" class="weight-input-small ml-2" value="30" min="0" max="100" onchange="validateWeights()" disabled>%
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <span class="config-label">计分方式</span>
+                            <div class="config-value">
+                                <div class="formula-highlight">
+                                    <i class="fas fa-calculator mr-2"></i>
+                                    培训得分 = 完成率 × 100 × 权重 &nbsp;&nbsp;（完成率 = 已参加 / 应参加）
+                                </div>
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <span class="config-label">默认分值</span>
+                            <div class="config-value flex items-center gap-2">
+                                <span class="text-gray-700 font-medium">0分</span>
+                                <span class="text-gray-400">→ 根据实际完成率计算</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 证书维度 -->
+                    <div class="dimension-card cert">
+                        <div class="dimension-header">
+                            <div class="dimension-title">
+                                <div class="dimension-icon orange">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                证书维度
+                            </div>
+                            <div class="weight-badge">
+                                权重 <input type="number" id="certWeight" class="weight-input-small ml-2" value="30" min="0" max="100" onchange="validateWeights()" disabled>%
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <span class="config-label">计分方式</span>
+                            <div class="config-value">
+                                <div class="formula-highlight">
+                                    <i class="fas fa-calculator mr-2"></i>
+                                    证书得分 = 累计证书分值 × 权重
+                                </div>
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <span class="config-label">默认分值</span>
+                            <div class="config-value flex items-center gap-2">
+                                <span class="text-gray-700 font-medium">0分</span>
+                                <span class="text-gray-400">→ 根据持证情况累计计分</span>
+                            </div>
+                        </div>
+
+                        <!-- 证书分值配置表 -->
+                        <div class="mt-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-sm font-medium text-gray-700">岗位证书分值配置</span>
+                                <button id="addCertBtn" onclick="addCertConfig()" class="btn-success px-3 py-1 rounded text-sm flex items-center gap-1" style="display: none;">
+                                    <i class="fas fa-plus"></i> 添加证书
+                                </button>
+                            </div>
+                            <table class="cert-config-table">
+                                <thead>
+                                    <tr>
+                                        <th>适用岗位</th>
+                                        <th>证书类型</th>
+                                        <th>分值</th>
+                                        <th id="certTableAction">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="certConfigBody">
+                                    <tr>
+                                        <td>电工</td>
+                                        <td>特种作业操作证（低压）</td>
+                                        <td>+10</td>
+                                        <td class="action-cell">
+                                            <span class="operate-btn view" onclick="viewCertDetail(this)"><i class="fas fa-eye"></i></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>焊工</td>
+                                        <td>特种作业操作证（焊接）</td>
+                                        <td>+10</td>
+                                        <td class="action-cell">
+                                            <span class="operate-btn view" onclick="viewCertDetail(this)"><i class="fas fa-eye"></i></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>安全员</td>
+                                        <td>安全生产考核合格证（C证）</td>
+                                        <td>+15</td>
+                                        <td class="action-cell">
+                                            <span class="operate-btn view" onclick="viewCertDetail(this)"><i class="fas fa-eye"></i></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>工程师</td>
+                                        <td>职业资格证书（高级）</td>
+                                        <td>+20</td>
+                                        <td class="action-cell">
+                                            <span class="operate-btn view" onclick="viewCertDetail(this)"><i class="fas fa-eye"></i></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 权重校验提示 -->
+                    <div id="weightAlert" class="alert alert-error" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>三维度权重之和须为100%，当前 <span id="currentSum">0</span>%</span>
+                        <button onclick="autoBalance()" class="ml-4 text-blue-600 hover:underline">自动平衡</button>
+                    </div>
+
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm text-gray-600">维度权重总和：</span>
+                            <span id="totalWeight" class="text-lg font-bold text-gray-800">100%</span>
+                            <span id="weightStatus"></span>
+                        </div>
+                        <button id="resetBtn" onclick="resetDefault()" class="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1" style="display: none;">
+                            <i class="fas fa-undo"></i> 恢复默认权重
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- 右侧：实时预览 -->
+                <div class="col-span-1">
+                    <div class="card p-5 sticky top-6">
+                        <div class="section-title">评分计算预览</div>
+
+                        <div class="preview-box mb-4">
+                            <div class="text-sm font-medium text-purple-700 mb-3">计分公式</div>
+                            <div class="formula-highlight bg-white border-purple-200 text-purple-800">
+                                最终得分 = 基础分 + 考试×<span class="exam-weight">40%</span> + 培训×<span class="train-weight">30%</span> + 证书×<span class="cert-weight">30%</span> +- 加分/扣分
+                                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #d9d9d9; color: #ff4d4f;">
+                                    <i class="fas fa-hand-paper mr-1"></i> 封顶限制：最高不超过 <span id="previewMaxScore">150</span> 分
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="score-flow">
+                            <!-- 基础分 -->
+                            <div class="score-item">
+                                <div class="score-icon base">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="score-content">
+                                    <div class="score-title">基础分</div>
+                                </div>
+                                <div class="score-value" id="previewBase">60.0</div>
+                            </div>
+
+                            <div class="operator"><i class="fas fa-plus text-gray-400"></i></div>
+
+                            <!-- 考试 -->
+                            <div class="score-item">
+                                <div class="score-icon exam">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="score-content">
+                                    <div class="score-title">考试得分</div>
+                                    <div class="score-calc">平均分85 × <span class="exam-weight">40%</span></div>
+                                </div>
+                                <div class="score-value text-blue-600" id="previewExam">34.0</div>
+                            </div>
+
+                            <div class="operator"><i class="fas fa-plus text-gray-400"></i></div>
+
+                            <!-- 培训 -->
+                            <div class="score-item">
+                                <div class="score-icon train">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                </div>
+                                <div class="score-content">
+                                    <div class="score-title">培训得分</div>
+                                    <div class="score-calc">完成率80% × 100 × <span class="train-weight">30%</span></div>
+                                </div>
+                                <div class="score-value text-green-600" id="previewTrain">24.0</div>
+                            </div>
+
+                            <div class="operator"><i class="fas fa-plus text-gray-400"></i></div>
+
+                            <!-- 证书 -->
+                            <div class="score-item">
+                                <div class="score-icon cert">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div class="score-content">
+                                    <div class="score-title">证书得分</div>
+                                    <div class="score-calc">持证分值20 × <span class="cert-weight">30%</span></div>
+                                </div>
+                                <div class="score-value text-orange-600" id="previewCert">6.0</div>
+                            </div>
+
+                            <div class="operator"><i class="fas fa-minus text-gray-400"></i></div>
+
+                            <!-- 扣分 -->
+                            <div class="score-item">
+                                <div class="score-icon deduct">
+                                    <i class="fas fa-minus-circle"></i>
+                                </div>
+                                <div class="score-content">
+                                    <div class="score-title">加分/扣分(人工录入)</div>
+                                    <div class="score-calc">其他奖惩记录</div>
+                                </div>
+                                <div class="score-value text-red-500" id="previewDeduct">-5.0</div>
+                            </div>
+
+                            <!-- 封顶提示（条件显示） -->
+                            <div id="capNotice" class="score-item capped" style="display: none;">
+                                <div class="score-icon limit">
+                                    <i class="fas fa-hand-paper"></i>
+                                </div>
+                                <div class="score-content">
+                                    <div class="score-title" style="color: #ff4d4f; font-weight: 600;">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>已触发封顶
+                                    </div>
+                                    <div class="score-calc">原始总分<span id="rawTotal">0</span>分超过上限<span id="capLimit">150</span>分</div>
+                                </div>
+                                <div class="score-value capped">-<span id="deductCap">0</span></div>
+                            </div>
+                        </div>
+
+                        <div class="final-score-box" id="finalScoreBox">
+                            <div class="final-score-label">最终得分</div>
+                            <div class="final-score-value" id="previewFinal">119.0</div>
+                            <div class="formula-text">满分封顶 <span id="finalMaxScore">150</span> 分</div>
+                        </div>
+
+                        <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                            <div class="text-xs text-gray-500 mb-2">评分等级参考</div>
+                            <div class="flex justify-between text-xs" id="scoreRangeDisplay">
+                                <span class="text-red-500">差 (&lt;<span id="displayBad">60</span>)</span>
+                                <span class="text-orange-500">良 (<span id="displayGoodMin">60</span>-<span id="displayGoodMax">90</span>)</span>
+                                <span class="text-green-500">优 (&gt;<span id="displayExcellent">90</span>)</span>
+                            </div>
+                            <div class="w-full h-2 bg-gray-200 rounded-full mt-2 overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-red-400 via-orange-400 to-green-400" style="width: 100%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-xs text-gray-400 text-center">
+                            <i class="fas fa-sync-alt mr-1"></i> 根据配置实时计算
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部操作栏 -->
+            <div id="bottomBar" class="fixed bottom-0 left-56 right-0 bg-white border-t border-gray-200 p-4 flex items-center justify-between shadow-lg z-30" style="display: none;">
+                <div class="text-sm text-gray-500">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    最后保存时间：<span id="lastSaveTime">2024-01-15 14:30:00</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="cancelEdit()" class="btn-default px-6 py-2 rounded-lg text-sm">
+                        取消
+                    </button>
+                    <button onclick="saveConfig()" class="btn-primary px-6 py-2 rounded-lg text-sm flex items-center gap-2">
+                        <i class="fas fa-save"></i> 保存配置
+                    </button>
+                </div>
+            </div>
+
+            <div id="bottomPlaceholder" class="h-20"></div>
+
+        </main>
+    </div>
+
+    <!-- 证书配置弹窗 -->
+    <div id="certModal" class="modal-overlay">
+        <div class="modal-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 16px; font-weight: 600;">配置证书分值</h3>
+                <button onclick="closeCertModal()" style="background: none; border: none; font-size: 20px; cursor: pointer;"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; color: #666; margin-bottom: 6px;">适用岗位</label>
+                <select id="certPost" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px;">
+                    <option value="">请选择岗位</option>
+                    <option value="电工">电工</option>
+                    <option value="焊工">焊工</option>
+                    <option value="安全员">安全员</option>
+                    <option value="工程师">工程师</option>
+                    <option value="质检员">质检员</option>
+                    <option value="操作工">操作工</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; color: #666; margin-bottom: 6px;">证书类型</label>
+                <select id="certType" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px;">
+                    <option value="">请选择证书类型</option>
+                    <option value="特种作业操作证（低压）">特种作业操作证（低压电工）</option>
+                    <option value="特种作业操作证（高压）">特种作业操作证（高压电工）</option>
+                    <option value="特种作业操作证（焊接）">特种作业操作证（焊接与热切割）</option>
+                    <option value="安全生产考核合格证（C证）">安全生产考核合格证（C证）</option>
+                    <option value="职业资格证书（初级）">职业资格证书（初级）</option>
+                    <option value="职业资格证书（中级）">职业资格证书（中级）</option>
+                    <option value="职业资格证书（高级）">职业资格证书（高级）</option>
+                    <option value="特种设备作业证">特种设备作业证</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 13px; color: #666; margin-bottom: 6px;">获得分值</label>
+                <input type="number" id="certScore" style="width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px;" placeholder="请输入正数分值，如：10">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button onclick="closeCertModal()" style="padding: 8px 16px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; cursor: pointer;">取消</button>
+                <button onclick="saveCertConfig()" style="padding: 8px 16px; background: #1890ff; color: white; border: none; border-radius: 4px; cursor: pointer;">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isEditMode = false;
+        let originalData = {};
+        let editingCertRow = null;
+
+        // 进入编辑模式
+        function enterEditMode() {
+            isEditMode = true;
+
+            // 保存原始数据
+            originalData = {
+                baseScore: document.getElementById('baseScore').value,
+                maxScore: document.getElementById('maxScore').value,
+                examWeight: document.getElementById('examWeight').value,
+                trainWeight: document.getElementById('trainWeight').value,
+                certWeight: document.getElementById('certWeight').value,
+                badThreshold: document.getElementById('badThreshold').value,
+                goodMin: document.getElementById('goodMin').value,
+                goodMax: document.getElementById('goodMax').value,
+                excellentThreshold: document.getElementById('excellentThreshold').value
+            };
+
+            // 启用所有输入框
+            document.querySelectorAll('input:not([type="checkbox"]), select').forEach(el => {
+                el.disabled = false;
+            });
+
+            // 显示底部操作栏
+            document.getElementById('bottomBar').style.display = 'flex';
+
+            // 显示证书添加按钮
+            document.getElementById('addCertBtn').style.display = 'flex';
+
+            // 显示恢复默认按钮
+            document.getElementById('resetBtn').style.display = 'flex';
+
+            // 修改表格操作列为编辑/删除
+            document.getElementById('certTableAction').textContent = '操作';
+            document.querySelectorAll('#certConfigBody .action-cell').forEach(cell => {
+                cell.innerHTML = `
+                    <span class="operate-btn" onclick="editCertConfig(this)"><i class="fas fa-edit"></i></span>
+                    <span class="operate-btn delete" onclick="deleteCertConfig(this)"><i class="fas fa-trash-alt"></i></span>
+                `;
+            });
+
+            // 更新模式指示器
+            const badge = document.getElementById('modeBadge');
+            badge.className = 'mode-indicator edit';
+            badge.innerHTML = '<i class="fas fa-edit mr-1"></i> 编辑模式';
+
+            // 更新提示条
+            const alert = document.getElementById('modeAlert');
+            alert.className = 'alert alert-warning';
+            alert.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>当前为编辑模式，修改完成后请点击保存按钮</span>';
+
+            // 隐藏编辑按钮，显示取消和保存
+            document.getElementById('editBtn').style.display = 'none';
+
+            // 启用方案管理按钮
+            document.getElementById('newSchemeBtn').disabled = false;
+            document.getElementById('deleteBtn').disabled = false;
+
+            // 聚焦第一个输入框
+            document.getElementById('baseScore').focus();
+        }
+
+        // 取消编辑
+        function cancelEdit() {
+            if (!confirm('确定要取消编辑吗？未保存的修改将丢失。')) {
+                return;
+            }
+
+            // 恢复原始数据
+            document.getElementById('baseScore').value = originalData.baseScore;
+            document.getElementById('maxScore').value = originalData.maxScore;
+            document.getElementById('examWeight').value = originalData.examWeight;
+            document.getElementById('trainWeight').value = originalData.trainWeight;
+            document.getElementById('certWeight').value = originalData.certWeight;
+            document.getElementById('badThreshold').value = originalData.badThreshold;
+            document.getElementById('goodMin').value = originalData.goodMin;
+            document.getElementById('goodMax').value = originalData.goodMax;
+            document.getElementById('excellentThreshold').value = originalData.excellentThreshold;
+
+            validateScoreRanges();
+            exitEditMode();
+        }
+
+        // 退出编辑模式
+        function exitEditMode() {
+            isEditMode = false;
+
+            // 禁用所有输入框
+            document.querySelectorAll('input:not([type="checkbox"]), select').forEach(el => {
+                el.disabled = true;
+            });
+
+            // 隐藏底部操作栏
+            document.getElementById('bottomBar').style.display = 'none';
+
+            // 隐藏证书添加按钮
+            document.getElementById('addCertBtn').style.display = 'none';
+
+            // 隐藏恢复默认按钮
+            document.getElementById('resetBtn').style.display = 'none';
+
+            // 修改表格操作列为查看
+            document.getElementById('certTableAction').textContent = '操作';
+            document.querySelectorAll('#certConfigBody .action-cell').forEach(cell => {
+                cell.innerHTML = '<span class="operate-btn view" onclick="viewCertDetail(this)"><i class="fas fa-eye"></i></span>';
+            });
+
+            // 更新模式指示器
+            const badge = document.getElementById('modeBadge');
+            badge.className = 'mode-indicator view';
+            badge.innerHTML = '<i class="fas fa-eye mr-1"></i> 查看模式';
+
+            // 更新提示条
+            const alert = document.getElementById('modeAlert');
+            alert.className = 'alert alert-info';
+            alert.innerHTML = '<i class="fas fa-info-circle"></i><span>当前为查看模式，点击"编辑"按钮可修改配置参数</span>';
+
+            // 显示编辑按钮
+            document.getElementById('editBtn').style.display = 'inline-flex';
+
+            // 禁用方案管理按钮（在查看模式下不能新建/删除方案）
+            document.getElementById('newSchemeBtn').disabled = true;
+            document.getElementById('deleteBtn').disabled = true;
+
+            validateWeights();
+        }
+
+        // 查看证书详情（查看模式）
+        function viewCertDetail(btn) {
+            const row = btn.closest('tr');
+            const cells = row.cells;
+            alert(`证书详情：\n岗位：${cells[0].textContent}\n证书：${cells[1].textContent}\n分值：${cells[2].textContent}`);
+        }
+
+        // 权重校验
+        function validateWeights() {
+            const exam = parseFloat(document.getElementById('examWeight').value) || 0;
+            const train = parseFloat(document.getElementById('trainWeight').value) || 0;
+            const cert = parseFloat(document.getElementById('certWeight').value) || 0;
+
+            const total = exam + train + cert;
+            const totalEl = document.getElementById('totalWeight');
+            const alertEl = document.getElementById('weightAlert');
+            const currentSumEl = document.getElementById('currentSum');
+            const statusEl = document.getElementById('weightStatus');
+
+            totalEl.textContent = total + '%';
+            currentSumEl.textContent = total;
+
+            if (total !== 100) {
+                totalEl.classList.add('text-red-500');
+                totalEl.classList.remove('text-green-600');
+                if (isEditMode) {
+                    alertEl.style.display = 'flex';
+                }
+                statusEl.innerHTML = '<i class="fas fa-exclamation-circle text-red-500 ml-2"></i>';
+            } else {
+                totalEl.classList.remove('text-red-500');
+                totalEl.classList.add('text-green-600');
+                alertEl.style.display = 'none';
+                statusEl.innerHTML = '<i class="fas fa-check-circle text-green-500 ml-2"></i>';
+            }
+
+            updatePreview();
+        }
+
+        function autoBalance() {
+            const exam = parseFloat(document.getElementById('examWeight').value) || 0;
+            const train = parseFloat(document.getElementById('trainWeight').value) || 0;
+            const cert = parseFloat(document.getElementById('certWeight').value) || 0;
+            const total = exam + train + cert;
+
+            if (total > 0) {
+                const ratio = 100 / total;
+                document.getElementById('examWeight').value = Math.round(exam * ratio);
+                document.getElementById('trainWeight').value = Math.round(train * ratio);
+                document.getElementById('certWeight').value = Math.round(cert * ratio);
+                validateWeights();
+            }
+        }
+
+        function resetDefault() {
+            document.getElementById('examWeight').value = 40;
+            document.getElementById('trainWeight').value = 30;
+            document.getElementById('certWeight').value = 30;
+            document.getElementById('baseScore').value = 60;
+            document.getElementById('maxScore').value = 150;
+            document.getElementById('badThreshold').value = 60;
+            document.getElementById('goodMin').value = 60;
+            document.getElementById('goodMax').value = 90;
+            document.getElementById('excellentThreshold').value = 90;
+            validateWeights();
+            validateScoreRanges();
+        }
+
+        // 校验分数段设置
+        function validateScoreRanges(silent) {
+            const bad = parseFloat(document.getElementById('badThreshold').value);
+            const goodMin = parseFloat(document.getElementById('goodMin').value);
+            const goodMax = parseFloat(document.getElementById('goodMax').value);
+            const excellent = parseFloat(document.getElementById('excellentThreshold').value);
+            const alertEl = document.getElementById('rangeAlert');
+
+            // 同步关联输入框
+            document.getElementById('goodMin').value = bad;
+            document.getElementById('excellentThreshold').value = goodMax;
+
+            let isValid = !isNaN(bad) && !isNaN(goodMax) && bad >= 0 && goodMax > bad && goodMax <= 100;
+
+            if (!isValid) {
+                if (!silent) {
+                    alertEl.style.display = 'flex';
+                }
+            } else {
+                alertEl.style.display = 'none';
+            }
+
+            updateScoreRangeDisplay();
+            return isValid;
+        }
+
+        // 更新右侧分数段显示
+        function updateScoreRangeDisplay() {
+            const bad = document.getElementById('badThreshold').value;
+            const goodMin = document.getElementById('goodMin').value;
+            const goodMax = document.getElementById('goodMax').value;
+            const excellent = document.getElementById('excellentThreshold').value;
+
+            document.getElementById('displayBad').textContent = bad;
+            document.getElementById('displayGoodMin').textContent = goodMin;
+            document.getElementById('displayGoodMax').textContent = goodMax;
+            document.getElementById('displayExcellent').textContent = excellent;
+        }
+
+        function updatePreview() {
+            const base = parseFloat(document.getElementById('baseScore').value) || 0;
+            const maxScore = parseFloat(document.getElementById('maxScore').value) || 150;
+            const examWeight = parseFloat(document.getElementById('examWeight').value) || 0;
+            const trainWeight = parseFloat(document.getElementById('trainWeight').value) || 0;
+            const certWeight = parseFloat(document.getElementById('certWeight').value) || 0;
+
+            const examAvg = 85;
+            const trainComplete = 0.8;
+            const certTotal = 20;
+            const deduct = 5;
+
+            const examScore = (examAvg * examWeight / 100).toFixed(1);
+            const trainScore = (trainComplete * 100 * trainWeight / 100).toFixed(1);
+            const certScore = (certTotal * certWeight / 100).toFixed(1);
+
+            const rawTotal = base + parseFloat(examScore) + parseFloat(trainScore) + parseFloat(certScore) - deduct;
+            let final = rawTotal;
+            let isCapped = false;
+            let capDeduct = 0;
+
+            if (rawTotal > maxScore) {
+                final = maxScore;
+                isCapped = true;
+                capDeduct = (rawTotal - maxScore).toFixed(1);
+            }
+
+            final = final.toFixed(1);
+
+            document.getElementById('previewBase').textContent = base.toFixed(1);
+            document.getElementById('previewExam').textContent = examScore;
+            document.getElementById('previewTrain').textContent = trainScore;
+            document.getElementById('previewCert').textContent = certScore;
+            document.getElementById('previewDeduct').textContent = '-' + deduct.toFixed(1);
+            document.getElementById('previewFinal').textContent = final;
+
+            document.getElementById('previewMaxScore').textContent = maxScore;
+            document.getElementById('finalMaxScore').textContent = maxScore;
+
+            const capNotice = document.getElementById('capNotice');
+            const finalScoreBox = document.getElementById('finalScoreBox');
+
+            if (isCapped) {
+                capNotice.style.display = 'flex';
+                document.getElementById('rawTotal').textContent = rawTotal.toFixed(1);
+                document.getElementById('capLimit').textContent = maxScore;
+                document.getElementById('deductCap').textContent = capDeduct;
+                finalScoreBox.classList.add('capped');
+            } else {
+                capNotice.style.display = 'none';
+                finalScoreBox.classList.remove('capped');
+            }
+
+            document.querySelectorAll('.exam-weight').forEach(el => el.textContent = examWeight + '%');
+            document.querySelectorAll('.train-weight').forEach(el => el.textContent = trainWeight + '%');
+            document.querySelectorAll('.cert-weight').forEach(el => el.textContent = certWeight + '%');
+        }
+
+        // 证书配置
+        function addCertConfig() {
+            editingCertRow = null;
+            document.getElementById('certPost').value = '';
+            document.getElementById('certType').value = '';
+            document.getElementById('certScore').value = '';
+            document.getElementById('certModal').style.display = 'flex';
+        }
+
+        function editCertConfig(btn) {
+            editingCertRow = btn.closest('tr');
+            const cells = editingCertRow.cells;
+            document.getElementById('certPost').value = cells[0].textContent;
+            document.getElementById('certType').value = cells[1].textContent;
+            document.getElementById('certScore').value = cells[2].textContent.replace('+', '');
+            document.getElementById('certModal').style.display = 'flex';
+        }
+
+        function deleteCertConfig(btn) {
+            if (confirm('确定要删除这条证书配置吗？')) {
+                btn.closest('tr').remove();
+                updatePreview();
+            }
+        }
+
+        function closeCertModal() {
+            document.getElementById('certModal').style.display = 'none';
+            editingCertRow = null;
+        }
+
+        function saveCertConfig() {
+            const post = document.getElementById('certPost').value;
+            const type = document.getElementById('certType').value;
+            const score = document.getElementById('certScore').value;
+
+            if (!post || !type || !score) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            if (editingCertRow) {
+                editingCertRow.cells[0].textContent = post;
+                editingCertRow.cells[1].textContent = type;
+                editingCertRow.cells[2].textContent = '+' + score;
+            } else {
+                const tbody = document.getElementById('certConfigBody');
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${post}</td>
+                    <td>${type}</td>
+                    <td>+${score}</td>
+                    <td class="action-cell">
+                        <span class="operate-btn" onclick="editCertConfig(this)"><i class="fas fa-edit"></i></span>
+                        <span class="operate-btn delete" onclick="deleteCertConfig(this)"><i class="fas fa-trash-alt"></i></span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+
+            closeCertModal();
+            updatePreview();
+        }
+
+        // 方案管理
+        function newScheme() {
+            const name = prompt('请输入新方案名称：');
+            if (name) {
+                const select = document.getElementById('schemeSelect');
+                const option = new Option(name, 'custom_' + Date.now());
+                select.add(option);
+                select.selectedIndex = select.options.length - 1;
+            }
+        }
+
+        function deleteScheme() {
+            const select = document.getElementById('schemeSelect');
+            if (select.options.length <= 1) {
+                alert('至少需要保留一个方案');
+                return;
+            }
+            if (confirm('确定要删除当前方案吗？')) {
+                select.remove(select.selectedIndex);
+            }
+        }
+
+        function saveConfig() {
+            const total = parseFloat(document.getElementById('totalWeight').textContent);
+            if (total !== 100) {
+                alert('保存失败：维度权重之和必须等于100%');
+                return;
+            }
+
+            if (!validateScoreRanges(true)) {
+                alert('保存失败：分数段设置有误，请检查分界值');
+                return;
+            }
+
+            const now = new Date();
+            const timeStr = now.getFullYear() + '-' + 
+                          String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                          String(now.getDate()).padStart(2, '0') + ' ' + 
+                          String(now.getHours()).padStart(2, '0') + ':' + 
+                          String(now.getMinutes()).padStart(2, '0') + ':' + 
+                          String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('lastSaveTime').textContent = timeStr;
+
+            alert('配置保存成功！');
+            exitEditMode();
+        }
+
+        // 方案切换
+        document.getElementById('schemeSelect').addEventListener('change', function() {
+            const value = this.value;
+            if (value === 'strict') {
+                document.getElementById('baseScore').value = 50;
+                document.getElementById('maxScore').value = 130;
+                document.getElementById('examWeight').value = 50;
+                document.getElementById('trainWeight').value = 30;
+                document.getElementById('certWeight').value = 20;
+            } else if (value === 'loose') {
+                document.getElementById('baseScore').value = 70;
+                document.getElementById('maxScore').value = 180;
+                document.getElementById('examWeight').value = 30;
+                document.getElementById('trainWeight').value = 30;
+                document.getElementById('certWeight').value = 40;
+            } else {
+                document.getElementById('baseScore').value = 60;
+                document.getElementById('maxScore').value = 150;
+                document.getElementById('examWeight').value = 40;
+                document.getElementById('trainWeight').value = 30;
+                document.getElementById('certWeight').value = 30;
+            }
+            validateWeights();
+        });
+
+        // 点击遮罩关闭弹窗
+        document.getElementById('certModal').addEventListener('click', function(e) {
+            if (e.target === this) closeCertModal();
+        });
+
+        // 初始化
+        validateWeights();
+    </script>
+</body>
+</html>

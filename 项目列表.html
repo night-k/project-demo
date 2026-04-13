@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>云智工业互联平台 - 项目管理</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com">
+        // 显示卡片菜单（简化版）
+        function showCardMenu(cardId) {
+            // 可扩展为显示下拉菜单
+            console.log('打开卡片' + cardId + '的菜单');
+        }
+    </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -84,6 +90,12 @@
             background-color: #f6ffed;
             color: #52c41a;
             border: 1px solid #b7eb8f;
+        }
+
+        .tag-terminated {
+            background-color: #f5f5f5;
+            color: #9ca3af;
+            border: 1px solid #d1d5db;
         }
 
         .priority-high {
@@ -341,6 +353,7 @@
                                 <option>已完成</option>
                                 <option>草稿</option>
                                 <option>已暂停</option>
+                                <option>已终止</option>
                             </select>
                         </div>
                         <div>
@@ -410,92 +423,95 @@
                 <div id="cardView" class="grid grid-cols-3 gap-4 mb-6">
                     <!-- 项目卡片1 -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 card-hover overflow-hidden group">
-                        <div class="p-4">
-                            <!-- 第一行：项目名称 + 优先级 + 状态 -->
-                            <div class="flex items-center gap-2 mb-2 flex-wrap">
-                                <h3 class="font-bold text-gray-800 text-base group-hover:text-blue-600 transition-colors line-clamp-1">cs项目-设备合同</h3>
-                                <span class="text-xs text-gray-500">低优先级</span>
-                                <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                        <div class="p-5">
+                            <!-- 第一行：项目名称 + 右上角菜单 -->
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-bold text-gray-900 text-lg truncate pr-2">cs项目-设备合同</h3>
+                                <button onclick="showCardMenu(1)" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+
+                            <!-- 第二行：编号 | 类型 -->
+                            <div class="flex items-center gap-2 text-xs text-gray-500 mb-3">
+                                <span class="font-mono bg-gray-100 px-2 py-1 rounded text-gray-700">XM-20260331-3</span>
+                                <span class="text-gray-300">|</span>
+                                <span class="text-blue-600 font-medium">服务类</span>
+                            </div>
+
+                            <!-- 第三行：客户 -->
+                            <div class="text-sm text-gray-600 mb-3 truncate">客户：充电器公司</div>
+
+                            <!-- 标签行：状态 + 优先级 -->
+                            <div class="flex items-center gap-2 mb-4">
                                 <span class="tag-status tag-doing text-xs px-2 py-0.5">进行中</span>
+                                <span class="tag-status priority-low text-xs px-2 py-0.5">低优先级</span>
                             </div>
 
-                            <!-- 第二行：编号 ｜ 类型 ｜ 客户 -->
-                            <div class="text-xs text-gray-500 mb-3">
-                                <span class="font-mono text-gray-600">XM-20260331-3</span>
-                                <span class="mx-1">｜</span>
-                                <span class="text-blue-600">服务类</span>
-                                <span class="mx-1">｜</span>
-                                <span>客户：充电器公司</span>
+                            <!-- 灰色背景信息区 -->
+                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                <div class="flex items-baseline justify-between">
+                                    <div>
+                                        <div class="text-xs text-gray-500 mb-1">合同金额</div>
+                                        <div class="text-xl font-bold text-blue-600">¥200.00</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-xs text-gray-500 mb-1">计划完成</div>
+                                        <div class="text-base font-medium text-gray-900">2026-03-04</div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- 第三行：💰 合同金额 ｜ 📅 计划完成 -->
-                            <div class="text-sm text-gray-600 mb-4">
-                                <span>💰 合同金额 <span class="font-bold text-blue-600">¥200.00</span></span>
-                                <span class="mx-2 text-gray-300">｜</span>
-                                <span>📅 计划完成 <span class="font-medium text-gray-800">2026-03-04</span></span>
-                            </div>
-
-                            <!-- 进入项目空间按钮 -->
-                            <a href="项目空间.html" class="flex items-center justify-center gap-2 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors">
-                                <span>→</span> 进入项目空间
+                            <!-- 蓝色大按钮 -->
+                            <a href="项目空间.html" class="block w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                                <i class="fas fa-cube"></i> 进入项目空间
                             </a>
                         </div>
                     </div>
 
                     <!-- 项目卡片2 -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 card-hover overflow-hidden group">
-                        <div class="p-4">
+                        <div class="p-5">
+                            <!-- 第一行：项目名称 + 右上角菜单 -->
                             <div class="flex items-start justify-between mb-2">
-                                <h3 class="font-bold text-gray-800 text-base group-hover:text-blue-600 transition-colors line-clamp-1 flex-1 mr-3">踩踩踩-设备合同</h3>
-                                <div class="relative">
-                                    <div class="relative">
-                                        <button onclick="toggleDropdown(this)" class="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-                                            <i class="fas fa-ellipsis-v text-sm"></i>
-                                        </button>
-                                        <div class="dropdown-menu">
-                                            <div class="dropdown-item" onclick="editProject(2)"><i class="fas fa-edit mr-2"></i>编辑项目</div>
-                                            <div class="dropdown-item" onclick="manageMilestone(2)"><i class="fas fa-flag mr-2"></i>里程碑</div>
-                                            <div class="dropdown-item" onclick="manageTeam(2)"><i class="fas fa-users mr-2"></i>团队成员</div>
-                                            <div class="dropdown-item" onclick="managePayment(2)"><i class="fas fa-money-bill mr-2"></i>收款计划</div>
-                                            <div class="dropdown-item" onclick="manageFiles(2)"><i class="fas fa-paperclip mr-2"></i>附件资料</div>
-                                            <div class="dropdown-divider"></div>
-                                            <div class="dropdown-item text-red-500" onclick="deleteProject(2)"><i class="fas fa-trash-alt mr-2"></i>删除项目</div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <h3 class="font-bold text-gray-900 text-lg truncate pr-2">踩踩踩-设备合同</h3>
+                                <button onclick="showCardMenu(2)" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
                             </div>
 
-                            <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                                <span class="font-mono bg-gray-100 px-2 py-0.5 rounded text-gray-600">SB-20260318-002</span>
+                            <!-- 第二行：编号 | 类型 -->
+                            <div class="flex items-center gap-2 text-xs text-gray-500 mb-3">
+                                <span class="font-mono bg-gray-100 px-2 py-1 rounded text-gray-700">SB-20260318-002</span>
                                 <span class="text-gray-300">|</span>
                                 <span class="text-orange-600 font-medium">工程类</span>
                             </div>
 
-                            <div class="text-sm text-gray-600 mb-3 truncate">
-                                <span class="text-gray-400">客户：</span>vvvvv科技有限公司
-                            </div>
+                            <!-- 第三行：客户 -->
+                            <div class="text-sm text-gray-600 mb-3 truncate">客户：vvvvv科技有限公司</div>
 
+                            <!-- 标签行：状态 + 优先级 -->
                             <div class="flex items-center gap-2 mb-4">
-                                <span class="tag-status tag-done">已完成</span>
-                                <span class="tag-status priority-medium">中优先级</span>
+                                <span class="tag-status tag-done text-xs px-2 py-0.5">已完成</span>
+                                <span class="tag-status priority-medium text-xs px-2 py-0.5">中优先级</span>
                             </div>
 
-                            <!-- 金额和计划完成 -->
-                            <div class="bg-gray-50 rounded-lg p-2.5 mb-3">
-                                <div class="grid grid-cols-2 gap-2">
+                            <!-- 灰色背景信息区 -->
+                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                <div class="flex items-baseline justify-between">
                                     <div>
-                                        <div class="text-xs text-gray-500 mb-0.5">合同金额</div>
-                                        <div class="font-bold text-blue-600 text-sm">¥10,000.00</div>
+                                        <div class="text-xs text-gray-500 mb-1">合同金额</div>
+                                        <div class="text-xl font-bold text-blue-600">¥10,000.00</div>
                                     </div>
-                                    <div>
-                                        <div class="text-xs text-gray-500 mb-0.5">计划完成</div>
-                                        <div class="font-medium text-gray-800 text-sm">2026-04-03</div>
+                                    <div class="text-right">
+                                        <div class="text-xs text-gray-500 mb-1">计划完成</div>
+                                        <div class="text-base font-medium text-gray-900">2026-04-03</div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- 进入项目空间按钮 -->
-                            <a href="项目空间.html" class="block w-full py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                            <!-- 蓝色大按钮 -->
+                            <a href="项目空间.html" class="block w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
                                 <i class="fas fa-cube"></i> 进入项目空间
                             </a>
                         </div>
@@ -503,58 +519,47 @@
 
                     <!-- 项目卡片3 -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 card-hover overflow-hidden group">
-                        <div class="p-4">
+                        <div class="p-5">
+                            <!-- 第一行：项目名称 + 右上角菜单 -->
                             <div class="flex items-start justify-between mb-2">
-                                <h3 class="font-bold text-gray-800 text-base group-hover:text-blue-600 transition-colors line-clamp-1 flex-1 mr-3">智能仓储系统研发</h3>
-                                <div class="relative">
-                                    <div class="relative">
-                                        <button onclick="toggleDropdown(this)" class="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-                                            <i class="fas fa-ellipsis-v text-sm"></i>
-                                        </button>
-                                        <div class="dropdown-menu">
-                                            <div class="dropdown-item" onclick="editProject(3)"><i class="fas fa-edit mr-2"></i>编辑项目</div>
-                                            <div class="dropdown-item" onclick="manageMilestone(3)"><i class="fas fa-flag mr-2"></i>里程碑</div>
-                                            <div class="dropdown-item" onclick="manageTeam(3)"><i class="fas fa-users mr-2"></i>团队成员</div>
-                                            <div class="dropdown-item" onclick="managePayment(3)"><i class="fas fa-money-bill mr-2"></i>收款计划</div>
-                                            <div class="dropdown-item" onclick="manageFiles(3)"><i class="fas fa-paperclip mr-2"></i>附件资料</div>
-                                            <div class="dropdown-divider"></div>
-                                            <div class="dropdown-item text-red-500" onclick="deleteProject(3)"><i class="fas fa-trash-alt mr-2"></i>删除项目</div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <h3 class="font-bold text-gray-900 text-lg truncate pr-2">智能仓储系统研发</h3>
+                                <button onclick="showCardMenu(3)" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
                             </div>
 
-                            <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                                <span class="font-mono bg-gray-100 px-2 py-0.5 rounded text-gray-600">XM-20260126-3</span>
+                            <!-- 第二行：编号 | 类型 -->
+                            <div class="flex items-center gap-2 text-xs text-gray-500 mb-3">
+                                <span class="font-mono bg-gray-100 px-2 py-1 rounded text-gray-700">XM-20260126-3</span>
                                 <span class="text-gray-300">|</span>
                                 <span class="text-purple-600 font-medium">研发类</span>
                             </div>
 
-                            <div class="text-sm text-gray-600 mb-3 truncate">
-                                <span class="text-gray-400">客户：</span>内部研发项目
-                            </div>
+                            <!-- 第三行：客户 -->
+                            <div class="text-sm text-gray-600 mb-3 truncate">客户：内部研发项目</div>
 
+                            <!-- 标签行：状态 + 优先级 -->
                             <div class="flex items-center gap-2 mb-4">
-                                <span class="tag-status tag-doing">进行中</span>
-                                <span class="tag-status priority-high">高优先级</span>
+                                <span class="tag-status tag-doing text-xs px-2 py-0.5">进行中</span>
+                                <span class="tag-status priority-high text-xs px-2 py-0.5">高优先级</span>
                             </div>
 
-                            <!-- 金额和计划完成 -->
-                            <div class="bg-gray-50 rounded-lg p-2.5 mb-3">
-                                <div class="grid grid-cols-2 gap-2">
+                            <!-- 灰色背景信息区 -->
+                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                <div class="flex items-baseline justify-between">
                                     <div>
-                                        <div class="text-xs text-gray-500 mb-0.5">合同金额</div>
-                                        <div class="font-bold text-blue-600 text-sm">¥50,000.00</div>
+                                        <div class="text-xs text-gray-500 mb-1">合同金额</div>
+                                        <div class="text-xl font-bold text-blue-600">¥50,000.00</div>
                                     </div>
-                                    <div>
-                                        <div class="text-xs text-gray-500 mb-0.5">计划完成</div>
-                                        <div class="font-medium text-gray-800 text-sm">2026-06-30</div>
+                                    <div class="text-right">
+                                        <div class="text-xs text-gray-500 mb-1">计划完成</div>
+                                        <div class="text-base font-medium text-gray-900">2026-06-30</div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- 进入项目空间按钮 -->
-                            <a href="项目空间.html" class="block w-full py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                            <!-- 蓝色大按钮 -->
+                            <a href="项目空间.html" class="block w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2">
                                 <i class="fas fa-cube"></i> 进入项目空间
                             </a>
                         </div>
@@ -1009,7 +1014,7 @@
                             </div>
                         </div>
 
-                        <!-- Step 3 - 项目合同（原额度设定） -->
+                        <!-- Step 3 - 项目合同（原额度设定）- 已增加合同签订日期字段 -->
                         <div id="step3" class="step-content hidden fade-in">
                             <div class="mb-6">
                                 <h2 class="text-xl font-bold text-gray-800 mb-2">项目合同</h2>
@@ -1017,8 +1022,8 @@
                             </div>
 
                             <div class="space-y-6">
-                                <!-- 合同基本信息 -->
-                                <div class="grid grid-cols-2 gap-6">
+                                <!-- 合同基本信息 - 已增加合同签订日期字段 -->
+                                <div class="grid grid-cols-3 gap-6">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                             <span class="text-red-500 mr-1">*</span>合同编号
@@ -1039,6 +1044,12 @@
                                             <option>其他</option>
                                         </select>
                                     </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <span class="text-red-500 mr-1">*</span>合同签订日期
+                                        </label>
+                                        <input type="date" class="input-field w-full px-4 py-3 rounded-lg bg-white">
+                                    </div>
                                 </div>
 
                                 <!-- 金额信息 -->
@@ -1049,7 +1060,7 @@
                                         </label>
                                         <div class="relative">
                                             <span class="absolute left-3 top-3 text-gray-500">¥</span>
-                                            <input type="number" placeholder="0.00" class="input-field w-full pl-8 pr-3 py-3 rounded-lg text-lg font-semibold">
+                                            <input type="number" id="totalAmount" placeholder="0.00" oninput="calculateMargin()" class="input-field w-full pl-8 pr-3 py-3 rounded-lg text-lg font-semibold">
                                         </div>
                                     </div>
                                     <div class="bg-gradient-to-br from-orange-50 to-white p-5 rounded-xl border border-orange-100">
@@ -1058,13 +1069,13 @@
                                         </label>
                                         <div class="relative">
                                             <span class="absolute left-3 top-3 text-gray-500">¥</span>
-                                            <input type="number" placeholder="0.00" class="input-field w-full pl-8 pr-3 py-3 rounded-lg text-lg font-semibold">
+                                            <input type="number" id="projectBudget" placeholder="0.00" oninput="calculateMargin()" class="input-field w-full pl-8 pr-3 py-3 rounded-lg text-lg font-semibold">
                                         </div>
                                     </div>
                                     <div class="bg-gradient-to-br from-purple-50 to-white p-5 rounded-xl border border-purple-100">
                                         <label class="block text-sm font-medium text-gray-700 mb-2">预估毛利率</label>
                                         <div class="relative">
-                                            <input type="text" disabled value="--" class="w-full px-3 py-3 rounded-lg bg-gray-100 text-gray-500 text-lg font-semibold pr-8">
+                                            <input type="text" id="marginRate" disabled value="--" class="w-full px-3 py-3 rounded-lg bg-gray-100 text-gray-500 text-lg font-semibold pr-8">
                                             <span class="absolute right-3 top-3 text-gray-500">%</span>
                                         </div>
                                     </div>
@@ -1510,7 +1521,7 @@
 
         // 提交项目（发起项目）
         function submitProject() {
-            alert('项目发起成功！\n\n项目已进入审批流程，请等待上级审批。');
+            alert('项目发起成功！\n\n');
             showProjectList();
         }
 
@@ -1657,6 +1668,26 @@
             if (confirm('确定要完成该项目吗？')) {
                 alert('项目已完成');
             }
+        }
+
+        // 计算预估毛利率
+        function calculateMargin() {
+            const totalAmount = parseFloat(document.getElementById('totalAmount').value) || 0;
+            const projectBudget = parseFloat(document.getElementById('projectBudget').value) || 0;
+            const marginRateInput = document.getElementById('marginRate');
+
+            if (totalAmount > 0) {
+                const marginRate = ((totalAmount - projectBudget) / totalAmount * 100).toFixed(2);
+                marginRateInput.value = marginRate;
+            } else {
+                marginRateInput.value = '--';
+            }
+        }
+    
+        // 显示卡片菜单（简化版）
+        function showCardMenu(cardId) {
+            // 可扩展为显示下拉菜单
+            console.log('打开卡片' + cardId + '的菜单');
         }
     </script>
 </body>

@@ -178,6 +178,21 @@
             background-position: right 12px center;
             background-size: 16px;
             padding-right: 40px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            border: none;
+            background-color: transparent;
+            outline: none;
+        }
+
+        .project-selector:focus {
+            outline: none;
+        }
+
+        .project-selector option {
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .info-row {
@@ -214,9 +229,7 @@
             background: linear-gradient(to right, #f0f7ff, #ffffff);
         }
 
-        .table-row:hover {
-            background-color: #fafafa;
-        }
+
 
         .cost-chart-bar {
             background: linear-gradient(90deg, #1890ff, #40a9ff);
@@ -226,24 +239,19 @@
         }
 
         .editable-input {
-            border: 1px solid transparent;
+            border: none;
             background: transparent;
             padding: 4px 8px;
             border-radius: 4px;
-            transition: all 0.3s;
             width: 100%;
-        }
-
-        .editable-input:hover {
-            border-color: #d9d9d9;
-            background: white;
+            text-align: center;
+            font-size: 14px;
+            color: #374151;
         }
 
         .editable-input:focus {
-            border-color: #1890ff;
-            background: white;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
+            background: #f9fafb;
         }
 
         .edit-icon {
@@ -256,7 +264,17 @@
         tr:hover .edit-icon {
             opacity: 1;
         }
+        
+        .position-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
     </style>
+<base target="_blank">
 </head>
 <body class="h-screen overflow-hidden flex flex-col">
 
@@ -317,7 +335,7 @@
                     </div>
                     <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
                         <i class="fas fa-chart-line w-5"></i>
-                        <span>项目报表</span>
+                        <span>项目列表</span>
                     </div>
                 </div>
             </div>
@@ -353,9 +371,8 @@
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
                     <div class="mb-6">
                         <div class="flex items-center gap-3 mb-2">
-                            <h1 class="text-2xl font-bold text-gray-800" id="projectName">cs项目-设备合同</h1>
                             <div class="relative">
-                                <select id="projectSelector" onchange="switchProject(this.value)" class="project-selector bg-white border border-gray-300 rounded-lg px-4 py-2 pr-10 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 min-w-[280px] font-medium text-gray-800">
+                                <select id="projectSelector" onchange="switchProject(this.value)" class="project-selector min-w-[280px]">
                                     <option value="1">📁 cs项目-设备合同 (XM-20260331-3)</option>
                                     <option value="2">📁 智能仓储系统研发 (XM-20260126-3)</option>
                                     <option value="3">📁 工厂自动化改造 (XM-20260215-1)</option>
@@ -631,9 +648,12 @@
                                 </div>
                             </div>
 
-                            <div class="milestone-phase rounded-xl p-5 shadow-sm border border-gray-100 relative" style="border-left-color: #fa8c16; background: linear-gradient(to right, #fff7e6, #ffffff);">
-                                <div class="absolute top-4 right-4">
-                                    <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">进行中</span>
+                            <div class="milestone-phase rounded-xl p-5 shadow-sm border border-gray-100 relative" style="border-left-color: #fa8c16; background: linear-gradient(to right, #fff7e6, #ffffff);" id="milestoneImplement">
+                                <div class="absolute top-4 right-4 flex items-center gap-2">
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium" id="implementStatus">进行中</span>
+                                    <button onclick="completeImplementPhase()" class="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded-full font-medium transition-colors flex items-center gap-1" id="completeImplementBtn">
+                                        <i class="fas fa-check"></i> 完成
+                                    </button>
                                 </div>
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="w-12 h-12 rounded-lg bg-orange-500 text-white flex items-center justify-center text-xl">
@@ -665,13 +685,6 @@
                                 <div class="bg-white rounded-lg p-3 border border-gray-100 mb-3">
                                     <span class="text-sm text-gray-500">交付物：</span>
                                     <span class="text-sm font-medium">设备清单.xlsx、出厂检验报告.pdf、安装记录.docx</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-sm text-gray-500">阶段进度：</span>
-                                    <div class="flex-1 progress-bar max-w-[200px]" style="height: 6px;">
-                                        <div class="progress-fill" style="width: 75%"></div>
-                                    </div>
-                                    <span class="text-sm font-medium text-orange-600">75%</span>
                                 </div>
                             </div>
 
@@ -731,9 +744,8 @@
                                             <h4 class="font-bold text-gray-800">伍红卫</h4>
                                             <span class="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded font-medium">负责人</span>
                                         </div>
-                                        <p class="text-sm text-gray-500 mb-2">项目经理</p>
                                         <div class="flex items-center gap-2 text-xs text-gray-400">
-                                            <span><i class="fas fa-envelope mr-1"></i>wu@company.com</span>
+                                            <span><i class="fas fa-phone mr-1"></i>13800138001</span>
                                         </div>
                                     </div>
                                 </div>
@@ -747,9 +759,8 @@
                                             <h4 class="font-bold text-gray-800">李工程师</h4>
                                             <span class="px-2 py-0.5 bg-blue-100 text-blue-600 text-xs rounded font-medium">技术</span>
                                         </div>
-                                        <p class="text-sm text-gray-500 mb-2">技术负责人</p>
                                         <div class="flex items-center gap-2 text-xs text-gray-400">
-                                            <span><i class="fas fa-envelope mr-1"></i>li@company.com</span>
+                                            <span><i class="fas fa-phone mr-1"></i>13800138002</span>
                                         </div>
                                     </div>
                                 </div>
@@ -763,9 +774,8 @@
                                             <h4 class="font-bold text-gray-800">王师傅</h4>
                                             <span class="px-2 py-0.5 bg-green-100 text-green-600 text-xs rounded font-medium">执行</span>
                                         </div>
-                                        <p class="text-sm text-gray-500 mb-2">实施工程师</p>
                                         <div class="flex items-center gap-2 text-xs text-gray-400">
-                                            <span><i class="fas fa-envelope mr-1"></i>wang@company.com</span>
+                                            <span><i class="fas fa-phone mr-1"></i>13800138003</span>
                                         </div>
                                     </div>
                                 </div>
@@ -779,9 +789,8 @@
                                             <h4 class="font-bold text-gray-800">陈质检</h4>
                                             <span class="px-2 py-0.5 bg-purple-100 text-purple-600 text-xs rounded font-medium">质检</span>
                                         </div>
-                                        <p class="text-sm text-gray-500 mb-2">质量管理员</p>
                                         <div class="flex items-center gap-2 text-xs text-gray-400">
-                                            <span><i class="fas fa-envelope mr-1"></i>chen@company.com</span>
+                                            <span><i class="fas fa-phone mr-1"></i>13800138004</span>
                                         </div>
                                     </div>
                                 </div>
@@ -795,9 +804,8 @@
                                             <h4 class="font-bold text-gray-800">刘助理</h4>
                                             <span class="px-2 py-0.5 bg-orange-100 text-orange-600 text-xs rounded font-medium">支持</span>
                                         </div>
-                                        <p class="text-sm text-gray-500 mb-2">项目助理</p>
                                         <div class="flex items-center gap-2 text-xs text-gray-400">
-                                            <span><i class="fas fa-envelope mr-1"></i>liu@company.com</span>
+                                            <span><i class="fas fa-phone mr-1"></i>13800138005</span>
                                         </div>
                                     </div>
                                 </div>
@@ -838,7 +846,7 @@
                             </h4>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm border border-gray-200 rounded-xl overflow-hidden">
-                                    <thead class="bg-gray-50 text-gray-600">
+                                    <thead class="bg-white text-gray-500">
                                         <tr>
                                             <th class="px-4 py-3 text-left font-medium">采购单号</th>
                                             <th class="px-4 py-3 text-left font-medium">物资名称</th>
@@ -892,7 +900,7 @@
                                 付款进度
                             </h4>
                             <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-white rounded-xl border border-gray-200 p-4">
+                                <div class="bg-white rounded-xl p-4">
                                     <div class="flex items-center justify-between mb-3">
                                         <span class="font-medium text-gray-700">深圳科达电子</span>
                                         <span class="text-xs text-gray-500">采购单：CG-20260320-001</span>
@@ -909,7 +917,7 @@
                                     <div class="text-xs text-gray-500">付款日期：2026-03-25 | 付款方式：银行转账</div>
                                 </div>
 
-                                <div class="bg-white rounded-xl border border-gray-200 p-4">
+                                <div class="bg-white rounded-xl p-4">
                                     <div class="flex items-center justify-between mb-3">
                                         <span class="font-medium text-gray-700">华为技术</span>
                                         <span class="text-xs text-gray-500">采购单：CG-20260322-002</span>
@@ -926,7 +934,7 @@
                                     <div class="text-xs text-gray-500">付款日期：2026-03-28 | 付款方式：银行转账</div>
                                 </div>
 
-                                <div class="bg-white rounded-xl border border-gray-200 p-4">
+                                <div class="bg-white rounded-xl p-4">
                                     <div class="flex items-center justify-between mb-3">
                                         <span class="font-medium text-gray-700">本地建材市场</span>
                                         <span class="text-xs text-gray-500">采购单：CG-20260325-003</span>
@@ -943,7 +951,7 @@
                                     <div class="text-xs text-gray-500">待收货后付款</div>
                                 </div>
 
-                                <div class="bg-white rounded-xl border border-gray-200 p-4">
+                                <div class="bg-white rounded-xl p-4">
                                     <div class="flex items-center justify-between mb-3">
                                         <span class="font-medium text-gray-700">TP-Link企业</span>
                                         <span class="text-xs text-gray-500">采购单：CG-20260328-004</span>
@@ -1006,7 +1014,7 @@
                             </h4>
                             <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
                                 <table class="w-full text-sm">
-                                    <thead class="bg-gray-50 text-gray-600">
+                                    <thead class="bg-white text-gray-500">
                                         <tr>
                                             <th class="px-4 py-3 text-left font-medium">物资名称</th>
                                             <th class="px-4 py-3 text-left font-medium">规格型号</th>
@@ -1016,8 +1024,8 @@
                                             <th class="px-4 py-3 text-left font-medium">使用日期</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-gray-100">
-                                        <tr class="table-row hover:bg-gray-50 transition-colors">
+                                    <tbody class="divide-y divide-gray-50">
+                                        <tr class="table-row">
                                             <td class="px-4 py-3 font-medium">智能充电设备主机</td>
                                             <td class="px-4 py-3 text-gray-600">KD-2024-A</td>
                                             <td class="px-4 py-3">10台</td>
@@ -1025,7 +1033,7 @@
                                             <td class="px-4 py-3 font-medium text-red-600">¥50.00</td>
                                             <td class="px-4 py-3 text-gray-500">2026-03-20</td>
                                         </tr>
-                                        <tr class="table-row hover:bg-gray-50 transition-colors">
+                                        <tr class="table-row">
                                             <td class="px-4 py-3 font-medium">控制模块套件</td>
                                             <td class="px-4 py-3 text-gray-600">HW-Control-V2</td>
                                             <td class="px-4 py-3">8套</td>
@@ -1033,7 +1041,7 @@
                                             <td class="px-4 py-3 font-medium text-red-600">¥20.00</td>
                                             <td class="px-4 py-3 text-gray-500">2026-03-25</td>
                                         </tr>
-                                        <tr class="table-row hover:bg-gray-50 transition-colors">
+                                        <tr class="table-row">
                                             <td class="px-4 py-3 font-medium">安装辅材包</td>
                                             <td class="px-4 py-3 text-gray-600">标准配套</td>
                                             <td class="px-4 py-3">20套</td>
@@ -1058,7 +1066,7 @@
                             </h4>
                             <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
                                 <table class="w-full text-sm">
-                                    <thead class="bg-gray-50 text-gray-600">
+                                    <thead class="bg-white text-gray-500">
                                         <tr>
                                             <th class="px-4 py-3 text-left font-medium">费用项目</th>
                                             <th class="px-4 py-3 text-left font-medium">设备类型</th>
@@ -1067,29 +1075,29 @@
                                             <th class="px-4 py-3 text-left font-medium">备注</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-gray-100">
-                                        <tr class="table-row hover:bg-gray-50 transition-colors">
+                                    <tbody class="divide-y divide-gray-50">
+                                        <tr class="table-row">
                                             <td class="px-4 py-3 font-medium">工程车辆保养</td>
                                             <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">货车-京A12345</span></td>
                                             <td class="px-4 py-3 font-medium text-yellow-600">¥3,500</td>
                                             <td class="px-4 py-3 text-gray-500">2026-03-15</td>
                                             <td class="px-4 py-3 text-gray-600">定期保养，更换机油三滤</td>
                                         </tr>
-                                        <tr class="table-row hover:bg-gray-50 transition-colors">
+                                        <tr class="table-row">
                                             <td class="px-4 py-3 font-medium">货车维修费</td>
                                             <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">货车-京A12345</span></td>
                                             <td class="px-4 py-3 font-medium text-yellow-600">¥2,800</td>
                                             <td class="px-4 py-3 text-gray-500">2026-03-22</td>
                                             <td class="px-4 py-3 text-gray-600">刹车系统维修，更换刹车片</td>
                                         </tr>
-                                        <tr class="table-row hover:bg-gray-50 transition-colors">
+                                        <tr class="table-row">
                                             <td class="px-4 py-3 font-medium">车辆加油费</td>
                                             <td class="px-4 py-3"><span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded">面包车-京B67890</span></td>
                                             <td class="px-4 py-3 font-medium text-yellow-600">¥1,200</td>
                                             <td class="px-4 py-3 text-gray-500">2026-03-25</td>
                                             <td class="px-4 py-3 text-gray-600">项目现场往返加油</td>
                                         </tr>
-                                        <tr class="table-row hover:bg-gray-50 transition-colors">
+                                        <tr class="table-row">
                                             <td class="px-4 py-3 font-medium">叉车租赁费</td>
                                             <td class="px-4 py-3"><span class="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded">叉车</span></td>
                                             <td class="px-4 py-3 font-medium text-yellow-600">¥2,500</td>
@@ -1119,153 +1127,206 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-6">
-                                <div class="bg-white rounded-xl border border-gray-200 p-4">
-                                    <h5 class="font-medium text-gray-700 mb-4">人员工时明细 <span class="text-xs text-gray-400 font-normal">(点击单价可编辑)</span></h5>
+                                <!-- 修改后的岗位工时明细表格 -->
+                                <div class="bg-white rounded-xl p-4">
+                                    <h5 class="font-medium text-gray-700 mb-4">岗位工时明细 <span class="text-xs text-gray-400 font-normal">(按岗位维度统计)</span></h5>
                                     <div class="overflow-x-auto">
-                                        <table class="w-full text-sm">
-                                            <thead class="bg-gray-50 text-gray-600">
+                                        <table class="w-full text-sm" id="positionLaborTable">
+                                            <thead class="bg-white text-gray-500">
                                                 <tr>
-                                                    <th class="px-3 py-2 text-left font-medium">成员</th>
-                                                    <th class="px-3 py-2 text-left font-medium">岗位</th>
-                                                    <th class="px-3 py-2 text-left font-medium">工时</th>
-                                                    <th class="px-3 py-2 text-left font-medium">单价(元/时)</th>
-                                                    <th class="px-3 py-2 text-left font-medium">金额</th>
+                                                    <th class="px-3 py-2 text-left font-normal">岗位</th>
+                                                    <th class="px-3 py-2 text-center font-normal">人员数量</th>
+                                                    <th class="px-3 py-2 text-right font-normal">工时总和</th>
+                                                    <th class="px-3 py-2 text-center font-normal">岗位工时单价(元/时)</th>
+                                                    <th class="px-3 py-2 text-right font-normal">金额</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="divide-y divide-gray-100">
-                                                <tr class="table-row hover:bg-gray-50 transition-colors">
+                                            <tbody class="divide-y divide-gray-50">
+                                                <tr class="table-row" data-position="项目经理">
                                                     <td class="px-3 py-3">
                                                         <div class="flex items-center gap-2">
-                                                            <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-xs font-bold">伍</div>
-                                                            <span>伍红卫</span>
+                                                            <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-xs font-bold">
+                                                                <i class="fas fa-user-tie"></i>
+                                                            </div>
+                                                            <span>项目经理</span>
                                                         </div>
                                                     </td>
-                                                    <td class="px-3 py-3 text-gray-600">项目经理</td>
-                                                    <td class="px-3 py-3">80h</td>
-                                                    <td class="px-3 py-3">
-                                                        <input type="number" value="50" class="editable-input w-20 text-center" onchange="calculateLaborCost()">
+                                                    <td class="px-3 py-3 text-center">
+                                                        <input type="number" value="1" min="1" class="editable-input w-12 text-center position-count" onchange="calculatePositionLaborCost()">
                                                     </td>
-                                                    <td class="px-3 py-3 font-medium text-blue-600 labor-cost">¥4,000</td>
+                                                    <td class="px-3 py-3">
+                                                        <input type="number" value="80" class="editable-input w-16 text-right position-hours" onchange="calculatePositionLaborCost()"><br><span class="text-xs text-gray-500">h</span>
+                                                    </td>
+                                                    <td class="px-3 py-3 text-center">
+                                                        <input type="number" value="50" class="editable-input w-16 text-center position-price" onchange="calculatePositionLaborCost()">
+                                                    </td>
+                                                    <td class="px-3 py-3 text-right text-blue-600 position-cost">¥4,000</td>
                                                 </tr>
-                                                <tr class="table-row hover:bg-gray-50 transition-colors">
+                                                <tr class="table-row" data-position="技术负责人">
                                                     <td class="px-3 py-3">
                                                         <div class="flex items-center gap-2">
-                                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold">李</div>
-                                                            <span>李工程师</span>
+                                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold">
+                                                                <i class="fas fa-laptop-code"></i>
+                                                            </div>
+                                                            <span>技术负责人</span>
                                                         </div>
                                                     </td>
-                                                    <td class="px-3 py-3 text-gray-600">技术负责人</td>
-                                                    <td class="px-3 py-3">120h</td>
-                                                    <td class="px-3 py-3">
-                                                        <input type="number" value="40" class="editable-input w-20 text-center" onchange="calculateLaborCost()">
+                                                    <td class="px-3 py-3 text-center">
+                                                        <input type="number" value="1" min="1" class="editable-input w-12 text-center position-count" onchange="calculatePositionLaborCost()">
                                                     </td>
-                                                    <td class="px-3 py-3 font-medium text-blue-600 labor-cost">¥4,800</td>
+                                                    <td class="px-3 py-3">
+                                                        <input type="number" value="120" class="editable-input w-16 text-right position-hours" onchange="calculatePositionLaborCost()"><br><span class="text-xs text-gray-500">h</span>
+                                                    </td>
+                                                    <td class="px-3 py-3 text-center">
+                                                        <input type="number" value="40" class="editable-input w-16 text-center position-price" onchange="calculatePositionLaborCost()">
+                                                    </td>
+                                                    <td class="px-3 py-3 text-right text-blue-600 position-cost">¥4,800</td>
                                                 </tr>
-                                                <tr class="table-row hover:bg-gray-50 transition-colors">
+                                                <tr class="table-row" data-position="实施工程师">
                                                     <td class="px-3 py-3">
                                                         <div class="flex items-center gap-2">
-                                                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs font-bold">王</div>
-                                                            <span>王师傅</span>
+                                                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs font-bold">
+                                                                <i class="fas fa-tools"></i>
+                                                            </div>
+                                                            <span>实施工程师</span>
                                                         </div>
                                                     </td>
-                                                    <td class="px-3 py-3 text-gray-600">实施工程师</td>
-                                                    <td class="px-3 py-3">100h</td>
-                                                    <td class="px-3 py-3">
-                                                        <input type="number" value="30" class="editable-input w-20 text-center" onchange="calculateLaborCost()">
+                                                    <td class="px-3 py-3 text-center">
+                                                        <input type="number" value="1" min="1" class="editable-input w-12 text-center position-count" onchange="calculatePositionLaborCost()">
                                                     </td>
-                                                    <td class="px-3 py-3 font-medium text-blue-600 labor-cost">¥3,000</td>
+                                                    <td class="px-3 py-3">
+                                                        <input type="number" value="100" class="editable-input w-16 text-right position-hours" onchange="calculatePositionLaborCost()"><br><span class="text-xs text-gray-500">h</span>
+                                                    </td>
+                                                    <td class="px-3 py-3 text-center">
+                                                        <input type="number" value="30" class="editable-input w-16 text-center position-price" onchange="calculatePositionLaborCost()">
+                                                    </td>
+                                                    <td class="px-3 py-3 text-right text-blue-600 position-cost">¥3,000</td>
                                                 </tr>
-                                                <tr class="table-row hover:bg-gray-50 transition-colors">
+                                                <tr class="table-row" data-position="质量管理员">
                                                     <td class="px-3 py-3">
                                                         <div class="flex items-center gap-2">
-                                                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-xs font-bold">陈</div>
-                                                            <span>陈质检</span>
+                                                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-xs font-bold">
+                                                                <i class="fas fa-clipboard-check"></i>
+                                                            </div>
+                                                            <span>质量管理员</span>
                                                         </div>
                                                     </td>
-                                                    <td class="px-3 py-3 text-gray-600">质量管理员</td>
-                                                    <td class="px-3 py-3">40h</td>
-                                                    <td class="px-3 py-3">
-                                                        <input type="number" value="35" class="editable-input w-20 text-center" onchange="calculateLaborCost()">
+                                                    <td class="px-3 py-3 text-center">
+                                                        <input type="number" value="1" min="1" class="editable-input w-12 text-center position-count" onchange="calculatePositionLaborCost()">
                                                     </td>
-                                                    <td class="px-3 py-3 font-medium text-blue-600 labor-cost">¥1,400</td>
+                                                    <td class="px-3 py-3">
+                                                        <input type="number" value="40" class="editable-input w-16 text-right position-hours" onchange="calculatePositionLaborCost()"><br><span class="text-xs text-gray-500">h</span>
+                                                    </td>
+                                                    <td class="px-3 py-3 text-center">
+                                                        <input type="number" value="35" class="editable-input w-16 text-center position-price" onchange="calculatePositionLaborCost()">
+                                                    </td>
+                                                    <td class="px-3 py-3 text-right text-blue-600 position-cost">¥1,400</td>
                                                 </tr>
-                                                <tr class="table-row hover:bg-gray-50 transition-colors">
+                                                <tr class="table-row" data-position="项目助理">
                                                     <td class="px-3 py-3">
                                                         <div class="flex items-center gap-2">
-                                                            <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-xs font-bold">刘</div>
-                                                            <span>刘助理</span>
+                                                            <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-xs font-bold">
+                                                                <i class="fas fa-hands-helping"></i>
+                                                            </div>
+                                                            <span>项目助理</span>
                                                         </div>
                                                     </td>
-                                                    <td class="px-3 py-3 text-gray-600">项目助理</td>
-                                                    <td class="px-3 py-3">60h</td>
-                                                    <td class="px-3 py-3">
-                                                        <input type="number" value="20" class="editable-input w-20 text-center" onchange="calculateLaborCost()">
+                                                    <td class="px-3 py-3 text-center">
+                                                        <input type="number" value="1" min="1" class="editable-input w-12 text-center position-count" onchange="calculatePositionLaborCost()">
                                                     </td>
-                                                    <td class="px-3 py-3 font-medium text-blue-600 labor-cost">¥1,200</td>
+                                                    <td class="px-3 py-3">
+                                                        <input type="number" value="60" class="editable-input w-16 text-right position-hours" onchange="calculatePositionLaborCost()"><br><span class="text-xs text-gray-500">h</span>
+                                                    </td>
+                                                    <td class="px-3 py-3 text-center">
+                                                        <input type="number" value="20" class="editable-input w-16 text-center position-price" onchange="calculatePositionLaborCost()">
+                                                    </td>
+                                                    <td class="px-3 py-3 text-right text-blue-600 position-cost">¥1,200</td>
                                                 </tr>
-                                                <tr class="table-row bg-gray-50 font-medium">
-                                                    <td class="px-3 py-3" colspan="2" align="right">合计：</td>
-                                                    <td class="px-3 py-3">400h</td>
-                                                    <td class="px-3 py-3">-</td>
-                                                    <td class="px-3 py-3 text-blue-600" id="totalLaborCost">¥14,400</td>
+                                                <tr class="table-row">
+                                                    <td class="px-3 py-3 font-bold text-gray-800" colspan="2" align="right">合计：</td>
+                                                    <td class="px-3 py-3 font-bold text-gray-800" id="totalPositionHours">400<span class="text-xs text-gray-500">h</span></td>
+                                                    <td class="px-3 py-3 text-center text-gray-400">-</td>
+                                                    <td class="px-3 py-3 text-right font-bold text-blue-600" id="totalPositionCost">¥14,400</td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
+                                    <div class="mt-3 text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                                        <i class="fas fa-info-circle text-blue-500 mr-1"></i>
+                                        计算公式： 工时总和 × 岗位工时单价 = 金额
+                                    </div>
                                 </div>
 
-                                <div class="bg-white rounded-xl border border-gray-200 p-4">
-                                    <h5 class="font-medium text-gray-700 mb-4">工时分布</h5>
-                                    <div class="space-y-4">
+                                <div class="bg-white rounded-xl p-4">
+                                    <h5 class="font-medium text-gray-700 mb-4">岗位成本分布</h5>
+                                    <div class="space-y-4" id="positionDistribution">
                                         <div>
                                             <div class="flex items-center justify-between text-sm mb-1">
-                                                <span class="text-gray-600">项目管理</span>
-                                                <span class="font-medium">80小时 (20%)</span>
+                                                <span class="text-gray-600 flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                                                    项目经理 (1人)
+                                                </span>
+                                                <span class="font-medium">¥4,000 (27.8%)</span>
                                             </div>
                                             <div class="progress-bar" style="height: 8px;">
-                                                <div class="cost-chart-bar bg-red-400" style="width: 20%"></div>
+                                                <div class="cost-chart-bar bg-red-400" style="width: 27.8%"></div>
                                             </div>
                                         </div>
                                         <div>
                                             <div class="flex items-center justify-between text-sm mb-1">
-                                                <span class="text-gray-600">技术开发</span>
-                                                <span class="font-medium">120小时 (30%)</span>
+                                                <span class="text-gray-600 flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                                                    技术负责人 (1人)
+                                                </span>
+                                                <span class="font-medium">¥4,800 (33.3%)</span>
                                             </div>
                                             <div class="progress-bar" style="height: 8px;">
-                                                <div class="cost-chart-bar bg-blue-400" style="width: 30%"></div>
+                                                <div class="cost-chart-bar bg-blue-400" style="width: 33.3%"></div>
                                             </div>
                                         </div>
                                         <div>
                                             <div class="flex items-center justify-between text-sm mb-1">
-                                                <span class="text-gray-600">现场实施</span>
-                                                <span class="font-medium">100小时 (25%)</span>
+                                                <span class="text-gray-600 flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                                                    实施工程师 (1人)
+                                                </span>
+                                                <span class="font-medium">¥3,000 (20.8%)</span>
                                             </div>
                                             <div class="progress-bar" style="height: 8px;">
-                                                <div class="cost-chart-bar bg-green-400" style="width: 25%"></div>
+                                                <div class="cost-chart-bar bg-green-400" style="width: 20.8%"></div>
                                             </div>
                                         </div>
                                         <div>
                                             <div class="flex items-center justify-between text-sm mb-1">
-                                                <span class="text-gray-600">质量检测</span>
-                                                <span class="font-medium">40小时 (10%)</span>
+                                                <span class="text-gray-600 flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                                                    质量管理员 (1人)
+                                                </span>
+                                                <span class="font-medium">¥1,400 (9.7%)</span>
                                             </div>
                                             <div class="progress-bar" style="height: 8px;">
-                                                <div class="cost-chart-bar bg-purple-400" style="width: 10%"></div>
+                                                <div class="cost-chart-bar bg-purple-400" style="width: 9.7%"></div>
                                             </div>
                                         </div>
                                         <div>
                                             <div class="flex items-center justify-between text-sm mb-1">
-                                                <span class="text-gray-600">行政支持</span>
-                                                <span class="font-medium">60小时 (15%)</span>
+                                                <span class="text-gray-600 flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full bg-orange-400"></span>
+                                                    项目助理 (1人)
+                                                </span>
+                                                <span class="font-medium">¥1,200 (8.3%)</span>
                                             </div>
                                             <div class="progress-bar" style="height: 8px;">
-                                                <div class="cost-chart-bar bg-orange-400" style="width: 15%"></div>
+                                                <div class="cost-chart-bar bg-orange-400" style="width: 8.3%"></div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="mt-4 pt-3 border-t border-gray-200 flex items-center justify-between">
                                         <span class="font-medium text-gray-700">人工成本合计：</span>
-                                        <span class="text-lg font-bold text-blue-600" id="laborCostTotalShow">¥14,400</span>
+                                        <span class="text-lg font-bold text-blue-600" id="positionCostTotalShow">¥14,400</span>
+                                    </div>
+                                    <div class="mt-2 text-xs text-gray-500">
+                                        总工时：<span id="totalHoursShow">400</span> 小时 | 平均单价：¥36/时
                                     </div>
                                 </div>
                             </div>
@@ -1278,7 +1339,7 @@
                             </h4>
                             <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
                                 <table class="w-full text-sm">
-                                    <thead class="bg-gray-50 text-gray-600">
+                                    <thead class="bg-white text-gray-500">
                                         <tr>
                                             <th class="px-4 py-3 text-left font-medium">费用项目</th>
                                             <th class="px-4 py-3 text-left font-medium">费用类型</th>
@@ -1287,36 +1348,36 @@
                                             <th class="px-4 py-3 text-left font-medium">备注</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-gray-100">
-                                        <tr class="table-row hover:bg-gray-50 transition-colors">
+                                    <tbody class="divide-y divide-gray-50">
+                                        <tr class="table-row">
                                             <td class="px-4 py-3 font-medium">差旅费-广州往返</td>
                                             <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded">差旅费</span></td>
                                             <td class="px-4 py-3 font-medium text-green-600">¥5,000</td>
                                             <td class="px-4 py-3 text-gray-500">2026-03-15</td>
                                             <td class="px-4 py-3 text-gray-600">现场安装调试往返交通住宿</td>
                                         </tr>
-                                        <tr class="table-row hover:bg-gray-50 transition-colors">
+                                        <tr class="table-row">
                                             <td class="px-4 py-3 font-medium">设备运输费</td>
                                             <td class="px-4 py-3"><span class="px-2 py-1 bg-orange-50 text-orange-600 text-xs rounded">运输费</span></td>
                                             <td class="px-4 py-3 font-medium text-green-600">¥3,000</td>
                                             <td class="px-4 py-3 text-gray-500">2026-03-20</td>
                                             <td class="px-4 py-3 text-gray-600">设备发货至客户现场运费</td>
                                         </tr>
-                                        <tr class="table-row hover:bg-gray-50 transition-colors">
+                                        <tr class="table-row">
                                             <td class="px-4 py-3 font-medium">培训材料印制</td>
                                             <td class="px-4 py-3"><span class="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded">材料费</span></td>
                                             <td class="px-4 py-3 font-medium text-green-600">¥800</td>
                                             <td class="px-4 py-3 text-gray-500">2026-03-28</td>
                                             <td class="px-4 py-3 text-gray-600">操作手册、培训资料印制</td>
                                         </tr>
-                                        <tr class="table-row hover:bg-gray-50 transition-colors">
+                                        <tr class="table-row">
                                             <td class="px-4 py-3 font-medium">现场餐饮补贴</td>
                                             <td class="px-4 py-3"><span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded">补贴</span></td>
                                             <td class="px-4 py-3 font-medium text-green-600">¥1,200</td>
                                             <td class="px-4 py-3 text-gray-500">2026-03-25</td>
                                             <td class="px-4 py-3 text-gray-600">现场实施人员工作餐补贴</td>
                                         </tr>
-                                        <tr class="table-row hover:bg-gray-50 transition-colors">
+                                        <tr class="table-row">
                                             <td class="px-4 py-3 font-medium">第三方检测费</td>
                                             <td class="px-4 py-3"><span class="px-2 py-1 bg-red-50 text-red-600 text-xs rounded">检测费</span></td>
                                             <td class="px-4 py-3 font-medium text-green-600">¥5,000</td>
@@ -1658,33 +1719,113 @@
             }
         }
 
-        function calculateLaborCost() {
-            const rows = document.querySelectorAll('tbody tr');
-            let total = 0;
+        // 新岗位工时成本计算函数
+        function calculatePositionLaborCost() {
+            const rows = document.querySelectorAll('#positionLaborTable tbody tr[data-position]');
+            let totalCost = 0;
+            let totalHours = 0;
+            const positionData = [];
 
             rows.forEach(row => {
-                if (row.querySelector('.labor-cost')) {
-                    const hoursInput = row.querySelector('td:nth-child(3)');
-                    const priceInput = row.querySelector('.editable-input');
-                    const costCell = row.querySelector('.labor-cost');
+                const countInput = row.querySelector('.position-count');
+                const hoursInput = row.querySelector('.position-hours');
+                const priceInput = row.querySelector('.position-price');
+                const costCell = row.querySelector('.position-cost');
 
-                    if (hoursInput && priceInput && costCell) {
-                        const hours = parseInt(hoursInput.textContent) || 0;
-                        const price = parseFloat(priceInput.value) || 0;
-                        const cost = hours * price;
-                        costCell.textContent = '¥' + cost.toLocaleString();
-                        total += cost;
-                    }
-                }
+                const count = parseInt(countInput.value) || 0;
+                const hours = parseInt(hoursInput.value) || 0;
+                const price = parseFloat(priceInput.value) || 0;
+
+                // 公式：人员数量 × 工时总和 × 岗位工时单价 = 金额
+                const cost = count * hours * price;
+                
+                costCell.textContent = '¥' + cost.toLocaleString();
+                
+                totalCost += cost;
+                totalHours += (count * hours);
+                
+                const positionName = row.getAttribute('data-position');
+                positionData.push({
+                    name: positionName,
+                    count: count,
+                    cost: cost,
+                    percentage: 0 // 稍后计算
+                });
             });
 
-            document.getElementById('totalLaborCost').textContent = '¥' + total.toLocaleString();
-            document.getElementById('laborCostTotalShow').textContent = '¥' + total.toLocaleString();
+            // 计算百分比
+            positionData.forEach(pos => {
+                pos.percentage = totalCost > 0 ? (pos.cost / totalCost * 100).toFixed(1) : 0;
+            });
+
+            // 更新合计行
+            document.getElementById('totalPositionCost').textContent = '¥' + totalCost.toLocaleString();
+            document.getElementById('totalPositionHours').textContent = totalHours + 'h';
+            document.getElementById('positionCostTotalShow').textContent = '¥' + totalCost.toLocaleString();
+            document.getElementById('totalHoursShow').textContent = totalHours;
+
+            // 更新分布图表
+            updatePositionDistribution(positionData, totalCost);
         }
 
+        // 更新岗位成本分布图表
+        function updatePositionDistribution(data, totalCost) {
+            const container = document.getElementById('positionDistribution');
+            const colors = [
+                { bg: 'bg-red-400', fill: 'bg-red-400' },
+                { bg: 'bg-blue-400', fill: 'bg-blue-400' },
+                { bg: 'bg-green-400', fill: 'bg-green-400' },
+                { bg: 'bg-purple-400', fill: 'bg-purple-400' },
+                { bg: 'bg-orange-400', fill: 'bg-orange-400' }
+            ];
+            
+            let html = '';
+            data.forEach((item, index) => {
+                const color = colors[index % colors.length];
+                const width = item.percentage + '%';
+                html += `
+                    <div>
+                        <div class="flex items-center justify-between text-sm mb-1">
+                            <span class="text-gray-600 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full ${color.bg}"></span>
+                                ${item.name} (${item.count}人)
+                            </span>
+                            <span class="font-medium">¥${item.cost.toLocaleString()} (${item.percentage}%)</span>
+                        </div>
+                        <div class="progress-bar" style="height: 8px;">
+                            <div class="cost-chart-bar ${color.fill}" style="width: ${width}"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // 保留原函数名以兼容保存按钮
         function saveUnitPrice() {
-            calculateLaborCost();
-            alert('岗位工时单价已保存！\n人工成本已重新计算。');
+            calculatePositionLaborCost();
+            
+            // 收集数据用于保存
+            const rows = document.querySelectorAll('#positionLaborTable tbody tr[data-position]');
+            const saveData = [];
+            rows.forEach(row => {
+                saveData.push({
+                    position: row.getAttribute('data-position'),
+                    count: row.querySelector('.position-count').value,
+                    hours: row.querySelector('.position-hours').value,
+                    price: row.querySelector('.position-price').value,
+                    cost: row.querySelector('.position-cost').textContent
+                });
+            });
+            
+            console.log('保存岗位工时数据：', saveData);
+            alert('岗位工时单价设置已保存！\n\n计算公式：人员数量 × 工时总和 × 单价 = 金额\n\n人工成本已重新计算。');
+        }
+
+        // 保留原函数名以兼容（如果有其他地方调用）
+        function calculateLaborCost() {
+            calculatePositionLaborCost();
         }
 
         function showProjectList() {
@@ -1749,8 +1890,44 @@
             }
         }
 
+        // 完成实施阶段
+        function completeImplementPhase() {
+            if (confirm('确定要标记实施阶段为已完成吗？\n\n请确保该阶段所有交付物已上传。')) {
+                const statusEl = document.getElementById('implementStatus');
+                const btnEl = document.getElementById('completeImplementBtn');
+                const phaseEl = document.getElementById('milestoneImplement');
+                
+                // 更新状态标签
+                statusEl.textContent = '已完成';
+                statusEl.classList.remove('bg-blue-100', 'text-blue-700');
+                statusEl.classList.add('bg-green-100', 'text-green-700');
+                
+                // 隐藏完成按钮
+                btnEl.style.display = 'none';
+                
+                // 更新边框颜色为绿色
+                phaseEl.style.borderLeftColor = '#52c41a';
+                phaseEl.style.background = 'linear-gradient(to right, #f6ffed, #ffffff)';
+                
+                // 更新图标背景色
+                const iconEl = phaseEl.querySelector('.bg-orange-500');
+                iconEl.classList.remove('bg-orange-500');
+                iconEl.classList.add('bg-green-500');
+                
+                // 更新预计结束时间为实际结束时间，添加对勾
+                const estimatedEndEl = phaseEl.querySelector('[class*="预计结束"] + span');
+                if (estimatedEndEl) {
+                    estimatedEndEl.classList.remove('text-orange-600');
+                    estimatedEndEl.classList.add('text-green-600');
+                    estimatedEndEl.innerHTML += ' ✓';
+                }
+                
+                alert('实施阶段已完成！✓');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            calculateLaborCost();
+            calculatePositionLaborCost();
         });
     </script>
 </body>

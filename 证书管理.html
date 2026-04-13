@@ -401,18 +401,6 @@
         <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
             <div class="p-4">
                 <div class="space-y-1">
-                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600">
-                        <i class="fas fa-ticket-alt w-5"></i>
-                        <span>工单管理</span>
-                    </div>
-                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600">
-                        <i class="fas fa-tasks w-5"></i>
-                        <span>任务管理</span>
-                    </div>
-                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600">
-                        <i class="fas fa-user-tie w-5"></i>
-                        <span>人才管理</span>
-                    </div>
                     <div class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium">
                         <i class="fas fa-certificate w-5"></i>
                         <span>证书管理</span>
@@ -482,11 +470,11 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1.5">是否必须</label>
+                        <label class="block text-sm text-gray-600 mb-1.5">持证上岗</label>
                         <select id="filter_required" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
                             <option value="">全部</option>
-                            <option value="yes">是</option>
-                            <option value="no">否</option>
+                            <option value="yes">必须</option>
+                            <option value="no">非必须</option>
                         </select>
                     </div>
                     <div>
@@ -523,7 +511,7 @@
                 </div>
                 <div class="text-sm text-gray-500">
                     <i class="fas fa-info-circle mr-1"></i> 
-                    必须持证规则将用于排程强校验，无证人员禁止上岗
+                    必须持证规则将用于排程强校验，证书到期禁止上岗
                 </div>
             </div>
 
@@ -536,7 +524,7 @@
                             <th class="w-10">#</th>
                             <th>证书名称</th>
                             <th>证书类型</th>
-                            <th>是否必须</th>
+                            <th>持证上岗</th>
                             <th>默认有效期</th>
                             <th>校验有效期</th>
                             <th>预警天数</th>
@@ -703,7 +691,7 @@
                 </div>
                 <div class="form-row">
                     <div class="form-item">
-                        <label class="form-label">是否必须证书</label>
+                        <label class="form-label">是否持证上岗</label>
                         <div class="flex items-center gap-3 mt-2">
                             <label class="switch">
                                 <input type="checkbox" id="is_required" onchange="updateRuleDesc()">
@@ -884,9 +872,9 @@
             const hint = document.getElementById('requiredHint');
             
             if (isChecked) {
-                text.textContent = '必须持证（ required ）';
+                text.textContent = '必须持证';
                 text.classList.add('text-red-600');
-                hint.textContent = '排程时强制校验，无证禁止上岗';
+                hint.textContent = '排程时强制校验，证书到期禁止上岗';
                 hint.classList.add('text-red-400');
             } else {
                 text.textContent = '非必须（ optional ）';
