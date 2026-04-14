@@ -3,193 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>云智工业互联平台 - 原型页面导航</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>文件访问导航</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        :root {
+            --bg: #f3f6fb;
+            --panel: #ffffff;
+            --line: #d8e0ea;
+            --text: #1f2a37;
+            --muted: #6b7280;
+            --html: #0f766e;
+            --htm: #1d4ed8;
+        }
+        * { box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            margin: 0;
+            font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at top right, #d8ecff 0%, var(--bg) 45%);
         }
-        .nav-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+        .container {
+            width: min(1080px, 92vw);
+            margin: 36px auto 56px;
+        }
+        .header {
+            background: linear-gradient(120deg, #123b66 0%, #0e7490 100%);
+            color: #fff;
+            padding: 28px;
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(13, 46, 84, 0.24);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 0.5px;
+        }
+        .header p {
+            margin: 10px 0 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .sections {
+            margin-top: 24px;
+            display: grid;
+            gap: 18px;
+        }
+        .section {
+            background: var(--panel);
+            border: 1px solid var(--line);
             border-radius: 16px;
-            transition: all 0.3s ease;
+            padding: 18px;
         }
-        .nav-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        .section-title {
+            margin: 0 0 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 18px;
         }
-        .page-link {
-            transition: all 0.2s;
+        .tag {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-weight: 600;
         }
-        .page-link:hover {
-            background: #e6f7ff;
-            border-color: #1890ff;
-            color: #1890ff;
+        .tag-html {
+            color: var(--html);
+            background: #d1fae5;
+        }
+        .tag-htm {
+            color: var(--htm);
+            background: #dbeafe;
+        }
+        .list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+        }
+        .item a {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            transition: all .18s ease;
+            background: #fff;
+        }
+        .item a:hover {
+            transform: translateY(-1px);
+            border-color: #7aa6d2;
+            box-shadow: 0 6px 16px rgba(28, 73, 121, .12);
+        }
+        .name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80%;
+            font-size: 14px;
+        }
+        .ext {
+            font-size: 11px;
+            color: var(--muted);
+            border: 1px solid var(--line);
+            padding: 2px 6px;
+            border-radius: 999px;
+        }
+        .empty {
+            margin: 4px 0 2px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+        .footer {
+            margin-top: 16px;
+            color: var(--muted);
+            font-size: 13px;
         }
     </style>
 </head>
-<body class="flex items-center justify-center p-6">
-    <div class="w-full max-w-4xl">
-        <!-- 标题区 -->
-        <div class="text-center mb-10">
-            <div class="inline-flex items-center gap-3 text-white text-3xl font-bold mb-3">
-                <i class="fas fa-cloud"></i>
-                <span>云智工业互联平台</span>
-            </div>
-            <p class="text-white/80 text-lg">原型页面导航中心</p>
-        </div>
+<body>
+    <main class="container">
+        <section class="header">
+            <h1>文件访问导航</h1>
+            <p>当前目录下全部网页入口已按文件类型分类展示</p>
+        </section>
 
-        <!-- 页面卡片 -->
-        <div class="nav-card p-8">
-            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                <i class="fas fa-th-large text-blue-600"></i>
-                全部页面
-            </h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <a href="./人员画像.html" class="page-link block p-4 border border-gray-200 rounded-xl bg-white">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
-                            <i class="fas fa-user-tie"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-800">人员画像</div>
-                            <div class="text-xs text-gray-500">员工能力评分展示</div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="./人才管理.html" class="page-link block p-4 border border-gray-200 rounded-xl bg-white">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-800">人才管理</div>
-                            <div class="text-xs text-gray-500">人员信息列表管理</div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="./人才评分规则.html" class="page-link block p-4 border border-gray-200 rounded-xl bg-white">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-cyan-100 text-cyan-600 flex items-center justify-center">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-800">人才评分规则</div>
-                            <div class="text-xs text-gray-500">评分维度与权重配置</div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="./项目空间.html" class="page-link block p-4 border border-gray-200 rounded-xl bg-white">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
-                            <i class="fas fa-folder-open"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-800">项目空间</div>
-                            <div class="text-xs text-gray-500">项目详情与进度管理</div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="./项目列表.html" class="page-link block p-4 border border-gray-200 rounded-xl bg-white">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-violet-100 text-violet-600 flex items-center justify-center">
-                            <i class="fas fa-list-ul"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-800">项目列表</div>
-                            <div class="text-xs text-gray-500">全部项目概览</div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="./任务管理.html" class="page-link block p-4 border border-gray-200 rounded-xl bg-white">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
-                            <i class="fas fa-tasks"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-800">任务管理</div>
-                            <div class="text-xs text-gray-500">任务分配与跟踪</div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="./工单管理.html" class="page-link block p-4 border border-gray-200 rounded-xl bg-white">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center">
-                            <i class="fas fa-clipboard-list"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-800">工单管理</div>
-                            <div class="text-xs text-gray-500">工单列表与状态</div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="./工单详情.html" class="page-link block p-4 border border-gray-200 rounded-xl bg-white">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-800">工单详情</div>
-                            <div class="text-xs text-gray-500">单个工单详细信息</div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="./证书管理.html" class="page-link block p-4 border border-gray-200 rounded-xl bg-white">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
-                            <i class="fas fa-certificate"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-800">证书管理</div>
-                            <div class="text-xs text-gray-500">员工证书资质管理</div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="./培训记录.html" class="page-link block p-4 border border-gray-200 rounded-xl bg-white">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-800">培训记录</div>
-                            <div class="text-xs text-gray-500">培训完成情况统计</div>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="./业务流程图.html" class="page-link block p-4 border border-gray-200 rounded-xl bg-white">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center">
-                            <i class="fas fa-project-diagram"></i>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-800">业务流程图</div>
-                            <div class="text-xs text-gray-500">系统业务流程展示</div>
-                        </div>
-                    </div>
-                </a>
+        <section class="sections">
+            <div class="section">
+                <h2 class="section-title">
+                    <span>HTML 文件（.html）</span>
+                    <span class="tag tag-html">15 个文件</span>
+                </h2>
+                <ul class="list">
+                    <li class="item"><a href="./业务流程图.html"><span class="name">业务流程图.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./人员画像.html"><span class="name">人员画像.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./人才管理.html"><span class="name">人才管理.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./人才评分规则.html"><span class="name">人才评分规则.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./任务管理.html"><span class="name">任务管理.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./培训记录.html"><span class="name">培训记录.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./工单管理-报工.html"><span class="name">工单管理-报工.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./工单管理.html"><span class="name">工单管理.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./工单详情.html"><span class="name">工单详情.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./工序维护.html"><span class="name">工序维护.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./施工指导书(改字段名称,不做样式修改).html"><span class="name">施工指导书(改字段名称,不做样式修改).html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./服务维护.html"><span class="name">服务维护.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./证书管理.html"><span class="name">证书管理.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./项目列表.html"><span class="name">项目列表.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./项目空间.html"><span class="name">项目空间.html</span><span class="ext">.html</span></a></li>
+                </ul>
             </div>
 
-            <div class="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
-                <p>访问地址：<a href="https://night-k.github.io/project-demo/" class="text-blue-600 hover:underline" target="_blank">https://night-k.github.io/project-demo/</a></p>
-                <p class="mt-1">仓库地址：<a href="https://github.com/night-k/project-demo" class="text-blue-600 hover:underline" target="_blank">https://github.com/night-k/project-demo</a></p>
+            <div class="section">
+                <h2 class="section-title">
+                    <span>HTM 文件（.htm）</span>
+                    <span class="tag tag-htm">0 个文件</span>
+                </h2>
+                <p class="empty">当前目录暂无 .htm 文件。</p>
             </div>
-        </div>
-    </div>
+        </section>
+
+        <div class="footer">提示：若新增网页文件，请同步更新此导航页。</div>
+    </main>
 </body>
 </html>
