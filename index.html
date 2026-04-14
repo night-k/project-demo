@@ -6,239 +6,913 @@
     <title>企业项目管理系统 - 页面导航</title>
     <style>
         :root {
-            --bg: #eef2ff;
-            --ink: #20263a;
-            --muted: #65708a;
-            --line: #d7def3;
-            --panel: #ffffff;
-            --hero1: #5a7be7;
-            --hero2: #6763c7;
-            --mvp1: #5f79e8;
-            --mvp2: #7652b1;
-            --v11a: #2caee4;
-            --v11b: #20d0d3;
+            --bg: #f4efe7;
+            --panel: rgba(255, 251, 246, 0.88);
+            --panel-strong: #fffdf9;
+            --ink: #1d2433;
+            --muted: #6f7587;
+            --line: rgba(40, 52, 84, 0.12);
+            --shadow: 0 24px 60px rgba(43, 54, 88, 0.12);
+            --hero-start: #163d67;
+            --hero-end: #0d6c74;
+            --gold: #c98b2e;
+            --sand: #e9d7ba;
+            --mint: #c9ece0;
+            --sky: #d4e7f7;
+            --v11-start: #2b89d9;
+            --v11-end: #25bba8;
+            --mvp-start: #2748a7;
+            --mvp-end: #6f57c8;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
 
         body {
             margin: 0;
-            font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            font-family: "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
             color: var(--ink);
-            background: linear-gradient(180deg, #d8e3ff 0%, #eef2ff 38%, #f4f6ff 100%);
+            background:
+                radial-gradient(circle at top left, rgba(37, 187, 168, 0.16), transparent 30%),
+                radial-gradient(circle at top right, rgba(201, 139, 46, 0.16), transparent 26%),
+                linear-gradient(180deg, #f6f0e7 0%, #f2f4f8 40%, #eef4f5 100%);
+        }
+
+        a {
+            color: inherit;
+        }
+
+        .shell {
+            width: min(1400px, calc(100vw - 32px));
+            margin: 20px auto 40px;
         }
 
         .hero {
-            background: radial-gradient(1200px 420px at 12% -10%, #89a0ff 0%, transparent 56%),
-                        radial-gradient(900px 380px at 90% -10%, #7f79e6 0%, transparent 60%),
-                        linear-gradient(90deg, var(--hero1) 0%, var(--hero2) 100%);
-            color: #fff;
-            padding: 26px 18px 32px;
-            box-shadow: inset 0 -1px 0 rgba(255,255,255,0.25);
+            position: relative;
+            overflow: hidden;
+            border-radius: 32px;
+            padding: 28px;
+            background:
+                radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.16), transparent 28%),
+                radial-gradient(circle at 85% 15%, rgba(255, 214, 126, 0.18), transparent 24%),
+                linear-gradient(135deg, var(--hero-start) 0%, var(--hero-end) 100%);
+            box-shadow: var(--shadow);
+            color: #f9fbff;
         }
 
-        .hero-inner {
-            width: min(1360px, 96vw);
-            margin: 0 auto;
-            text-align: center;
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: auto -80px -120px auto;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            filter: blur(4px);
         }
 
-        .hero h1 {
-            margin: 0;
-            font-size: clamp(30px, 4.4vw, 62px);
-            letter-spacing: 1px;
-            line-height: 1.14;
-            font-weight: 800;
-        }
-
-        .hero p {
-            margin: 14px 0 0;
-            font-size: clamp(14px, 1.6vw, 22px);
-            opacity: 0.95;
-        }
-
-        .capsule-nav {
-            margin-top: 28px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .capsule {
-            border: 2px solid rgba(255,255,255,0.3);
+        .hero-top {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 999px;
-            color: #eef2ff;
-            text-decoration: none;
-            padding: 10px 22px;
-            font-weight: 700;
-            font-size: 20px;
-            backdrop-filter: blur(2px);
-            background: rgba(255,255,255,0.12);
-            transition: all .2s ease;
+            background: rgba(255, 255, 255, 0.08);
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
-        .capsule:hover {
-            transform: translateY(-1px);
-            background: rgba(255,255,255,0.24);
-        }
-
-        .capsule.active {
-            color: #4f68da;
-            background: #ffffff;
-            border-color: #ffffff;
-            box-shadow: 0 8px 20px rgba(16, 33, 103, 0.22);
-        }
-
-        .container {
-            width: min(1360px, 96vw);
-            margin: -8px auto 36px;
-            background: rgba(255,255,255,0.95);
-            border: 1px solid rgba(138, 153, 221, 0.22);
-            border-radius: 28px;
-            padding: 24px;
-        }
-
-        .section-title {
-            margin: 2px 0 18px;
-            font-size: clamp(24px, 3vw, 48px);
-            font-weight: 800;
-            letter-spacing: 0.4px;
-        }
-
-        .divider {
-            height: 4px;
-            width: min(540px, 60%);
-            background: linear-gradient(90deg, #6482ee 0%, #8568cf 100%);
-            border-radius: 8px;
-            margin-bottom: 24px;
-        }
-
-        .version-block + .version-block {
+        .hero-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
+            gap: 28px;
             margin-top: 22px;
         }
 
-        .version-head {
+        .hero-copy h1 {
+            margin: 0;
+            font-family: "STSong", "Songti SC", serif;
+            font-size: clamp(34px, 5vw, 68px);
+            line-height: 1.02;
+            letter-spacing: 0.02em;
+        }
+
+        .hero-copy p {
+            margin: 18px 0 0;
+            max-width: 720px;
+            font-size: clamp(15px, 1.6vw, 20px);
+            line-height: 1.75;
+            color: rgba(249, 251, 255, 0.84);
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .action-pill {
+            text-decoration: none;
+            padding: 12px 18px;
             border-radius: 999px;
+            font-weight: 700;
+            font-size: 15px;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .action-pill.primary {
+            background: #fff5df;
+            color: #74440b;
+        }
+
+        .action-pill.secondary {
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            background: rgba(255, 255, 255, 0.08);
+            color: #f3f8ff;
+        }
+
+        .action-pill:hover,
+        .mini-link:hover,
+        .nav-chip:hover,
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .hero-aside {
+            display: grid;
+            gap: 14px;
+            align-content: start;
+        }
+
+        .glass-card {
+            padding: 18px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background: rgba(6, 18, 36, 0.18);
+            backdrop-filter: blur(14px);
+        }
+
+        .glass-card h2,
+        .glass-card h3,
+        .section-heading h2,
+        .version-panel h3 {
+            margin: 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat {
+            padding: 14px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.08);
+            min-height: 108px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 30px;
+            line-height: 1;
+        }
+
+        .stat span {
+            display: block;
+            margin-top: 8px;
+            font-size: 13px;
+            color: rgba(249, 251, 255, 0.76);
+            line-height: 1.6;
+        }
+
+        .mini-links {
+            display: grid;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .mini-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.08);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .mini-link small {
+            display: block;
+            margin-bottom: 4px;
+            color: rgba(249, 251, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 11px;
+        }
+
+        .mini-link strong {
+            font-size: 16px;
+        }
+
+        .content {
+            margin-top: 24px;
+            display: grid;
+            gap: 24px;
+        }
+
+        .panel {
+            border-radius: 28px;
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+        }
+
+        .overview {
+            padding: 24px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .section-heading p {
+            margin: 10px 0 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .nav-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-chip {
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.72);
+            font-weight: 700;
+            font-size: 14px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.9fr);
+            gap: 18px;
+            margin-top: 22px;
+        }
+
+        .journey {
+            padding: 22px;
+            border-radius: 24px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(245, 249, 250, 0.92));
+            border: 1px solid rgba(40, 52, 84, 0.08);
+        }
+
+        .journey h3 {
+            margin: 0 0 18px;
+            font-size: 22px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .step {
+            position: relative;
+            padding: 16px;
+            border-radius: 22px;
+            background: linear-gradient(180deg, #fff8ec 0%, #ffffff 100%);
+            border: 1px solid rgba(201, 139, 46, 0.18);
+            min-height: 164px;
+        }
+
+        .step:nth-child(2n) {
+            background: linear-gradient(180deg, #eef8ff 0%, #ffffff 100%);
+            border-color: rgba(43, 137, 217, 0.18);
+        }
+
+        .step-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #183b62;
             color: #fff;
             font-weight: 800;
-            font-size: clamp(18px, 2.2vw, 36px);
-            padding: 10px 22px;
-            margin-bottom: 14px;
-            box-shadow: 0 10px 24px rgba(53, 80, 174, 0.18);
+            font-size: 14px;
         }
 
-        .version-head.v11 {
-            background: linear-gradient(90deg, var(--v11a) 0%, var(--v11b) 100%);
+        .step h4 {
+            margin: 14px 0 8px;
+            font-size: 18px;
         }
 
-        .version-head.mvp {
-            background: linear-gradient(90deg, var(--mvp1) 0%, var(--mvp2) 100%);
+        .step p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
         }
 
-        .grid {
+        .portfolio {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 12px;
+            gap: 14px;
+        }
+
+        .portfolio-card {
+            padding: 20px;
+            border-radius: 24px;
+            border: 1px solid var(--line);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 249, 252, 0.96));
+        }
+
+        .portfolio-card strong {
+            display: block;
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .portfolio-card p,
+        .version-panel p,
+        .note {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .versions {
+            padding: 24px;
+        }
+
+        .versions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        .version-panel {
+            padding: 22px;
+            border-radius: 26px;
+            color: #f7fbff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .version-panel::after {
+            content: "";
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .version-panel.v11 {
+            background: linear-gradient(135deg, var(--v11-start) 0%, var(--v11-end) 100%);
+        }
+
+        .version-panel.mvp {
+            background: linear-gradient(135deg, var(--mvp-start) 0%, var(--mvp-end) 100%);
+        }
+
+        .version-top {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: start;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .version-panel p {
+            position: relative;
+            z-index: 1;
+            margin-top: 12px;
+            color: rgba(247, 251, 255, 0.82);
+        }
+
+        .version-panel .jump {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            margin-top: 18px;
+            text-decoration: none;
+            padding: 11px 16px;
+            border-radius: 999px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+        }
+
+        .catalog {
+            padding: 24px;
+        }
+
+        .catalog-block + .catalog-block {
+            margin-top: 22px;
+        }
+
+        .catalog-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .catalog-title {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .catalog-index {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .catalog-block.v11 .catalog-index {
+            background: linear-gradient(135deg, var(--v11-start), var(--v11-end));
+        }
+
+        .catalog-block.mvp .catalog-index {
+            background: linear-gradient(135deg, var(--mvp-start), var(--mvp-end));
+        }
+
+        .catalog-head h3 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .catalog-head p {
+            margin: 4px 0 0;
+            color: var(--muted);
+        }
+
+        .catalog-meta {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: #fff;
+            border: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
         }
 
         .card {
             text-decoration: none;
-            color: inherit;
-            border-radius: 16px;
+            display: grid;
+            gap: 14px;
+            min-height: 184px;
+            padding: 18px;
+            border-radius: 22px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.92));
             border: 1px solid var(--line);
-            background: #fff;
-            padding: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+            box-shadow: 0 12px 28px rgba(32, 44, 76, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
 
         .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(63, 85, 164, 0.14);
-            border-color: #94a8ea;
+            border-color: rgba(43, 137, 217, 0.28);
+            box-shadow: 0 18px 38px rgba(32, 44, 76, 0.12);
         }
 
-        .card-name {
-            font-size: 15px;
-            font-weight: 700;
-            max-width: calc(100% - 58px);
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
+        .card-top {
+            display: flex;
+            align-items: start;
+            justify-content: space-between;
+            gap: 12px;
         }
 
-        .ext {
+        .card-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: rgba(24, 59, 98, 0.08);
+        }
+
+        .card-ext {
+            border-radius: 999px;
+            padding: 4px 9px;
             font-size: 11px;
             color: var(--muted);
+            background: #fff;
             border: 1px solid var(--line);
-            border-radius: 999px;
-            padding: 2px 7px;
-            background: #f8faff;
         }
 
-        .footer-note {
-            margin-top: 18px;
-            font-size: 13px;
+        .card h4 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .card p {
+            margin: 0;
             color: var(--muted);
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .card-tag {
+            align-self: end;
+            justify-self: start;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            background: rgba(24, 59, 98, 0.08);
+            color: #27476b;
+        }
+
+        .note {
+            margin-top: 18px;
+            padding: 16px 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px dashed rgba(40, 52, 84, 0.18);
+        }
+
+        @media (max-width: 1180px) {
+            .hero-grid,
+            .overview-grid,
+            .versions-grid,
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
         }
 
         @media (max-width: 860px) {
-            .hero { padding-top: 22px; }
-            .container { border-radius: 20px; padding: 18px; }
-            .capsule { font-size: 17px; padding: 9px 16px; }
-            .divider { width: 80%; }
+            .shell {
+                width: min(100vw - 20px, 1400px);
+                margin: 10px auto 28px;
+            }
+
+            .hero,
+            .overview,
+            .versions,
+            .catalog {
+                padding: 18px;
+                border-radius: 24px;
+            }
+
+            .section-heading,
+            .catalog-head,
+            .version-top {
+                flex-direction: column;
+                align-items: start;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <header class="hero">
-        <div class="hero-inner">
-            <h1>🏢 企业项目管理系统</h1>
-            <p>核心业务全流程管理 | 项目全生命周期闭环</p>
+    <div class="shell">
+        <header class="hero" id="top">
+            <div class="hero-top">Enterprise Project Management Portal</div>
+            <div class="hero-grid">
+                <section class="hero-copy">
+                    <h1>企业项目管理系统<br>页面导航中枢</h1>
+                    <p>将项目、任务、工单、人才、培训与服务维护集中到一个首页入口。页面结构从“链接堆叠”升级为“产品总览 + 生命周期导览 + 版本导航”，让首次进入的使用者也能迅速理解系统范围和模块关系。</p>
+                    <div class="hero-actions">
+                        <a class="action-pill primary" href="./业务流程图.html" target="_blank" rel="noopener noreferrer">查看业务流程图</a>
+                        <a class="action-pill secondary" href="#catalog">浏览全部页面</a>
+                        <a class="action-pill secondary" href="#versions">查看版本分层</a>
+                    </div>
+                </section>
 
-            <nav class="capsule-nav" aria-label="导航分区">
-                <a class="capsule active" href="#all">🌐 全局流程</a>
-                <a class="capsule" href="#v11">🆕 1.1版本</a>
-                <a class="capsule" href="#mvp">📦 MVP版本</a>
-            </nav>
-        </div>
-    </header>
+                <aside class="hero-aside">
+                    <section class="glass-card">
+                        <h2>导航概况</h2>
+                        <div class="stats">
+                            <div class="stat">
+                                <strong>15</strong>
+                                <span>当前已接入的业务页面，覆盖项目与交付主流程。</span>
+                            </div>
+                            <div class="stat">
+                                <strong>6</strong>
+                                <span>1.1 版本页面，聚焦能力补齐与维护增强。</span>
+                            </div>
+                            <div class="stat">
+                                <strong>9</strong>
+                                <span>MVP 页面，构成首版核心业务底座。</span>
+                            </div>
+                        </div>
+                    </section>
 
-    <main class="container" id="all">
-        <h2 class="section-title">🌐 项目全生命周期核心业务流程</h2>
-        <div class="divider"></div>
-
-        <section class="version-block" id="v11">
-            <div class="version-head v11">🚀 1.1 版本页面（6个）</div>
-            <div class="grid">
-                <a class="card" href="./人员画像.html" target="_blank" rel="noopener noreferrer"><span class="card-name">人员画像</span><span class="ext">.html</span></a>
-                <a class="card" href="./培训记录.html" target="_blank" rel="noopener noreferrer"><span class="card-name">培训记录</span><span class="ext">.html</span></a>
-                <a class="card" href="./人才评分规则.html" target="_blank" rel="noopener noreferrer"><span class="card-name">人才评分规则</span><span class="ext">.html</span></a>
-                <a class="card" href="./工序维护.html" target="_blank" rel="noopener noreferrer"><span class="card-name">工序维护</span><span class="ext">.html</span></a>
-                <a class="card" href="./施工指导书(改字段名称,不做样式修改).html" target="_blank" rel="noopener noreferrer"><span class="card-name">施工指导书(改字段名称,不做样式修改)</span><span class="ext">.html</span></a>
-                <a class="card" href="./服务维护.html" target="_blank" rel="noopener noreferrer"><span class="card-name">服务维护</span><span class="ext">.html</span></a>
+                    <section class="glass-card">
+                        <h3>推荐入口</h3>
+                        <div class="mini-links">
+                            <a class="mini-link" href="./项目空间.html" target="_blank" rel="noopener noreferrer">
+                                <span>
+                                    <small>Workspace</small>
+                                    <strong>项目空间</strong>
+                                </span>
+                                <span>→</span>
+                            </a>
+                            <a class="mini-link" href="./工单管理.html" target="_blank" rel="noopener noreferrer">
+                                <span>
+                                    <small>Execution</small>
+                                    <strong>工单管理</strong>
+                                </span>
+                                <span>→</span>
+                            </a>
+                            <a class="mini-link" href="./人员画像.html" target="_blank" rel="noopener noreferrer">
+                                <span>
+                                    <small>Talent</small>
+                                    <strong>人员画像</strong>
+                                </span>
+                                <span>→</span>
+                            </a>
+                        </div>
+                    </section>
+                </aside>
             </div>
-        </section>
+        </header>
 
-        <section class="version-block" id="mvp">
-            <div class="version-head mvp">📦 MVP 版本页面（9个）</div>
-            <div class="grid">
-                <a class="card" href="./业务流程图.html" target="_blank" rel="noopener noreferrer"><span class="card-name">业务流程图</span><span class="ext">.html</span></a>
-                <a class="card" href="./人才管理.html" target="_blank" rel="noopener noreferrer"><span class="card-name">人才管理</span><span class="ext">.html</span></a>
-                <a class="card" href="./任务管理.html" target="_blank" rel="noopener noreferrer"><span class="card-name">任务管理</span><span class="ext">.html</span></a>
-                <a class="card" href="./工单管理.html" target="_blank" rel="noopener noreferrer"><span class="card-name">工单管理</span><span class="ext">.html</span></a>
-                <a class="card" href="./工单管理-报工.html" target="_blank" rel="noopener noreferrer"><span class="card-name">工单管理-报工</span><span class="ext">.html</span></a>
-                <a class="card" href="./工单详情.html" target="_blank" rel="noopener noreferrer"><span class="card-name">工单详情</span><span class="ext">.html</span></a>
-                <a class="card" href="./证书管理.html" target="_blank" rel="noopener noreferrer"><span class="card-name">证书管理</span><span class="ext">.html</span></a>
-                <a class="card" href="./项目列表.html" target="_blank" rel="noopener noreferrer"><span class="card-name">项目列表</span><span class="ext">.html</span></a>
-                <a class="card" href="./项目空间.html" target="_blank" rel="noopener noreferrer"><span class="card-name">项目空间</span><span class="ext">.html</span></a>
-            </div>
-        </section>
+        <main class="content">
+            <section class="panel overview" id="overview">
+                <div class="section-heading">
+                    <div>
+                        <h2>全生命周期导览</h2>
+                        <p>从项目启动到执行交付，再到人才与知识沉淀，首页直接把核心路径和模块边界讲清楚，避免用户在多个页面之间盲目跳转。</p>
+                    </div>
+                    <nav class="nav-chips" aria-label="导航分区">
+                        <a class="nav-chip" href="#top">顶部概览</a>
+                        <a class="nav-chip" href="#versions">版本视图</a>
+                        <a class="nav-chip" href="#catalog">页面目录</a>
+                    </nav>
+                </div>
 
-        <div class="footer-note">所有链接均在新窗口打开；后续新增页面时请同步更新此导航。</div>
-    </main>
+                <div class="overview-grid">
+                    <section class="journey">
+                        <h3>业务闭环路径</h3>
+                        <div class="steps">
+                            <article class="step">
+                                <span class="step-mark">01</span>
+                                <h4>项目立项</h4>
+                                <p>通过项目列表、项目空间和业务流程图建立项目入口与协作上下文。</p>
+                            </article>
+                            <article class="step">
+                                <span class="step-mark">02</span>
+                                <h4>任务拆解</h4>
+                                <p>围绕任务管理与工序维护进行排产、分解与工序定义。</p>
+                            </article>
+                            <article class="step">
+                                <span class="step-mark">03</span>
+                                <h4>执行报工</h4>
+                                <p>用工单管理、工单详情和报工页面跟踪执行状态与交付进度。</p>
+                            </article>
+                            <article class="step">
+                                <span class="step-mark">04</span>
+                                <h4>人才支撑</h4>
+                                <p>把人员画像、证书、培训和评分规则连接到项目人力保障体系。</p>
+                            </article>
+                            <article class="step">
+                                <span class="step-mark">05</span>
+                                <h4>标准沉淀</h4>
+                                <p>通过施工指导书、服务维护等页面沉淀标准、服务和知识资产。</p>
+                            </article>
+                        </div>
+                    </section>
+
+                    <aside class="portfolio">
+                        <section class="portfolio-card">
+                            <strong>项目协同</strong>
+                            <p>项目列表、项目空间、任务管理、工单链路构成执行主干，适合作为日常入口。</p>
+                        </section>
+                        <section class="portfolio-card">
+                            <strong>人才治理</strong>
+                            <p>人才管理、人员画像、培训记录、证书管理和评分规则形成完整的人才能力视图。</p>
+                        </section>
+                        <section class="portfolio-card">
+                            <strong>标准与维护</strong>
+                            <p>工序维护、施工指导书和服务维护负责把流程经验转成标准化资产。</p>
+                        </section>
+                    </aside>
+                </div>
+            </section>
+
+            <section class="panel versions" id="versions">
+                <div class="section-heading">
+                    <div>
+                        <h2>版本分层</h2>
+                        <p>用版本视角帮助团队区分“核心可运行能力”和“后续增强能力”，便于汇报与演示时快速切换叙事重点。</p>
+                    </div>
+                </div>
+
+                <div class="versions-grid">
+                    <article class="version-panel v11">
+                        <div class="version-top">
+                            <div>
+                                <span class="badge">Version 1.1</span>
+                                <h3>增强能力集</h3>
+                            </div>
+                            <strong>06 Pages</strong>
+                        </div>
+                        <p>补充人才治理、培训与维护能力，增强组织能力标准化和知识沉淀。</p>
+                        <a class="jump" href="#v11">跳转 1.1 页面目录</a>
+                    </article>
+
+                    <article class="version-panel mvp">
+                        <div class="version-top">
+                            <div>
+                                <span class="badge">MVP</span>
+                                <h3>首版核心流程</h3>
+                            </div>
+                            <strong>09 Pages</strong>
+                        </div>
+                        <p>聚焦业务主链路，从项目到工单执行，再到人才基础管理，形成最小可运行闭环。</p>
+                        <a class="jump" href="#mvp">跳转 MVP 页面目录</a>
+                    </article>
+                </div>
+            </section>
+
+            <section class="panel catalog" id="catalog">
+                <div class="section-heading">
+                    <div>
+                        <h2>页面目录</h2>
+                        <p>所有链接继续保持新窗口打开，便于演示时保留导航首页；卡片补充模块角色说明，让目录本身也能承担讲解作用。</p>
+                    </div>
+                </div>
+
+                <section class="catalog-block v11" id="v11">
+                    <div class="catalog-head">
+                        <div class="catalog-title">
+                            <span class="catalog-index">1.1</span>
+                            <div>
+                                <h3>1.1 版本页面</h3>
+                                <p>聚焦人才治理、培训标准与维护配置</p>
+                            </div>
+                        </div>
+                        <div class="catalog-meta">共 6 个页面</div>
+                    </div>
+
+                    <div class="card-grid">
+                        <a class="card" href="./人员画像.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">👤</span><span class="card-ext">.html</span></div>
+                            <div><h4>人员画像</h4><p>沉淀人员能力标签、履历信息与岗位价值判断，适合人才盘点场景。</p></div>
+                            <span class="card-tag">人才视图</span>
+                        </a>
+                        <a class="card" href="./培训记录.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">🎓</span><span class="card-ext">.html</span></div>
+                            <div><h4>培训记录</h4><p>记录培训过程与结果，支撑人员成长追踪与合规留档。</p></div>
+                            <span class="card-tag">培训管理</span>
+                        </a>
+                        <a class="card" href="./人才评分规则.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">📏</span><span class="card-ext">.html</span></div>
+                            <div><h4>人才评分规则</h4><p>定义评分维度和评价口径，用于统一人才评价标准。</p></div>
+                            <span class="card-tag">规则配置</span>
+                        </a>
+                        <a class="card" href="./工序维护.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">🛠</span><span class="card-ext">.html</span></div>
+                            <div><h4>工序维护</h4><p>维护工序节点与执行规范，是工单与任务流程的底层配置入口。</p></div>
+                            <span class="card-tag">流程维护</span>
+                        </a>
+                        <a class="card" href="./施工指导书(改字段名称,不做样式修改).html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">📘</span><span class="card-ext">.html</span></div>
+                            <div><h4>施工指导书</h4><p>汇总现场执行标准与作业说明，减少交付过程中的信息偏差。</p></div>
+                            <span class="card-tag">知识沉淀</span>
+                        </a>
+                        <a class="card" href="./服务维护.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">🧩</span><span class="card-ext">.html</span></div>
+                            <div><h4>服务维护</h4><p>维护服务项和交付能力边界，为项目实施和售后服务提供标准入口。</p></div>
+                            <span class="card-tag">服务配置</span>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="catalog-block mvp" id="mvp">
+                    <div class="catalog-head">
+                        <div class="catalog-title">
+                            <span class="catalog-index">MVP</span>
+                            <div>
+                                <h3>MVP 版本页面</h3>
+                                <p>聚焦业务主链路与最小可运行闭环</p>
+                            </div>
+                        </div>
+                        <div class="catalog-meta">共 9 个页面</div>
+                    </div>
+
+                    <div class="card-grid">
+                        <a class="card" href="./业务流程图.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">🗺</span><span class="card-ext">.html</span></div>
+                            <div><h4>业务流程图</h4><p>从全局角度展示系统流程，是演示和理解系统边界的最佳起点。</p></div>
+                            <span class="card-tag">全局入口</span>
+                        </a>
+                        <a class="card" href="./人才管理.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">🧠</span><span class="card-ext">.html</span></div>
+                            <div><h4>人才管理</h4><p>管理人才档案与资源分布，为项目分配和能力建设提供依据。</p></div>
+                            <span class="card-tag">资源管理</span>
+                        </a>
+                        <a class="card" href="./任务管理.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">✅</span><span class="card-ext">.html</span></div>
+                            <div><h4>任务管理</h4><p>承接项目拆解后的执行任务，负责状态跟踪和责任落位。</p></div>
+                            <span class="card-tag">任务执行</span>
+                        </a>
+                        <a class="card" href="./工单管理.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">📦</span><span class="card-ext">.html</span></div>
+                            <div><h4>工单管理</h4><p>统一管理交付过程中的工单流转，是执行环节的核心操作台。</p></div>
+                            <span class="card-tag">执行中枢</span>
+                        </a>
+                        <a class="card" href="./工单管理-报工.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">⏱</span><span class="card-ext">.html</span></div>
+                            <div><h4>工单管理-报工</h4><p>承接现场反馈、工时与进展回传，提升交付透明度。</p></div>
+                            <span class="card-tag">现场反馈</span>
+                        </a>
+                        <a class="card" href="./工单详情.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">🔎</span><span class="card-ext">.html</span></div>
+                            <div><h4>工单详情</h4><p>查看工单上下文、处理动作与关键信息，适合问题追踪和复盘。</p></div>
+                            <span class="card-tag">详情追踪</span>
+                        </a>
+                        <a class="card" href="./证书管理.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">📜</span><span class="card-ext">.html</span></div>
+                            <div><h4>证书管理</h4><p>管理资质证书和有效期，为人员合规和项目准入提供支持。</p></div>
+                            <span class="card-tag">资质管理</span>
+                        </a>
+                        <a class="card" href="./项目列表.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">🧾</span><span class="card-ext">.html</span></div>
+                            <div><h4>项目列表</h4><p>汇总全部项目并承接检索筛选，是项目管理的总览入口。</p></div>
+                            <span class="card-tag">项目总览</span>
+                        </a>
+                        <a class="card" href="./项目空间.html" target="_blank" rel="noopener noreferrer">
+                            <div class="card-top"><span class="card-icon">🏗</span><span class="card-ext">.html</span></div>
+                            <div><h4>项目空间</h4><p>聚合单个项目的协作内容、进度与执行信息，适合作为项目驾驶舱。</p></div>
+                            <span class="card-tag">协作空间</span>
+                        </a>
+                    </div>
+                </section>
+
+                <div class="note">所有链接均在新窗口打开。后续如果新增页面，建议同步补充卡片说明与版本归属，保证该导航页既能演示，也能承担产品说明职责。</div>
+            </section>
+        </main>
+    </div>
 </body>
 </html>
