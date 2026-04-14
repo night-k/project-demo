@@ -3,323 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>企业项目管理系统 - 页面导航</title>
+    <title>文件访问导航</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #f3f6fb;
+            --panel: #ffffff;
+            --line: #d8e0ea;
+            --text: #1f2a37;
+            --muted: #6b7280;
+            --html: #0f766e;
+            --htm: #1d4ed8;
         }
-
+        * { box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            margin: 0;
+            font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at top right, #d8ecff 0%, var(--bg) 45%);
         }
-
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            width: min(1080px, 92vw);
+            margin: 36px auto 56px;
         }
-
         .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: white;
+            background: linear-gradient(120deg, #123b66 0%, #0e7490 100%);
+            color: #fff;
+            padding: 28px;
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(13, 46, 84, 0.24);
         }
-
         .header h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 0.5px;
         }
-
         .header p {
-            font-size: 1em;
+            margin: 10px 0 0;
             opacity: 0.9;
+            font-size: 14px;
         }
-
-        .nav-tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
-
-        .nav-tab {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 2px solid rgba(255,255,255,0.3);
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            backdrop-filter: blur(10px);
-        }
-
-        .nav-tab:hover, .nav-tab.active {
-            background: white;
-            color: #667eea;
-            transform: translateY(-2px);
-        }
-
-        .content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-
-        .section-title {
-            font-size: 1.5em;
-            color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
-            display: inline-block;
-        }
-
-        .page-grid {
+        .sections {
+            margin-top: 24px;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
-            margin-bottom: 30px;
+            gap: 18px;
         }
-
-        .page-card {
-            background: #f8f9fc;
-            border: 2px solid #e8eaf0;
+        .section {
+            background: var(--panel);
+            border: 1px solid var(--line);
             border-radius: 16px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            padding: 18px;
         }
-
-        .page-card:hover {
-            border-color: #667eea;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
-        }
-
-        .page-card-header {
+        .section-title {
+            margin: 0 0 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            font-size: 18px;
         }
-
-        .page-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 10px;
+        .tag {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+        .tag-html {
+            color: var(--html);
+            background: #d1fae5;
+        }
+        .tag-htm {
+            color: var(--htm);
+            background: #dbeafe;
+        }
+        .list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+        }
+        .item a {
+            text-decoration: none;
+            color: inherit;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: white;
-        }
-
-        .page-tag {
-            font-size: 11px;
-            padding: 4px 10px;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
             border-radius: 12px;
-            background: #e8eaf0;
-            color: #666;
+            transition: all .18s ease;
+            background: #fff;
         }
-
-        .page-card h3 {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 8px;
+        .item a:hover {
+            transform: translateY(-1px);
+            border-color: #7aa6d2;
+            box-shadow: 0 6px 16px rgba(28, 73, 121, .12);
         }
-
-        .page-card p {
+        .name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80%;
+            font-size: 14px;
+        }
+        .ext {
+            font-size: 11px;
+            color: var(--muted);
+            border: 1px solid var(--line);
+            padding: 2px 6px;
+            border-radius: 999px;
+        }
+        .empty {
+            margin: 4px 0 2px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+        .footer {
+            margin-top: 16px;
+            color: var(--muted);
             font-size: 13px;
-            color: #666;
-            line-height: 1.5;
-        }
-
-        .version-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .v11-badge {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        .mvp-badge {
-            background: linear-gradient(135deg, #f093fb, #f5576c);
-            color: white;
-        }
-
-        .version-section {
-            margin-bottom: 30px;
-        }
-
-        .version-section:last-child {
-            margin-bottom: 0;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>企业项目管理系统</h1>
-            <p>页面导航入口</p>
-        </header>
+    <main class="container">
+        <section class="header">
+            <h1>文件访问导航</h1>
+            <p>当前目录下全部网页入口已按文件类型分类展示</p>
+        </section>
 
-        <div class="nav-tabs">
-            <a class="nav-tab active" href="index.html">全部页面</a>
-            <a class="nav-tab" href="./业务流程图.html" target="_blank">业务流程图</a>
-            <a class="nav-tab" href="./项目空间.html" target="_blank">项目空间</a>
-            <a class="nav-tab" href="./工单管理.html" target="_blank">工单管理</a>
-            <a class="nav-tab" href="./人员画像.html" target="_blank">人员画像</a>
-        </div>
-
-        <div class="content">
-            <div class="version-section">
-                <span class="version-badge v11-badge">Version 1.1</span>
-                <h2 class="section-title">1.1 版本页面</h2>
-                <div class="page-grid">
-                    <a class="page-card" href="./人员画像.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">👤</div>
-                            <span class="page-tag">人才</span>
-                        </div>
-                        <h3>人员画像</h3>
-                        <p>人员能力标签、履历信息与岗位价值判断</p>
-                    </a>
-                    <a class="page-card" href="./培训记录.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">🎓</div>
-                            <span class="page-tag">培训</span>
-                        </div>
-                        <h3>培训记录</h3>
-                        <p>培训过程与结果记录，支撑成长追踪</p>
-                    </a>
-                    <a class="page-card" href="./人才评分规则.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">📏</div>
-                            <span class="page-tag">规则</span>
-                        </div>
-                        <h3>人才评分规则</h3>
-                        <p>定义评分维度和评价口径</p>
-                    </a>
-                    <a class="page-card" href="./工序维护.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">🛠</div>
-                            <span class="page-tag">流程</span>
-                        </div>
-                        <h3>工序维护</h3>
-                        <p>工序节点与执行规范配置</p>
-                    </a>
-                    <a class="page-card" href="./施工指导书(改字段名称,不做样式修改).html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">📘</div>
-                            <span class="page-tag">知识</span>
-                        </div>
-                        <h3>施工指导书</h3>
-                        <p>现场执行标准与作业说明</p>
-                    </a>
-                    <a class="page-card" href="./服务维护.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">🧩</div>
-                            <span class="page-tag">服务</span>
-                        </div>
-                        <h3>服务维护</h3>
-                        <p>服务项和交付能力边界配置</p>
-                    </a>
-                </div>
+        <section class="sections">
+            <div class="section">
+                <h2 class="section-title">
+                    <span>HTML 文件（.html）</span>
+                    <span class="tag tag-html">15 个文件</span>
+                </h2>
+                <ul class="list">
+                    <li class="item"><a href="./业务流程图.html"><span class="name">业务流程图.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./人员画像.html"><span class="name">人员画像.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./人才管理.html"><span class="name">人才管理.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./人才评分规则.html"><span class="name">人才评分规则.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./任务管理.html"><span class="name">任务管理.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./培训记录.html"><span class="name">培训记录.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./工单管理-报工.html"><span class="name">工单管理-报工.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./工单管理.html"><span class="name">工单管理.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./工单详情.html"><span class="name">工单详情.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./工序维护.html"><span class="name">工序维护.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./施工指导书(改字段名称,不做样式修改).html"><span class="name">施工指导书(改字段名称,不做样式修改).html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./服务维护.html"><span class="name">服务维护.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./证书管理.html"><span class="name">证书管理.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./项目列表.html"><span class="name">项目列表.html</span><span class="ext">.html</span></a></li>
+                    <li class="item"><a href="./项目空间.html"><span class="name">项目空间.html</span><span class="ext">.html</span></a></li>
+                </ul>
             </div>
 
-            <div class="version-section">
-                <span class="version-badge mvp-badge">MVP</span>
-                <h2 class="section-title">MVP 版本页面</h2>
-                <div class="page-grid">
-                    <a class="page-card" href="./业务流程图.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">🗺</div>
-                            <span class="page-tag">全局</span>
-                        </div>
-                        <h3>业务流程图</h3>
-                        <p>全局视角展示系统流程</p>
-                    </a>
-                    <a class="page-card" href="./人才管理.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">🧠</div>
-                            <span class="page-tag">资源</span>
-                        </div>
-                        <h3>人才管理</h3>
-                        <p>人才档案与资源分布管理</p>
-                    </a>
-                    <a class="page-card" href="./任务管理.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">✅</div>
-                            <span class="page-tag">任务</span>
-                        </div>
-                        <h3>任务管理</h3>
-                        <p>执行任务状态跟踪与责任落位</p>
-                    </a>
-                    <a class="page-card" href="./工单管理.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">📦</div>
-                            <span class="page-tag">执行</span>
-                        </div>
-                        <h3>工单管理</h3>
-                        <p>交付过程工单流转管理</p>
-                    </a>
-                    <a class="page-card" href="./工单管理-报工.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">⏱</div>
-                            <span class="page-tag">现场</span>
-                        </div>
-                        <h3>工单管理-报工</h3>
-                        <p>工时与进展回传</p>
-                    </a>
-                    <a class="page-card" href="./工单详情.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">🔎</div>
-                            <span class="page-tag">详情</span>
-                        </div>
-                        <h3>工单详情</h3>
-                        <p>工单上下文与处理动作</p>
-                    </a>
-                    <a class="page-card" href="./证书管理.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">📜</div>
-                            <span class="page-tag">资质</span>
-                        </div>
-                        <h3>证书管理</h3>
-                        <p>资质证书和有效期管理</p>
-                    </a>
-                    <a class="page-card" href="./项目列表.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">🧾</div>
-                            <span class="page-tag">总览</span>
-                        </div>
-                        <h3>项目列表</h3>
-                        <p>全部项目汇总与检索</p>
-                    </a>
-                    <a class="page-card" href="./项目空间.html" target="_blank">
-                        <div class="page-card-header">
-                            <div class="page-icon">🏗</div>
-                            <span class="page-tag">协作</span>
-                        </div>
-                        <h3>项目空间</h3>
-                        <p>项目协作内容与进度聚合</p>
-                    </a>
-                </div>
+            <div class="section">
+                <h2 class="section-title">
+                    <span>HTM 文件（.htm）</span>
+                    <span class="tag tag-htm">0 个文件</span>
+                </h2>
+                <p class="empty">当前目录暂无 .htm 文件。</p>
             </div>
-        </div>
-    </div>
+        </section>
+
+        <div class="footer">提示：若新增网页文件，请同步更新此导航页。</div>
+    </main>
 </body>
 </html>
