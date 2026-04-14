@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服务维护 - 油田MES系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* 左侧分类树 - 截图样式 */
+        .sidebar {
+            width: 240px;
+            background: #fff;
+            border-right: 1px solid #e8e8e8;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 12px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: #666;
+        }
+        
+        .btn-icon:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .tree-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        
+        .tree-node {
+            padding: 10px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            color: #333;
+        }
+        
+        .tree-node:hover {
+            background-color: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .tree-node.active {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            font-weight: 500;
+        }
+        
+        .tree-icon {
+            font-size: 12px;
+            color: #999;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .tree-label {
+            flex: 1;
+        }
+        
+        .tree-children {
+            display: none;
+        }
+        
+        .tree-children.expanded {
+            display: block;
+        }
+        
+        .tree-node.parent.expanded > .tree-icon {
+            transform: rotate(90deg);
+        }
+        
+        /* 右侧内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #f5f7fa;
+        }
+        
+        /* 搜索区域 - 截图样式 */
+        .search-area {
+            background: #fff;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e8e8e8;
+            margin: 16px;
+            margin-bottom: 0;
+            border-radius: 4px;
+        }
+        
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+        }
+        
+        .form-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        
+        .form-input, .form-select {
+            width: 200px;
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            background: #fff;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24,144,255,0.2);
+        }
+        
+        .btn {
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .btn-primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+        }
+        
+        .btn-danger {
+            background: #fff;
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+        
+        .btn-danger:hover {
+            background: #ff4d4f;
+            color: #fff;
+        }
+        
+        .btn-success {
+            background: #52c41a;
+            color: #fff;
+            border-color: #52c41a;
+        }
+        
+        .btn-success:hover {
+            background: #73d13d;
+            border-color: #73d13d;
+        }
+        
+        .btn-default {
+            background: #fff;
+            border-color: #d9d9d9;
+            color: #666;
+        }
+        
+        .btn-default:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .search-buttons {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* 操作栏 */
+        .toolbar {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0 16px;
+        }
+        
+        .toolbar-left {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .toolbar-right {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .toolbar-icon-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .toolbar-icon-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        /* 表格区域 */
+        .table-container {
+            flex: 1;
+            margin: 0 16px 16px;
+            overflow: auto;
+            background: #fff;
+            border-radius: 4px;
+            border: 1px solid #e8e8e8;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .data-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: #e6f7ff;
+        }
+        
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .tag-blue {
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+        
+        .tag-green {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+        
+        .tag-orange {
+            background: #fff7e6;
+            color: #fa8c16;
+            border: 1px solid #ffd591;
+        }
+        
+        .tag-red {
+            background: #fff1f0;
+            color: #ff4d4f;
+            border: 1px solid #ffa39e;
+        }
+        
+        .operation-btns {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .operation-btns a {
+            color: #1890ff;
+            cursor: pointer;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        
+        .operation-btns a:hover {
+            color: #40a9ff;
+            text-decoration: underline;
+        }
+        
+        .operation-btns a.danger {
+            color: #ff4d4f;
+        }
+        
+        .operation-btns a.danger:hover {
+            color: #ff7875;
+        }
+        
+        /* 模态框 - 截图简洁样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #fff;
+            border-radius: 4px;
+            width: 700px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s;
+            font-size: 18px;
+        }
+        
+        .modal-close:hover {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        
+        .modal-footer {
+            padding: 12px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            background: #fafafa;
+        }
+        
+        /* 表单布局 - 截图两列样式 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px 24px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        
+        .form-group label {
+            font-size: 14px;
+            color: #262626;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .required::before {
+            content: "*";
+            color: #ff4d4f;
+            margin-right: 4px;
+        }
+        
+        .input-wrapper input,
+        .input-wrapper select,
+        .input-wrapper textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            font-family: inherit;
+            background: #fff;
+        }
+        
+        .input-wrapper input:focus,
+        .input-wrapper select:focus,
+        .input-wrapper textarea:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24,144,255,0.2);
+        }
+        
+        .input-wrapper input:disabled {
+            background: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
+        }
+        
+        .input-wrapper textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* 附件上传区域 - 新增 */
+        .upload-area {
+            border: 2px dashed #d9d9d9;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        .upload-area:hover {
+            border-color: #1890ff;
+            background: #e6f7ff;
+        }
+        
+        .upload-icon {
+            font-size: 32px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+        
+        .upload-text {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .upload-hint {
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .file-list {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 4px;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #262626;
+        }
+        
+        .file-remove {
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .file-remove:hover {
+            color: #ff4d4f;
+        }
+        
+        /* Toast 提示 */
+        #toast {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            z-index: 2000;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧分类树 - 截图样式 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <input type="text" class="search-input" placeholder="搜索类别">
+                <button class="btn-icon" title="新增类别">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="tree-container">
+                <div class="tree-node parent" onclick="toggleTree(this)">
+                    <span class="tree-icon"><i class="fas fa-chevron-right"></i></span>
+                    <span class="tree-label">(28)井下作业服务</span>
+                </div>
+                <div class="tree-children" id="tree-28"></div>
+                
+                <div class="tree-node parent" onclick="toggleTree(this)">
+                    <span class="tree-icon"><i class="fas fa-chevron-right"></i></span>
+                    <span class="tree-label">(21)采油服务</span>
+                </div>
+                <div class="tree-children" id="tree-21"></div>
+                
+                <div class="tree-node parent expanded active" onclick="selectCategory(this, '(30)集输服务')">
+                    <span class="tree-icon"><i class="fas fa-chevron-down"></i></span>
+                    <span class="tree-label">(30)集输服务</span>
+                </div>
+                <div class="tree-children expanded" id="tree-30">
+                    <div class="tree-node" style="padding-left: 32px;" onclick="selectSubCategory(this, '管线巡检')">
+                        <span class="tree-label">(25)管线巡检</span>
+                    </div>
+                    <div class="tree-node" style="padding-left: 32px;" onclick="selectSubCategory(this, '泵组维护')">
+                        <span class="tree-label">(23)泵组维护</span>
+                    </div>
+                    <div class="tree-node" style="padding-left: 32px;" onclick="selectSubCategory(this, '阀门保养')">
+                        <span class="tree-label">(02)阀门保养</span>
+                    </div>
+                </div>
+                
+                <div class="tree-node parent" onclick="toggleTree(this)">
+                    <span class="tree-icon"><i class="fas fa-chevron-right"></i></span>
+                    <span class="tree-label">(03)应急抢维修</span>
+                </div>
+                <div class="tree-children" id="tree-03"></div>
+            </div>
+        </div>
+
+        <!-- 右侧内容区 -->
+        <div class="main-content">
+            <!-- 搜索区域 -->
+            <div class="search-area">
+                <div class="search-form">
+                    <div class="form-item">
+                        <label class="form-label">服务编码:</label>
+                        <input type="text" class="form-input" placeholder="请输入服务编码">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">服务名称:</label>
+                        <input type="text" class="form-input" placeholder="请输入服务名称">
+                    </div>
+                    <div class="form-item">
+                        <label class="form-label">服务类型:</label>
+                        <select class="form-select" disabled style="background: #f5f5f5; color: #666;">
+                            <option value="">从左侧选择分类</option>
+                        </select>
+                    </div>
+                    <div class="search-buttons">
+                        <button class="btn btn-primary" onclick="search()">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                        <button class="btn btn-default" onclick="resetForm()">
+                            <i class="fas fa-trash-alt"></i> 清空
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="btn btn-primary" onclick="openModal()">
+                        <i class="fas fa-plus"></i> 新增服务
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteSelected()">
+                        <i class="fas fa-trash-alt"></i> 删除
+                    </button>
+                    <button class="btn btn-success" onclick="exportList()">
+                        <i class="fas fa-file-export"></i> 导出清单
+                    </button>
+                </div>
+                <div class="toolbar-right">
+                    <button class="toolbar-icon-btn" title="刷新" onclick="refresh()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="toolbar-icon-btn" title="列设置">
+                        <i class="fas fa-columns"></i>
+                    </button>
+                    <button class="toolbar-icon-btn" title="全屏">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 表格区域 -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">
+                                <input type="checkbox" class="checkbox">
+                            </th>
+                            <th>服务编码</th>
+                            <th>服务名称</th>
+                            <th>服务类型</th>
+                            <th style="width: 200px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" class="checkbox"></td>
+                            <td>SRV-2024-001</td>
+                            <td>输油管线月度巡检</td>
+                            <td><span class="tag tag-blue">集输服务/管线巡检</span></td>
+                            <td class="operation-btns">
+                                <a onclick="editService('SRV-2024-001')">
+                                    <i class="fas fa-edit"></i> 编辑
+                                </a>
+                                <a onclick="viewService('SRV-2024-001')">
+                                    <i class="fas fa-eye"></i> 查看
+                                </a>
+                                <a class="danger" onclick="deleteService('SRV-2024-001')">
+                                    <i class="fas fa-trash-alt"></i> 删除
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="checkbox"></td>
+                            <td>SRV-2024-002</td>
+                            <td>抽油机故障维修</td>
+                            <td><span class="tag tag-orange">采油服务</span></td>
+                            <td class="operation-btns">
+                                <a onclick="editService('SRV-2024-002')">
+                                    <i class="fas fa-edit"></i> 编辑
+                                </a>
+                                <a onclick="viewService('SRV-2024-002')">
+                                    <i class="fas fa-eye"></i> 查看
+                                </a>
+                                <a class="danger" onclick="deleteService('SRV-2024-002')">
+                                    <i class="fas fa-trash-alt"></i> 删除
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="checkbox"></td>
+                            <td>SRV-2024-003</td>
+                            <td>海上平台应急抢险</td>
+                            <td><span class="tag tag-red">应急抢维修</span></td>
+                            <td class="operation-btns">
+                                <a onclick="editService('SRV-2024-003')">
+                                    <i class="fas fa-edit"></i> 编辑
+                                </a>
+                                <a onclick="viewService('SRV-2024-003')">
+                                    <i class="fas fa-eye"></i> 查看
+                                </a>
+                                <a class="danger" onclick="deleteService('SRV-2024-003')">
+                                    <i class="fas fa-trash-alt"></i> 删除
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/编辑模态框 - 已删除作业属性和作业控制，增加附件上传 -->
+    <div class="modal" id="serviceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">新增服务定义</div>
+                <div class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <!-- 基础信息 - 两列布局，服务类型从左侧取值 -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="required">服务编码</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="serviceCode" placeholder="请输入服务编码" value="SRV-2024-">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="required">服务名称</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="serviceName" placeholder="请输入服务名称">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="required">服务类型</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="serviceType" placeholder="请从左侧选择分类" readonly style="background: #f5f5f5;">
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>服务描述</label>
+                        <div class="input-wrapper">
+                            <textarea id="serviceDesc" placeholder="请详细描述服务内容及技术要求..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- 附件上传 - 新增功能 -->
+                    <div class="form-group full-width">
+                        <label>附件上传</label>
+                        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">点击上传附件</div>
+                            <div class="upload-hint">支持 PDF、Word、Excel、JPG、PNG 格式，单个文件不超过 20MB</div>
+                        </div>
+                        <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileUpload(this)">
+                        <div class="file-list" id="fileList"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal()">
+                    <i class="fas fa-times"></i> 取 消
+                </button>
+                <button class="btn btn-primary" onclick="saveService()">
+                    <i class="fas fa-save"></i> 保 存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div id="toast">
+        <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+        <span id="toastMsg">提示信息</span>
+    </div>
+
+    <script>
+        let selectedCategory = '';
+        let uploadedFiles = [];
+        
+        // 树形菜单展开/收起
+        function toggleTree(element) {
+            const children = element.nextElementSibling;
+            const isExpanded = element.classList.contains('expanded');
+            
+            if (isExpanded) {
+                element.classList.remove('expanded');
+                if (children) children.classList.remove('expanded');
+                element.querySelector('.tree-icon i').classList.remove('fa-chevron-down');
+                element.querySelector('.tree-icon i').classList.add('fa-chevron-right');
+            } else {
+                element.classList.add('expanded');
+                if (children) children.classList.add('expanded');
+                element.querySelector('.tree-icon i').classList.remove('fa-chevron-right');
+                element.querySelector('.tree-icon i').classList.add('fa-chevron-down');
+            }
+        }
+        
+        // 选择主分类
+        function selectCategory(element, categoryName) {
+            document.querySelectorAll('.tree-node').forEach(node => {
+                node.classList.remove('active');
+            });
+            element.classList.add('active');
+            selectedCategory = categoryName;
+            
+            // 如果模态框打开，自动填充服务类型
+            const typeInput = document.getElementById('serviceType');
+            if (typeInput && document.getElementById('serviceModal').classList.contains('show')) {
+                typeInput.value = categoryName;
+            }
+            
+            showToast(`已选择分类: ${categoryName}`, 'success');
+        }
+        
+        // 选择子分类
+        function selectSubCategory(element, subCategory) {
+            document.querySelectorAll('.tree-node').forEach(node => {
+                node.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            const parentName = '(30)集输服务';
+            selectedCategory = `${parentName}/${subCategory}`;
+            
+            // 如果模态框打开，自动填充服务类型
+            const typeInput = document.getElementById('serviceType');
+            if (typeInput && document.getElementById('serviceModal').classList.contains('show')) {
+                typeInput.value = selectedCategory;
+            }
+            
+            showToast(`已选择: ${selectedCategory}`, 'success');
+        }
+        
+        // 打开模态框
+        function openModal() {
+            document.getElementById('serviceModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            
+            // 如果有选中的分类，自动填充
+            if (selectedCategory) {
+                document.getElementById('serviceType').value = selectedCategory;
+            }
+            
+            // 重置表单
+            uploadedFiles = [];
+            document.getElementById('fileList').innerHTML = '';
+        }
+        
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('serviceModal').classList.remove('show');
+            document.body.style.overflow = '';
+            
+            // 清空表单
+            document.getElementById('serviceCode').value = 'SRV-2024-';
+            document.getElementById('serviceName').value = '';
+            document.getElementById('serviceType').value = '';
+            document.getElementById('serviceDesc').value = '';
+            uploadedFiles = [];
+            document.getElementById('fileList').innerHTML = '';
+        }
+        
+        // 文件上传处理
+        function handleFileUpload(input) {
+            const files = Array.from(input.files);
+            const fileList = document.getElementById('fileList');
+            
+            files.forEach(file => {
+                if (file.size > 20 * 1024 * 1024) {
+                    showToast(`文件 ${file.name} 超过20MB限制`, 'error');
+                    return;
+                }
+                
+                uploadedFiles.push(file);
+                
+                const fileSize = (file.size / 1024).toFixed(1);
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                
+                // 根据文件类型选择图标
+                let iconClass = 'fa-file';
+                if (file.name.endsWith('.pdf')) iconClass = 'fa-file-pdf';
+                else if (file.name.match(/\.(doc|docx)$/)) iconClass = 'fa-file-word';
+                else if (file.name.match(/\.(xls|xlsx)$/)) iconClass = 'fa-file-excel';
+                else if (file.name.match(/\.(jpg|jpeg|png)$/)) iconClass = 'fa-file-image';
+                
+                div.innerHTML = `
+                    <div class="file-info">
+                        <i class="fas ${iconClass} text-green-500"></i>
+                        <span>${file.name} (${fileSize}KB)</span>
+                    </div>
+                    <div class="file-remove" onclick="removeFile(this, '${file.name}')">
+                        <i class="fas fa-times"></i>
+                    </div>
+                `;
+                fileList.appendChild(div);
+            });
+            
+            input.value = '';
+        }
+        
+        // 删除文件
+        function removeFile(element, fileName) {
+            element.parentElement.remove();
+            uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
+            showToast('已移除附件', 'success');
+        }
+        
+        // 保存服务
+        function saveService() {
+            const code = document.getElementById('serviceCode').value;
+            const name = document.getElementById('serviceName').value;
+            const type = document.getElementById('serviceType').value;
+            
+            if (!code || code === 'SRV-2024-') {
+                showToast('请输入服务编码', 'error');
+                return;
+            }
+            if (!name) {
+                showToast('请输入服务名称', 'error');
+                return;
+            }
+            if (!type) {
+                showToast('请从左侧选择服务类型', 'error');
+                return;
+            }
+            
+            showToast(`服务保存成功！共上传 ${uploadedFiles.length} 个附件`, 'success');
+            closeModal();
+        }
+        
+        // 显示提示
+        function showToast(msg, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const icon = toast.querySelector('i');
+            
+            toastMsg.textContent = msg;
+            
+            if (type === 'success') {
+                icon.className = 'fas fa-check-circle';
+                toast.style.background = '#52c41a';
+            } else if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle';
+                toast.style.background = '#ff4d4f';
+            } else {
+                icon.className = 'fas fa-info-circle';
+                toast.style.background = 'rgba(0,0,0,0.8)';
+            }
+            
+            toast.style.display = 'flex';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+        
+        // 其他功能函数
+        function search() { showToast('搜索功能已触发', 'info'); }
+        function resetForm() { 
+            document.querySelectorAll('.form-input').forEach(input => input.value = '');
+            showToast('已清空搜索条件', 'success'); 
+        }
+        function deleteSelected() { showToast('请选择要删除的服务项', 'error'); }
+        function exportList() { showToast('正在导出服务清单...', 'success'); }
+        function refresh() { showToast('页面已刷新', 'success'); }
+        function editService(code) { 
+            openModal(); 
+            showToast(`正在编辑服务: ${code}`, 'info'); 
+        }
+        function viewService(code) { showToast(`查看服务详情: ${code}`, 'info'); }
+        function deleteService(code) { showToast(`服务 ${code} 已删除`, 'success'); }
+        
+        // 点击模态框外部关闭
+        document.getElementById('serviceModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        
+        // ESC键关闭
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>

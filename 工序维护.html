@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标准作业步骤 - 油田MES系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* 顶部导航 */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            z-index: 100;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1890ff;
+            margin-right: 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            flex: 1;
+        }
+        
+        .nav-item {
+            color: #666;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            padding: 20px 0;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            color: #1890ff;
+        }
+        
+        .nav-item.active {
+            border-bottom: 2px solid #1890ff;
+            font-weight: 500;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* 左侧边栏 */
+        .sidebar {
+            width: 200px;
+            background: #fff;
+            border-right: 1px solid #e8e8e8;
+            margin-top: 60px;
+            overflow-y: auto;
+        }
+        
+        .sidebar-menu {
+            padding: 12px 0;
+        }
+        
+        .sidebar-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-item:hover {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .sidebar-item.active {
+            background: #e6f7ff;
+            color: #1890ff;
+            border-left-color: #1890ff;
+            font-weight: 500;
+        }
+        
+        .sidebar-icon {
+            width: 16px;
+            text-align: center;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            margin-top: 60px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: #f5f7fa;
+        }
+        
+        /* Tab栏 */
+        .tab-bar {
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            padding: 0 16px;
+            height: 40px;
+            align-items: center;
+        }
+        
+        .tab-item {
+            padding: 0 16px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-item.active {
+            color: #1890ff;
+            border-bottom-color: #1890ff;
+            font-weight: 500;
+        }
+        
+        .tab-close {
+            font-size: 12px;
+            margin-left: 4px;
+            color: #999;
+        }
+        
+        .tab-close:hover {
+            color: #ff4d4f;
+        }
+        
+        /* 内容区域 */
+        .content-area {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+        }
+        
+        /* 搜索区域 */
+        .search-area {
+            background: #fff;
+            padding: 16px 20px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .search-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-label {
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+        }
+        
+        .search-input, .search-select {
+            width: 200px;
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus, .search-select:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24,144,255,0.2);
+        }
+        
+        .btn {
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+        
+        .btn-default {
+            background: #fff;
+            border-color: #d9d9d9;
+            color: #666;
+        }
+        
+        .btn-default:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .btn-danger {
+            background: #fff;
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+        
+        .btn-danger:hover {
+            background: #ff4d4f;
+            color: #fff;
+        }
+        
+        /* 操作栏 */
+        .toolbar {
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .toolbar-left {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .toolbar-right {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .toolbar-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .toolbar-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        /* 表格 */
+        .table-container {
+            background: #fff;
+            border-radius: 4px;
+            border: 1px solid #e8e8e8;
+            overflow: hidden;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .data-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: #e6f7ff;
+        }
+        
+        .data-table .index {
+            color: #666;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .link-blue {
+            color: #1890ff;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .link-blue:hover {
+            text-decoration: underline;
+        }
+        
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .tag-blue {
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+        
+        .tag-green {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+        
+        .operation-btns {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .operation-btns a {
+            color: #1890ff;
+            cursor: pointer;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+        }
+        
+        .operation-btns a:hover {
+            text-decoration: underline;
+        }
+        
+        .operation-btns a.delete {
+            color: #ff4d4f;
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 8px;
+            background: #fff;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .page-info {
+            color: #666;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+        
+        .page-btn {
+            min-width: 32px;
+            height: 32px;
+            border: 1px solid #d9d9d9;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .page-btn:hover:not(:disabled) {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .page-btn.active {
+            background: #1890ff;
+            border-color: #1890ff;
+            color: #fff;
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .page-select {
+            width: 60px;
+            padding: 4px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #fff;
+            border-radius: 4px;
+            width: 900px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #999;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        
+        .modal-footer {
+            padding: 12px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #fafafa;
+        }
+        
+        /* 表单布局 - 三列 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px 16px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 3;
+        }
+        
+        .form-group.half-width {
+            grid-column: span 1;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            color: #262626;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .required::before {
+            content: "*";
+            color: #ff4d4f;
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24,144,255,0.2);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .input-with-suffix {
+            position: relative;
+        }
+        
+        .input-suffix {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 14px;
+        }
+        
+        /* 开关样式 */
+        .switch-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 32px;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 22px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #1890ff;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+        
+        .switch-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* 附件上传 */
+        .upload-area {
+            border: 2px dashed #d9d9d9;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .upload-area:hover {
+            border-color: #1890ff;
+            background: #e6f7ff;
+        }
+        
+        .upload-icon {
+            font-size: 24px;
+            color: #999;
+        }
+        
+        .upload-text {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .file-list {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 12px;
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #262626;
+        }
+        
+        .file-remove {
+            margin-left: 8px;
+            color: #999;
+            cursor: pointer;
+        }
+        
+        .file-remove:hover {
+            color: #ff4d4f;
+        }
+        
+        /* Toast提示 */
+        #toast {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            z-index: 2000;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="top-nav">
+        <div class="logo">
+            <i class="fas fa-cloud"></i>
+            云智工业互联平台
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item"><i class="fas fa-bars"></i></div>
+            <div class="nav-item"><i class="fas fa-home"></i> 首页</div>
+            <div class="nav-item"><i class="fas fa-desktop"></i> 工作台</div>
+            <div class="nav-item"><i class="fas fa-project-diagram"></i> 流程管理</div>
+            <div class="nav-item active"><i class="fas fa-cogs"></i> 产品工艺</div>
+            <div class="nav-item"><i class="fas fa-shopping-cart"></i> 销售管理</div>
+            <div class="nav-item"><i class="fas fa-tasks"></i> 项目管理</div>
+            <div class="nav-item"><i class="fas fa-industry"></i> 生产管理</div>
+            <div class="nav-item"><i class="fas fa-warehouse"></i> 库存管理</div>
+        </div>
+        <div class="user-info">
+            <div class="btn-icon" style="width: 28px; height: 28px;">
+                <i class="fas fa-ellipsis-h"></i>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-user-circle" style="font-size: 24px; color: #1890ff;"></i>
+                <span>admin-admin</span>
+                <i class="fas fa-chevron-down" style="font-size: 12px;"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 左侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-menu">
+                <div class="sidebar-item">
+                    <i class="sidebar-icon fas fa-box"></i>
+                    物料信息
+                </div>
+                <div class="sidebar-item">
+                    <i class="sidebar-icon fas fa-info-circle"></i>
+                    产品信息
+                </div>
+                <div class="sidebar-item">
+                    <i class="sidebar-icon fas fa-sitemap"></i>
+                    产品BOM(旧)
+                </div>
+                <div class="sidebar-item">
+                    <i class="sidebar-icon fas fa-sitemap"></i>
+                    产品BOM
+                </div>
+                <div class="sidebar-item">
+                    <i class="sidebar-icon fas fa-route"></i>
+                    工艺路线
+                </div>
+                <div class="sidebar-item active">
+                    <i class="sidebar-icon fas fa-cog"></i>
+                    作业步骤
+                </div>
+                <div class="sidebar-item">
+                    <i class="sidebar-icon fas fa-folder"></i>
+                    施工指导书
+                </div>
+                <div class="sidebar-item">
+                    <i class="sidebar-icon fas fa-layer-group"></i>
+                    步骤分类
+                </div>
+                <div class="sidebar-item">
+                    <i class="sidebar-icon fas fa-exclamation-triangle"></i>
+                    作业告警记录
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- Tab栏 -->
+            <div class="tab-bar">
+                <div class="tab-item"><i class="fas fa-chevron-left"></i></div>
+                <div class="tab-item">工艺路线</div>
+                <div class="tab-item active">
+                    作业步骤配置
+                    <i class="fas fa-times tab-close"></i>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- 搜索区域 - 步骤类型已更新 -->
+                <div class="search-area">
+                    <div class="search-item">
+                        <label class="search-label">步骤名称:</label>
+                        <input type="text" class="search-input" placeholder="请输入步骤名称">
+                    </div>
+                    <div class="search-item">
+                        <label class="search-label">步骤类型:</label>
+                        <select class="search-select">
+                            <option value="">全部类型</option>
+                            <option value="operation">作业</option>
+                            <option value="qc">质检</option>
+                        </select>
+                    </div>
+                    <div class="search-item">
+                        <label class="search-label">执行岗位:</label>
+                        <select class="search-select">
+                            <option value="">全部岗位</option>
+                            <option>工程师</option>
+                            <option>技术员</option>
+                            <option>质检员</option>
+                            <option>操作工</option>
+                        </select>
+                    </div>
+                    <div style="margin-left: auto; display: flex; gap: 8px;">
+                        <button class="btn btn-primary" onclick="search()">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                        <button class="btn btn-default" onclick="resetSearch()">
+                            <i class="fas fa-trash-alt"></i> 清空
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 操作栏 -->
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <button class="btn btn-primary" onclick="openModal()">
+                            <i class="fas fa-plus"></i> 新增
+                        </button>
+                        <button class="btn btn-danger" onclick="batchDelete()">
+                            <i class="fas fa-trash-alt"></i> 删除
+                        </button>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="toolbar-btn" title="刷新"><i class="fas fa-sync-alt"></i></button>
+                        <button class="toolbar-btn" title="列设置"><i class="fas fa-columns"></i></button>
+                        <button class="toolbar-btn" title="搜索"><i class="fas fa-search"></i></button>
+                        <button class="toolbar-btn" title="全屏"><i class="fas fa-expand"></i></button>
+                    </div>
+                </div>
+
+                <!-- 表格 - 步骤类型列已更新 -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="index">#</th>
+                                <th>步骤编码</th>
+                                <th>步骤名称</th>
+                                <th>步骤类型</th>
+                                <th>执行岗位</th>
+                                <th>建议工时</th>
+                                <th>必须报工</th>
+                                <th>关键步骤</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="index">1</td>
+                                <td><span class="link-blue">STEP-2024-001</span></td>
+                                <td>管线外观检查</td>
+                                <td><span class="tag tag-blue">作业</span></td>
+                                <td>技术员</td>
+                                <td>2小时</td>
+                                <td><i class="fas fa-check-circle" style="color: #52c41a;"></i></td>
+                                <td><i class="fas fa-check-circle" style="color: #52c41a;"></i></td>
+                                <td class="operation-btns">
+                                    <a onclick="editStep('STEP-2024-001')"><i class="fas fa-edit"></i> 编辑</a>
+                                    <a class="delete" onclick="deleteStep('STEP-2024-001')"><i class="fas fa-trash-alt"></i> 删除</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="index">2</td>
+                                <td><span class="link-blue">STEP-2024-002</span></td>
+                                <td>阀门压力测试</td>
+                                <td><span class="tag tag-green">质检</span></td>
+                                <td>质检员</td>
+                                <td>1.5小时</td>
+                                <td><i class="fas fa-check-circle" style="color: #52c41a;"></i></td>
+                                <td><i class="fas fa-times-circle" style="color: #d9d9d9;"></i></td>
+                                <td class="operation-btns">
+                                    <a onclick="editStep('STEP-2024-002')"><i class="fas fa-edit"></i> 编辑</a>
+                                    <a class="delete" onclick="deleteStep('STEP-2024-002')"><i class="fas fa-trash-alt"></i> 删除</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="index">3</td>
+                                <td><span class="link-blue">STEP-2024-003</span></td>
+                                <td>焊接质量验收</td>
+                                <td><span class="tag tag-green">质检</span></td>
+                                <td>质检员</td>
+                                <td>1小时</td>
+                                <td><i class="fas fa-times-circle" style="color: #d9d9d9;"></i></td>
+                                <td><i class="fas fa-check-circle" style="color: #52c41a;"></i></td>
+                                <td class="operation-btns">
+                                    <a onclick="editStep('STEP-2024-003')"><i class="fas fa-edit"></i> 编辑</a>
+                                    <a class="delete" onclick="deleteStep('STEP-2024-003')"><i class="fas fa-trash-alt"></i> 删除</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="index">4</td>
+                                <td><span class="link-blue">STEP-2024-004</span></td>
+                                <td>抽油机安装</td>
+                                <td><span class="tag tag-blue">作业</span></td>
+                                <td>操作工</td>
+                                <td>8小时</td>
+                                <td><i class="fas fa-check-circle" style="color: #52c41a;"></i></td>
+                                <td><i class="fas fa-check-circle" style="color: #52c41a;"></i></td>
+                                <td class="operation-btns">
+                                    <a onclick="editStep('STEP-2024-004')"><i class="fas fa-edit"></i> 编辑</a>
+                                    <a class="delete" onclick="deleteStep('STEP-2024-004')"><i class="fas fa-trash-alt"></i> 删除</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <!-- 分页 -->
+                    <div class="pagination">
+                        <span class="page-info">共 73 条</span>
+                        <select class="page-select">
+                            <option>10条/页</option>
+                            <option>20条/页</option>
+                            <option>50条/页</option>
+                        </select>
+                        <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">4</button>
+                        <button class="page-btn">5</button>
+                        <button class="page-btn">6</button>
+                        <span style="color: #666;">...</span>
+                        <button class="page-btn">8</button>
+                        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                        <span style="color: #666; font-size: 14px;">前往</span>
+                        <input type="text" class="page-select" value="1" style="width: 40px;">
+                        <span style="color: #666; font-size: 14px;">页</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/编辑模态框 - 步骤类型已更新为作业/质检两项 -->
+    <div class="modal" id="stepModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">新增作业步骤</div>
+                <div class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <!-- 基础信息 -->
+                <div class="form-grid">
+                    <div class="form-group half-width">
+                        <label class="form-label required">步骤编码</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" class="form-input" id="stepCode" value="STEP-2024-" style="flex: 1;">
+                            <button class="btn btn-default" style="white-space: nowrap;">生成编码</button>
+                        </div>
+                    </div>
+                    <div class="form-group half-width">
+                        <label class="form-label required">步骤名称</label>
+                        <input type="text" class="form-input" id="stepName" placeholder="请输入步骤名称">
+                    </div>
+                    <div class="form-group half-width">
+                        <label class="form-label required">步骤类型</label>
+                        <select class="form-select" id="stepType">
+                            <option value="">请选择步骤类型</option>
+                            <option value="operation">作业</option>
+                            <option value="qc">质检</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 作业内容 -->
+                <div style="margin-top: 24px;">
+                    <div class="form-group full-width">
+                        <label class="form-label">作业内容</label>
+                        <textarea class="form-textarea" id="stepContent" placeholder="请详细描述具体施工动作、操作方法..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-grid" style="margin-top: 20px;">
+                    <div class="form-group full-width">
+                        <label class="form-label">作业标准（验收标准）</label>
+                        <textarea class="form-textarea" id="stepStandard" placeholder="请输入验收标准、质量要求..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-grid" style="margin-top: 20px;">
+                    <div class="form-group half-width">
+                        <label class="form-label">注意事项</label>
+                        <input type="text" class="form-input" id="stepNotice" placeholder="请输入操作注意事项">
+                    </div>
+                    <div class="form-group half-width">
+                        <label class="form-label">安全要求</label>
+                        <input type="text" class="form-input" id="stepSafety" placeholder="请输入安全防护要求">
+                    </div>
+                </div>
+
+                <!-- 执行信息 -->
+                <div style="margin-top: 24px; border-top: 1px solid #f0f0f0; padding-top: 20px;">
+                    <div class="form-grid">
+                        <div class="form-group half-width">
+                            <label class="form-label required">执行方式</label>
+                            <select class="form-select" id="execMode">
+                                <option value="">请选择执行方式</option>
+                                <option value="role">按角色</option>
+                                <option value="team">按班组</option>
+                            </select>
+                        </div>
+                        <div class="form-group half-width">
+                            <label class="form-label required">默认执行岗位</label>
+                            <div style="position: relative;">
+                                <input type="text" class="form-input" id="execPost" placeholder="请选择岗位" style="padding-right: 32px;">
+                                <i class="fas fa-search" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999;"></i>
+                            </div>
+                        </div>
+                        <div class="form-group half-width">
+                            <label class="form-label">建议工时</label>
+                            <div class="input-with-suffix">
+                                <input type="number" class="form-input" id="stepHours" placeholder="请输入工时" step="0.5" min="0">
+                                <span class="input-suffix">小时</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 控制项 -->
+                <div style="margin-top: 24px; border-top: 1px solid #f0f0f0; padding-top: 20px;">
+                    <div style="font-size: 14px; font-weight: 600; color: #262626; margin-bottom: 16px; padding-left: 12px; border-left: 4px solid #1890ff;">控制项</div>
+                    <div class="form-grid">
+                        <div class="form-group half-width">
+                            <div class="switch-wrapper">
+                                <label class="switch">
+                                    <input type="checkbox" id="mustReport" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="switch-label">必须报工</span>
+                            </div>
+                        </div>
+                        <div class="form-group half-width">
+                            <div class="switch-wrapper">
+                                <label class="switch">
+                                    <input type="checkbox" id="keyStep" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="switch-label">关键步骤</span>
+                            </div>
+                        </div>
+                        <div class="form-group half-width">
+                            <div class="switch-wrapper">
+                                <label class="switch">
+                                    <input type="checkbox" id="allowSkip">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="switch-label">允许跳过</span>
+                            </div>
+                        </div>
+                        <div class="form-group half-width">
+                            <div class="switch-wrapper">
+                                <label class="switch">
+                                    <input type="checkbox" id="needAttachment">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="switch-label">需要附件</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 附件上传 -->
+                <div style="margin-top: 24px; border-top: 1px solid #f0f0f0; padding-top: 20px;">
+                    <div style="font-size: 14px; font-weight: 600; color: #262626; margin-bottom: 16px; padding-left: 12px; border-left: 4px solid #1890ff;">参考附件</div>
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-plus upload-icon"></i>
+                            <span class="upload-text">上传附件</span>
+                        </div>
+                        <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileUpload(this)">
+                        <div style="flex: 1;">
+                            <div class="file-list" id="fileList"></div>
+                            <div style="font-size: 12px; color: #999; margin-top: 8px;">支持 PDF、Word、Excel 格式，单个文件不超过 20MB</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal()">
+                    <i class="fas fa-times"></i> 取 消
+                </button>
+                <button class="btn btn-primary" onclick="saveStep()">
+                    <i class="fas fa-save"></i> 保 存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast提示 -->
+    <div id="toast">
+        <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+        <span id="toastMsg">提示信息</span>
+    </div>
+
+    <script>
+        let uploadedFiles = [];
+        
+        function openModal() {
+            document.getElementById('stepModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            uploadedFiles = [];
+            document.getElementById('fileList').innerHTML = '';
+            document.getElementById('stepCode').value = 'STEP-2024-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+        }
+        
+        function closeModal() {
+            document.getElementById('stepModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+        
+        function handleFileUpload(input) {
+            const files = Array.from(input.files);
+            const fileList = document.getElementById('fileList');
+            
+            files.forEach(file => {
+                if (file.size > 20 * 1024 * 1024) {
+                    showToast(`文件 ${file.name} 超过20MB限制`, 'error');
+                    return;
+                }
+                
+                uploadedFiles.push(file);
+                
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                let icon = 'fa-file';
+                if (file.name.endsWith('.pdf')) icon = 'fa-file-pdf';
+                else if (file.name.match(/\.(doc|docx)$/)) icon = 'fa-file-word';
+                else if (file.name.match(/\.(xls|xlsx)$/)) icon = 'fa-file-excel';
+                
+                div.innerHTML = `
+                    <i class="fas ${icon}" style="color: #52c41a; margin-right: 6px;"></i>
+                    ${file.name}
+                    <i class="fas fa-times file-remove" onclick="removeFile(this, '${file.name}')"></i>
+                `;
+                fileList.appendChild(div);
+            });
+            
+            input.value = '';
+        }
+        
+        function removeFile(element, fileName) {
+            element.parentElement.remove();
+            uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
+        }
+        
+        function saveStep() {
+            const code = document.getElementById('stepCode').value;
+            const name = document.getElementById('stepName').value;
+            
+            if (!name) {
+                showToast('请输入步骤名称', 'error');
+                return;
+            }
+            
+            showToast('作业步骤保存成功！', 'success');
+            closeModal();
+        }
+        
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const icon = toast.querySelector('i');
+            
+            toastMsg.textContent = msg;
+            
+            if (type === 'success') {
+                icon.className = 'fas fa-check-circle';
+                toast.style.background = '#52c41a';
+            } else if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle';
+                toast.style.background = '#ff4d4f';
+            } else {
+                icon.className = 'fas fa-info-circle';
+                toast.style.background = 'rgba(0,0,0,0.8)';
+            }
+            
+            toast.style.display = 'flex';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+        
+        function search() { showToast('搜索功能已触发', 'info'); }
+        function resetSearch() { showToast('已清空搜索条件', 'success'); }
+        function batchDelete() { showToast('请选择要删除的步骤', 'error'); }
+        function editStep(code) { openModal(); showToast(`编辑步骤: ${code}`, 'info'); }
+        function deleteStep(code) { showToast(`步骤 ${code} 已删除`, 'success'); }
+        
+        document.getElementById('stepModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>

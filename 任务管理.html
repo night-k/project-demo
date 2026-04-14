@@ -872,32 +872,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-4 gap-4">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm text-gray-600 mb-1.5">产品名称</label>
                         <input type="text" placeholder="请输入 产品名称" class="input-field w-full px-3 py-2 rounded-lg text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-600 mb-1.5">进度状态</label>
-                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
-                            <option>请选择 进度状态</option>
-                            <option>待领取</option>
-                            <option>待分发</option>
-                            <option>待开始</option>
-                            <option>进行中</option>
-                            <option>已完成</option>
-
-                            <option>终止</option>
-                            <option>入库中</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-600 mb-1.5">状态</label>
-                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
-                            <option>请选择 状态</option>
-                            <option>正常</option>
-                            <option>异常</option>
-                        </select>
                     </div>
                     <div class="flex items-end gap-2">
                         <button class="btn-primary px-6 py-2 rounded-lg text-sm flex items-center gap-2">
@@ -911,32 +889,7 @@
             </div>
 
             <!-- 操作按钮区 -->
-            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                <div class="flex items-center gap-2 flex-wrap">
-
-                    <!-- 修复后的批量报工按钮组 -->
-                    <div class="btn-group-wrapper" id="batchBtnWrapper">
-                        <button class="btn-main btn-success" onclick="openBatchImportModal()">
-                            <i class="fas fa-file-import"></i>
-                            <span>批量报工</span>
-                        </button>
-                        <button class="btn-dropdown btn-success" onclick="toggleBatchMenu(this)">
-                            <i class="fas fa-chevron-down text-xs"></i>
-                        </button>
-                        <div class="btn-group-menu" id="batchMenu">
-                            <div class="menu-item" onclick="openBatchImportModal()">
-                                <i class="fas fa-file-excel text-green-500"></i>
-                                <span>Excel导入</span>
-                            </div>
-                            <div class="menu-item" onclick="downloadTemplate()">
-                                <i class="fas fa-download text-blue-500"></i>
-                                <span>下载模板</span>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
+            <div class="flex items-center justify-end mb-4 flex-wrap gap-2">
                 <div class="flex items-center gap-2">
                     <button class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:text-blue-600 hover:border-blue-500 transition-colors" title="刷新">
                         <i class="fas fa-sync-alt"></i>
@@ -969,9 +922,7 @@
                             <th>工序资源</th>
                             <th>执行者</th>
                             <th>产品名称</th>
-                            <th>进度状态</th>
                             <th>创建时间</th>
-                            <th>状态</th>
                             <th style="min-width: 220px;">操作</th>
                         </tr>
                     </thead>
@@ -986,14 +937,8 @@
                             <td class="text-gray-600">工人</td>
                             <td class="text-gray-800">ERP</td>
                             <td class="text-gray-800">测试永城</td>
-                            <td><span class="status-tag status-distributed">待分发</span></td>
                             <td class="text-gray-600">2026-04-08 23:42</td>
-                            <td class="text-gray-600">正常</td>
                             <td>
-                                <span class="operate-btn" onclick="openWorkReportModal('T20260408002')">
-                                    <i class="fas fa-clock"></i> 报工
-                                </span>
-
                                 <span class="operate-btn warning">
                                     <i class="fas fa-eye"></i> 详情
                                 </span>
@@ -1009,14 +954,8 @@
                             <td class="text-gray-600">工人小组</td>
                             <td class="text-gray-800">admin</td>
                             <td class="text-gray-800">24K纯金绝缘子</td>
-                            <td><span class="status-tag status-processing">进行中</span></td>
                             <td class="text-gray-600">2026-03-19 16:27</td>
-                            <td class="text-gray-600">正常</td>
                             <td>
-                                <span class="operate-btn" onclick="openWorkReportModal('T20260319002')">
-                                    <i class="fas fa-clock"></i> 报工
-                                </span>
-
                                 <span class="operate-btn warning">
                                     <i class="fas fa-eye"></i> 详情
                                 </span>
@@ -1032,14 +971,8 @@
                             <td class="text-gray-600">工人小组</td>
                             <td class="text-gray-800">admin</td>
                             <td class="text-gray-800">二三产品</td>
-                            <td><span class="status-tag status-completed">已完成</span></td>
                             <td class="text-gray-600">2026-02-04 13:45</td>
-                            <td class="text-gray-600">正常</td>
                             <td>
-                                <span class="operate-btn" onclick="openWorkReportModal('T20260204004', true)">
-                                    <i class="fas fa-edit"></i> 修改报工
-                                </span>
-
                                 <span class="operate-btn warning">
                                     <i class="fas fa-eye"></i> 详情
                                 </span>
@@ -1055,14 +988,8 @@
                             <td class="text-gray-600">工人小组</td>
                             <td class="text-gray-800">admin</td>
                             <td class="text-gray-800">二三产品</td>
-                            <td><span class="status-tag status-completed">已完成</span></td>
                             <td class="text-gray-600">2026-02-04 13:45</td>
-                            <td class="text-gray-600">正常</td>
                             <td>
-                                <span class="operate-btn" onclick="viewWorkReport('T20260204003')">
-                                    <i class="fas fa-file-alt"></i> 报工记录
-                                </span>
-
                                 <span class="operate-btn warning">
                                     <i class="fas fa-eye"></i> 详情
                                 </span>
@@ -1078,14 +1005,8 @@
                             <td class="text-gray-600">工人小组</td>
                             <td class="text-gray-800">admin</td>
                             <td class="text-gray-800">二三产品</td>
-                            <td><span class="status-tag status-distributed">待分发</span></td>
                             <td class="text-gray-600">2026-02-04 13:45</td>
-                            <td class="text-gray-600">正常</td>
                             <td>
-                                <span class="operate-btn" onclick="openWorkReportModal('T20260204002')">
-                                    <i class="fas fa-clock"></i> 报工
-                                </span>
-
                                 <span class="operate-btn warning">
                                     <i class="fas fa-eye"></i> 详情
                                 </span>
@@ -1101,14 +1022,8 @@
                             <td class="text-gray-600">工人小组</td>
                             <td class="text-gray-800">admin</td>
                             <td class="text-gray-800">二三产品</td>
-                            <td><span class="status-tag status-completed">已完成</span></td>
                             <td class="text-gray-600">2026-02-03 21:25</td>
-                            <td class="text-gray-600">正常</td>
                             <td>
-                                <span class="operate-btn" onclick="viewWorkReport('T20260203007')">
-                                    <i class="fas fa-file-alt"></i> 报工记录
-                                </span>
-
                                 <span class="operate-btn warning">
                                     <i class="fas fa-eye"></i> 详情
                                 </span>
@@ -1124,14 +1039,8 @@
                             <td class="text-gray-600">工人小组</td>
                             <td class="text-gray-800">admin</td>
                             <td class="text-gray-800">二三产品</td>
-                            <td><span class="status-tag status-completed">已完成</span></td>
                             <td class="text-gray-600">2026-02-03 21:25</td>
-                            <td class="text-gray-600">正常</td>
                             <td>
-                                <span class="operate-btn" onclick="openWorkReportModal('T20260203005', true)">
-                                    <i class="fas fa-edit"></i> 修改报工
-                                </span>
-
                                 <span class="operate-btn warning">
                                     <i class="fas fa-eye"></i> 详情
                                 </span>
@@ -1177,184 +1086,6 @@
         </main>
     </div>
 
-    <!-- 报工模态框 -->
-    <div id="workReportModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-clock text-blue-500 mr-2"></i>
-                    <span id="workReportTitle">生产报工</span> - <span id="workReportTaskNo">T20260408002</span>
-                </h3>
-                <div class="modal-close" onclick="closeWorkReportModal()">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-            <div class="modal-body">
-                <div class="form-grid">
-                    <!-- 报工人员（自动带出，只读） -->
-                    <div class="form-group">
-                        <label class="form-label">
-                            工作人员 <span class="required">*</span>
-                        </label>
-                        <input type="text" class="form-input" id="workReportPerson" value="工单执行者" disabled>
-                    </div>
-
-                    <!-- 实际工时 -->
-                    <div class="form-group">
-                        <label class="form-label">
-                            实际工时(小时) <span class="required">*</span>
-                        </label>
-                        <input type="number" class="form-input" id="workHours" placeholder="请输入实际工时" step="0.5" min="0.5" required>
-                    </div>
-
-                    <!-- 选择设备（非必填） -->
-                    <div class="form-group">
-                        <label class="form-label">
-                            使用设备
-                        </label>
-                        <select class="form-select" id="workDevice" onchange="onDeviceChange()">
-                            <option value="">请选择设备（选填）</option>
-                            <option value="CNC-001">数控机床-001</option>
-                            <option value="CNC-002">数控机床-002</option>
-                            <option value="ROBOT-A1">焊接机器人-A1</option>
-                            <option value="QC-01">检测设备-QC01</option>
-                        </select>
-                    </div>
-
-                    <!-- 设备运行时长（选择设备后必填） -->
-                    <div class="form-group" id="deviceDurationGroup">
-                        <label class="form-label">
-                            设备运行时长(小时) <span id="durationRequired" style="display:none" class="required">*</span>
-                        </label>
-                        <input type="number" class="form-input" id="deviceDuration" placeholder="请先选择设备" step="0.5" min="0" disabled>
-                    </div>
-
-                    <!-- 设备状态 -->
-                    <div class="form-group">
-                        <label class="form-label">设备状态</label>
-                        <select class="form-select" id="deviceStatus" disabled>
-                            <option value="normal">正常运行</option>
-                            <option value="fault">故障维修</option>
-                            <option value="standby">待机</option>
-                            <option value="maintain">停机保养</option>
-                        </select>
-                    </div>
-
-                    <!-- 工作记录 -->
-                    <div class="form-group full-width">
-                        <label class="form-label">
-                            工作记录/备注 <span class="required">*</span>
-                        </label>
-                        <textarea class="form-textarea" id="workRecord" placeholder="请填写工作内容描述、完成情况及异常说明..." required></textarea>
-                    </div>
-
-                    <!-- 照片上传 -->
-                    <div class="form-group full-width">
-                        <label class="form-label">现场照片上传(选填)</label>
-                        <div class="photo-grid" id="photoGrid">
-                            <div class="photo-add" onclick="document.getElementById('photoInput').click()">
-                                <i class="fas fa-camera"></i>
-                                <span>添加照片</span>
-                            </div>
-                        </div>
-                        <input type="file" id="photoInput" multiple accept="image/*" style="display: none;" onchange="handlePhotoUpload(this)">
-                        <p class="text-xs text-gray-400 mt-2">支持jpg、png格式，单张不超过5MB，最多上传4张</p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors" onclick="closeWorkReportModal()">
-                    取消
-                </button>
-                <button class="btn-primary px-5 py-2 rounded-lg" onclick="submitWorkReport()">
-                    <i class="fas fa-check mr-1"></i> 确认报工
-                </button>
-            </div>
-        </div>
-    </div>
-
-        </div>
-    </div>
-
-    <!-- 批量导入模态框 -->
-    <div id="batchImportModal" class="modal-overlay">
-        <div class="modal-container" style="max-width: 600px;">
-            <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-file-import text-green-500 mr-2"></i>
-                    批量导入报工
-                </h3>
-                <div class="modal-close" onclick="closeBatchImportModal()">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-            <div class="modal-body">
-                <!-- 步骤提示 -->
-                <div class="import-steps">
-                    <div class="step-item">
-                        <i class="fas fa-download"></i>
-                        <span>下载模板</span>
-                    </div>
-                    <i class="fas fa-arrow-right step-divider"></i>
-                    <div class="step-item">
-                        <i class="fas fa-edit"></i>
-                        <span>填写数据</span>
-                    </div>
-                    <i class="fas fa-arrow-right step-divider"></i>
-                    <div class="step-item">
-                        <i class="fas fa-upload"></i>
-                        <span>上传文件</span>
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <div class="template-download" onclick="downloadTemplate()">
-                        <i class="fas fa-file-excel"></i>
-                        <span>点击下载报工导入模板(.xlsx)</span>
-                    </div>
-                </div>
-
-                <div class="upload-area" onclick="document.getElementById('batchFileInput').click()" style="padding: 40px;">
-                    <div class="upload-icon">
-                        <i class="fas fa-file-excel" style="color: #52c41a;"></i>
-                    </div>
-                    <div class="upload-text" style="font-size: 16px; margin-bottom: 8px;">点击上传Excel文件</div>
-                    <div class="upload-hint">仅支持.xlsx格式，文件大小不超过10MB<br>单次最多导入500条记录</div>
-                </div>
-                <input type="file" id="batchFileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleBatchImport(this)">
-
-                <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <h4 class="text-sm font-medium text-blue-800 mb-2">
-                        <i class="fas fa-info-circle mr-1"></i> 导入说明
-                    </h4>
-                    <ul class="text-xs text-blue-700 space-y-1 list-disc list-inside">
-                        <li>请严格按照模板格式填写，不要修改列名和sheet名称</li>
-                        <li>必填字段：任务单号、工时、工作记录</li>
-                        <li>设备字段为选填，填写设备编码后必须填写设备运行时长</li>
-                        <li>日期格式：YYYY-MM-DD HH:mm</li>
-                        <li>重复导入将覆盖已存在的报工记录</li>
-                    </ul>
-                </div>
-
-                <!-- 导入进度（初始隐藏） -->
-                <div id="importProgress" class="mt-4" style="display: none;">
-                    <div class="flex justify-between text-sm mb-2">
-                        <span class="text-gray-600">正在导入...</span>
-                        <span class="text-blue-600 font-medium" id="progressText">0%</span>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-blue-500 h-2 rounded-full transition-all" style="width: 0%" id="progressBar"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors" onclick="closeBatchImportModal()">
-                    取消
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- 提示框（Toast） -->
     <div id="toast" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 6px; z-index: 2000; font-size: 14px;">
         <i class="fas fa-info-circle mr-2"></i>
@@ -1362,21 +1093,6 @@
     </div>
 
     <script>
-        // 当前登录用户（模拟）
-        const currentUser = "自动带出工单执行人员";
-        const currentUserId = "user001";
-
-        // 任务状态管理（模拟数据）
-        const taskStatus = {
-            'T20260408002': { reported: false },
-            'T20260319002': { reported: false },
-            'T20260204004': { reported: true },
-            'T20260204003': { reported: true },
-            'T20260204002': { reported: false },
-            'T20260203007': { reported: true },
-            'T20260203005': { reported: true }
-        };
-
         // Tab切换功能
         document.querySelectorAll('.tab-item').forEach(tab => {
             tab.addEventListener('click', function() {
@@ -1392,20 +1108,6 @@
                 this.parentElement.remove();
             });
         });
-
-        // 批量报工下拉菜单
-        function toggleBatchMenu(btn) {
-            const menu = document.getElementById('batchMenu');
-            menu.classList.toggle('show');
-
-            // 点击外部关闭
-            document.addEventListener('click', function closeMenu(e) {
-                if (!btn.contains(e.target) && !menu.contains(e.target)) {
-                    menu.classList.remove('show');
-                    document.removeEventListener('click', closeMenu);
-                }
-            });
-        }
 
         // 显示提示
         function showToast(msg, type = 'info') {
@@ -1427,293 +1129,6 @@
             }, 3000);
         }
 
-        // 报工模态框控制
-        function openWorkReportModal(taskNo, isEdit = false) {
-            document.getElementById('workReportTaskNo').textContent = taskNo;
-            document.getElementById('workReportTitle').textContent = isEdit ? '修改报工' : '生产报工';
-            document.getElementById('workReportPerson').value = currentUser;
-
-            // 重置表单
-            document.getElementById('workHours').value = '';
-            document.getElementById('workDevice').value = '';
-            document.getElementById('deviceDuration').value = '';
-            document.getElementById('deviceDuration').disabled = true;
-            document.getElementById('deviceStatus').value = 'normal';
-            document.getElementById('deviceStatus').disabled = true;
-            document.getElementById('workRecord').value = '';
-            document.getElementById('photoGrid').innerHTML = `
-                <div class="photo-add" onclick="document.getElementById('photoInput').click()">
-                    <i class="fas fa-camera"></i>
-                    <span>添加照片</span>
-                </div>
-            `;
-
-            document.getElementById('workReportModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeWorkReportModal() {
-            document.getElementById('workReportModal').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // 设备选择变化处理
-        function onDeviceChange() {
-            const device = document.getElementById('workDevice').value;
-            const durationInput = document.getElementById('deviceDuration');
-            const deviceStatus = document.getElementById('deviceStatus');
-            const durationRequired = document.getElementById('durationRequired');
-
-            if (device) {
-                durationInput.disabled = false;
-                durationInput.placeholder = '请输入设备运行时长';
-                deviceStatus.disabled = false;
-                durationRequired.style.display = 'inline';
-                durationInput.setAttribute('required', 'required');
-            } else {
-                durationInput.disabled = true;
-                durationInput.value = '';
-                durationInput.placeholder = '请先选择设备';
-                deviceStatus.disabled = true;
-                deviceStatus.value = 'normal';
-                durationRequired.style.display = 'none';
-                durationInput.removeAttribute('required');
-            }
-        }
-
-        // 批量导入模态框控制
-        function openBatchImportModal() {
-            document.getElementById('batchImportModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-            document.getElementById('batchMenu').classList.remove('show');
-        }
-
-        function closeBatchImportModal() {
-            document.getElementById('batchImportModal').classList.remove('active');
-            document.body.style.overflow = '';
-            setTimeout(() => {
-                document.getElementById('importProgress').style.display = 'none';
-                document.getElementById('progressBar').style.width = '0%';
-                document.getElementById('progressText').textContent = '0%';
-            }, 300);
-        }
-
-        // 照片上传处理
-        function handlePhotoUpload(input) {
-            const files = input.files;
-            const grid = document.getElementById('photoGrid');
-
-            const addBtn = grid.querySelector('.photo-add');
-            if (addBtn) addBtn.remove();
-
-            Array.from(files).forEach(file => {
-                if (grid.children.length >= 4) return;
-
-                if (file.size > 5 * 1024 * 1024) {
-                    showToast('单张照片大小不能超过5MB', 'error');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const div = document.createElement('div');
-                    div.className = 'photo-item';
-                    div.innerHTML = `
-                        <img src="${e.target.result}" alt="photo">
-                        <div class="photo-remove" onclick="this.parentElement.remove(); checkPhotoAddBtn();">
-                            <i class="fas fa-times"></i>
-                        </div>
-                    `;
-                    grid.appendChild(div);
-                    checkPhotoAddBtn();
-                };
-                reader.readAsDataURL(file);
-            });
-
-            input.value = '';
-        }
-
-        function checkPhotoAddBtn() {
-            const grid = document.getElementById('photoGrid');
-            if (grid.children.length < 4 && !grid.querySelector('.photo-add')) {
-                const addBtn = document.createElement('div');
-                addBtn.className = 'photo-add';
-                addBtn.onclick = function() { document.getElementById('photoInput').click(); };
-                addBtn.innerHTML = `
-                    <i class="fas fa-camera"></i>
-                    <span>添加照片</span>
-                `;
-                grid.appendChild(addBtn);
-            }
-        }
-
-        // 文件上传处理
-        function handleFileUpload(input) {
-            const files = input.files;
-            const list = document.getElementById('fileList');
-
-            Array.from(files).forEach(file => {
-                if (file.size > 20 * 1024 * 1024) {
-                    showToast('单个文件大小不能超过20MB', 'error');
-                    return;
-                }
-
-                const div = document.createElement('div');
-                div.className = 'file-item';
-                const size = (file.size / 1024 / 1024).toFixed(2);
-                div.innerHTML = `
-                    <div class="file-info">
-                        <i class="fas fa-file text-green-500"></i>
-                        <span>${file.name} (${size}MB)</span>
-                    </div>
-                    <div class="file-remove" onclick="this.parentElement.remove()">
-                        <i class="fas fa-times"></i>
-                    </div>
-                `;
-                list.appendChild(div);
-            });
-
-            input.value = '';
-        }
-
-        // 批量导入处理
-        function handleBatchImport(input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
-                showToast('请选择Excel文件(.xlsx或.xls格式)', 'error');
-                return;
-            }
-
-            if (file.size > 10 * 1024 * 1024) {
-                showToast('文件大小不能超过10MB', 'error');
-                return;
-            }
-
-            document.getElementById('importProgress').style.display = 'block';
-
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-
-                    setTimeout(() => {
-                        showToast(`成功导入45条报工记录`, 'success');
-                        closeBatchImportModal();
-                    }, 500);
-                }
-
-                document.getElementById('progressBar').style.width = progress + '%';
-                document.getElementById('progressText').textContent = Math.floor(progress) + '%';
-            }, 200);
-        }
-
-        // 下载模板
-        function downloadTemplate() {
-            const templateContent = `任务单号,工单号,工序,实际工时(小时),设备编码,设备运行时长(小时),工作记录,报工日期,报工人员
-T20260408002,T-HHHSCGD2602047,接线,2.5,CNC-001,2.0,完成接线工序，质量正常,2026-04-09,${currentUser}
-T20260319002,T-HHHSCGD260319,装发射工序,4.0,ROBOT-A1,3.5,发射装置安装完成,2026-04-09,${currentUser}`;
-
-            const blob = new Blob([templateContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', '报工导入模板.csv');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            showToast('模板下载成功！', 'success');
-            document.getElementById('batchMenu').classList.remove('show');
-        }
-
-        // 提交报工
-        function submitWorkReport() {
-            const hours = document.getElementById('workHours').value;
-            const device = document.getElementById('workDevice').value;
-            const duration = document.getElementById('deviceDuration').value;
-            const record = document.getElementById('workRecord').value;
-            const taskNo = document.getElementById('workReportTaskNo').textContent;
-
-            // 验证
-            if (!hours || parseFloat(hours) <= 0) {
-                showToast('请填写有效的实际工时', 'error');
-                document.getElementById('workHours').focus();
-                return;
-            }
-
-            if (device && (!duration || parseFloat(duration) <= 0)) {
-                showToast('请填写设备运行时长', 'error');
-                document.getElementById('deviceDuration').focus();
-                return;
-            }
-
-            if (!record.trim()) {
-                showToast('请填写工作记录', 'error');
-                document.getElementById('workRecord').focus();
-                return;
-            }
-
-            // 更新状态
-            taskStatus[taskNo].reported = true;
-            updateTaskRow(taskNo);
-
-            showToast('报工提交成功！', 'success');
-            closeWorkReportModal();
-        }
-
-        // 更新任务行状态显示
-        function updateTaskRow(taskNo) {
-            const row = document.querySelector(`tr[data-task-id="${taskNo}"]`);
-            if (!row) return;
-
-            const status = taskStatus[taskNo];
-            const statusCell = row.querySelector('td:nth-child(10)');
-            const actionCell = row.querySelector('td:last-child');
-
-            if (status.reported) {
-                statusCell.innerHTML = '<span class="status-tag status-completed">已完成</span>';
-                actionCell.innerHTML = `
-                    <span class="operate-btn" onclick="openWorkReportModal('${taskNo}', true)">
-                        <i class="fas fa-edit"></i> 修改报工
-                    </span>
-                    <span class="operate-btn warning">
-                        <i class="fas fa-eye"></i> 详情
-                    </span>
-                `;
-            }
-        }
-
-        // 点击模态框外部关闭
-        document.querySelectorAll('.modal-overlay').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    if (this.id === 'workReportModal') closeWorkReportModal();
-                    else if (this.id === 'qualityModal') closeQualityModal();
-                    else if (this.id === 'batchImportModal') closeBatchImportModal();
-                }
-            });
-        });
-
-        // ESC键关闭模态框
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeWorkReportModal();
-
-                closeBatchImportModal();
-            }
-        });
-
-        // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 初始化所有行状态
-            Object.keys(taskStatus).forEach(taskNo => {
-                updateTaskRow(taskNo);
-            });
-        });
     </script>
 </body>
 </html>

@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 批量工序报工</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .input-field {
+            transition: all 0.3s;
+            border: 1px solid #d9d9d9;
+            width: 100%;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .input-field:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24,144,255,0.1);
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn-primary:hover { background-color: #40a9ff; }
+
+        .btn-success {
+            background-color: #52c41a;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-success:hover { background-color: #73d13d; }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid #d9d9d9;
+            color: #666;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .btn-ghost:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .btn-danger {
+            background-color: #ff4d4f;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-executing {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+
+        .status-completed {
+            background-color: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex !important;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 1100px;
+            max-height: 95vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        /* 工序流程样式 */
+        .process-container {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .process-step {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-right: 1px solid #e8e8e8;
+            position: relative;
+            background: white;
+        }
+
+        .process-step:last-child { border-right: none; }
+        .process-step:hover { background: #f5f5f5; }
+        .process-step.active {
+            background: #e6f7ff;
+            border-bottom: 3px solid #1890ff;
+        }
+        .process-step.completed { background: #f6ffed; }
+
+        .process-step .step-number {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 2px;
+        }
+
+        .process-step .step-icon {
+            width: 36px;
+            height: 36px;
+            margin: 0 auto 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 18px;
+        }
+
+        .process-step.active .step-icon {
+            background: #1890ff;
+            color: white;
+        }
+
+        .process-step.completed .step-icon {
+            background: #52c41a;
+            color: white;
+        }
+
+        .process-step.pending .step-icon {
+            background: #f5f5f5;
+            color: #999;
+        }
+
+        .process-step .step-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: #262626;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .process-step .step-status {
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #e8e8e8;
+            margin-bottom: 16px;
+        }
+
+        .tab-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .tab-item:hover { color: #1890ff; }
+        .tab-item.active {
+            color: #1890ff;
+            border-bottom-color: #1890ff;
+            font-weight: 500;
+        }
+
+        /* 人员选择器 */
+        .staff-selector {
+            background: #fafafa;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .staff-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            background: white;
+        }
+
+        .staff-item:hover {
+            border-color: #1890ff;
+            background: #f0f7ff;
+        }
+
+        .staff-item.selected {
+            background: #e6f7ff;
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .staff-item i {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .staff-item.selected i {
+            color: #1890ff;
+        }
+
+        /* 批量报工表格 */
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .report-table th,
+        .report-table td {
+            border: 1px solid #e8e8e8;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .report-table th {
+            background: #fafafa;
+            font-weight: 500;
+            color: #666;
+            position: sticky;
+            top: 0;
+        }
+
+        .report-table tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        .report-table td {
+            background: white;
+        }
+
+        .batch-actions {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            background: #f0f7ff;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 8px;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            color: #666;
+            min-width: 70px;
+        }
+
+        .info-value {
+            color: #262626;
+            font-weight: 500;
+        }
+
+        .operate-btn {
+            color: #1890ff;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .operate-btn:hover { text-decoration: underline; }
+        .operate-btn.disabled { color: #999; cursor: not-allowed; }
+
+        .section-title {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .photo-upload-small {
+            border: 1px dashed #d9d9d9;
+            border-radius: 4px;
+            padding: 4px 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .photo-upload-small:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+            background: #f0f7ff;
+        }
+
+        .summary-bar {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20 flex-shrink-0">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
+            </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="#" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600">
+                    <i class="fas fa-industry"></i> 生产管理
+                </a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>admin</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 左侧边栏 -->
+        <aside class="w-64 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
+            <div class="p-4">
+                <div class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-blue-600 bg-blue-50 border-r-3 border-blue-600">
+                    <i class="fas fa-ticket-alt w-5"></i>
+                    <span>工单管理</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6 min-w-0">
+
+            <!-- 查询区域 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 mb-4">
+                <div class="grid grid-cols-4 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">项目</label>
+                        <select class="input-field">
+                            <option>请选择 项目</option>
+                            <option>永城基地扩建项目</option>
+                            <option>华南充电器交付项目</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">工单编号</label>
+                        <input type="text" placeholder="请输入 工单编号" class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">工单名称</label>
+                        <input type="text" placeholder="请输入 工单名称" class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">进度</label>
+                        <select class="input-field">
+                            <option>请选择 进度</option>
+                            <option>已创建</option>
+                            <option>执行中</option>
+                            <option>已完成</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex items-end gap-2">
+                    <button class="btn-primary flex items-center gap-2">
+                        <i class="fas fa-search"></i> 搜索
+                    </button>
+                    <button class="btn-ghost">
+                        <i class="fas fa-trash-alt"></i> 清空
+                    </button>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">#</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">工单编号</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">工单名称</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">产品名称</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">工艺路线</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">作业地点</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">负责人</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">进度</th>
+                            <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 w-32">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm text-gray-600">1</td>
+                            <td class="px-4 py-3 text-sm font-medium text-blue-600 cursor-pointer">T20260408002</td>
+                            <td class="px-4 py-3 text-sm text-gray-800">茶油-标准装配</td>
+                            <td class="px-4 py-3 text-sm text-gray-800">116-[茶油]</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">标准装配工艺</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">深圳工厂A区</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">张经理</td>
+                            <td class="px-4 py-3"><span class="status-tag status-executing">执行中</span></td>
+                            <td class="px-4 py-3 text-center">
+                                <span class="operate-btn" onclick="showReportModal('T20260408002', '茶油-标准装配')"><i class="fas fa-clipboard-check"></i> 工序报工</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm text-gray-600">2</td>
+                            <td class="px-4 py-3 text-sm font-medium text-blue-600 cursor-pointer">T20260408003</td>
+                            <td class="px-4 py-3 text-sm text-gray-800">电池组-精密加工</td>
+                            <td class="px-4 py-3 text-sm text-gray-800">锂电池组-A型</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">精密加工工艺</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">东莞工厂B区</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">李主管</td>
+                            <td class="px-4 py-3"><span class="status-tag status-executing">执行中</span></td>
+                            <td class="px-4 py-3 text-center">
+                                <span class="operate-btn" onclick="showReportModal('T20260408003', '电池组-精密加工')"><i class="fas fa-clipboard-check"></i> 工序报工</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- 批量工序报工弹窗 -->
+    <div id="reportModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <!-- 弹窗头部 -->
+            <div class="flex items-center justify-between px-6 py-3 border-b border-gray-200 bg-white sticky top-0 z-10">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-lg font-bold text-gray-800">批量工序报工 - <span id="modalOrderNo">T20260408002</span></h3>
+                    <span class="status-tag status-executing">执行中</span>
+                </div>
+                <button onclick="closeReportModal()" class="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-5">
+                <!-- 工序流程选择 -->
+                <div class="mb-4">
+                    <div class="text-sm font-medium text-gray-700 mb-2">选择报工工序</div>
+                    <div class="process-container">
+                        <div class="process-step active" onclick="selectStep(0, this)">
+                            <div class="step-number">第1步</div>
+                            <div class="step-icon pending"><i class="fas fa-utensils"></i></div>
+                            <div class="step-name">测试开工饭</div>
+                        </div>
+                        <div class="process-step" onclick="selectStep(1, this)">
+                            <div class="step-number">第2步</div>
+                            <div class="step-icon pending"><i class="fas fa-search"></i></div>
+                            <div class="step-name">演示质检</div>
+                        </div>
+                        <div class="process-step" onclick="selectStep(2, this)">
+                            <div class="step-number">第3步</div>
+                            <div class="step-icon pending"><i class="fas fa-cogs"></i></div>
+                            <div class="step-name">组装工序</div>
+                        </div>
+                        <div class="process-step" onclick="selectStep(3, this)">
+                            <div class="step-number">第4步</div>
+                            <div class="step-icon pending"><i class="fas fa-box"></i></div>
+                            <div class="step-name">终检包装</div>
+                        </div>
+                        <div class="process-step" onclick="selectStep(4, this)">
+                            <div class="step-number">第5步</div>
+                            <div class="step-icon pending"><i class="fas fa-truck"></i></div>
+                            <div class="step-name">入库</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <!-- 左侧：人员选择与批量报工 -->
+                    <div class="col-span-2">
+                        <div class="section-title">
+                            <i class="fas fa-users text-blue-600"></i>
+                            <span id="currentStepTitle">测试开工饭</span> - 批量报工
+                            <span class="text-xs text-gray-500 font-normal ml-2">所属步骤：<span id="stepDetail">第1步 | 行号:1 | 列号:1</span></span>
+                        </div>
+
+                        <!-- 工人小组选择 -->
+                        <div class="staff-selector">
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-users-cog mr-1 text-blue-600"></i>选择工人小组
+                                </label>
+                                <select id="workerGroupSelect" class="input-field" onchange="selectWorkerGroup(this.value)" style="width: 100%;">
+                                    <option value="">请选择工人小组</option>
+                                    <option value="assemblyA">装配A组</option>
+                                    <option value="assemblyB">装配B组</option>
+                                    <option value="quality">质检组</option>
+                                    <option value="packaging">包装组</option>
+                                    <option value="warehouse">仓储组</option>
+                                    <option value="maintenance">维保组</option>
+                                </select>
+                            </div>
+
+                            <!-- 已选小组人员展示 -->
+                            <div id="selectedGroupMembers" class="hidden">
+                                <div class="text-xs text-gray-500 mb-2">该组成员（已自动添加）：</div>
+                                <div class="flex flex-wrap gap-2" id="groupMembersTags">
+                                    <!-- 动态生成人员标签 -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 批量操作栏 -->
+                        <div class="batch-actions" id="batchActions" style="display: none;">
+                            <span class="text-sm text-gray-600">批量设置：</span>
+                            <button class="btn-ghost text-xs" onclick="batchSetDevice()">
+                                <i class="fas fa-cog mr-1"></i>设备
+                            </button>
+                            <button class="btn-ghost text-xs" onclick="batchSetTime()">
+                                <i class="fas fa-clock mr-1"></i>工时
+                            </button>
+                            <button class="btn-ghost text-xs" onclick="batchSetStatus()">
+                                <i class="fas fa-info-circle mr-1"></i>设备状态
+                            </button>
+                            <span class="text-xs text-gray-500 ml-2">已选择 <span id="selectedCount" class="font-medium text-blue-600">0</span> 人</span>
+                        </div>
+
+                        <!-- 报工表格 -->
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th width="30"><input type="checkbox" onchange="toggleAllRows(this)"></th>
+                                        <th>工作人员</th>
+                                        <th width="100">实际工时(小时) <span class="text-red-500">*</span></th>
+                                        <th width="120">使用设备</th>
+                                        <th width="100">设备时长</th>
+                                        <th width="100">设备状态</th>
+                                        <th>备注</th>
+                                        <th width="80">照片</th>
+                                        <th width="50">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportTableBody">
+                                    <!-- 动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 添加自定义人员 -->
+                        <div class="mt-3 flex gap-2">
+                            <input type="text" id="customStaffInput" placeholder="输入其他人员姓名" class="input-field" style="width: 200px;">
+                            <button class="btn-primary" onclick="addCustomStaff()">
+                                <i class="fas fa-plus mr-1"></i>添加人员
+                            </button>
+                        </div>
+
+                        <!-- 统计 -->
+                        <div class="summary-bar">
+                            <div>
+                                <span class="text-gray-600">已选人员：</span>
+                                <span class="font-medium" id="summaryCount">0人</span>
+                                <span class="text-gray-400 mx-2">|</span>
+                                <span class="text-gray-600">累计工时：</span>
+                                <span class="font-medium text-green-600" id="summaryHours">0小时</span>
+                            </div>
+                            <div class="text-gray-500 text-xs">工序完成后自动进入下一工序</div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：工单信息 -->
+                    <div>
+                        <div class="tab-container">
+                            <div class="tab-item active" onclick="switchTab(this, 'order')">工单信息</div>
+                            <div class="tab-item" onclick="switchTab(this, 'bom')">BOM</div>
+                        </div>
+
+                        <div id="orderTab" class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <div class="info-item">
+                                <span class="info-label">产品名称：</span>
+                                <span class="info-value" id="productName">116-[茶油]</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">BOM：</span>
+                                <span class="info-value">茶油 v1</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">紧急程度：</span>
+                                <span class="status-tag status-executing">正常</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">作业地点：</span>
+                                <span class="info-value">wm生产机构32</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">负责人：</span>
+                                <span class="info-value">张经理</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">计划日期：</span>
+                                <span class="info-value">2026-04-09 至 2026-04-16</span>
+                            </div>
+                        </div>
+
+                        <div id="bomTab" class="hidden">
+                            <div class="bg-white border rounded-lg overflow-hidden">
+                                <table class="w-full text-xs">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-2 py-2 text-left font-medium text-gray-600">物料</th>
+                                            <th class="px-2 py-2 text-left font-medium text-gray-600">用量</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <tr><td class="px-2 py-2">电机组件</td><td class="px-2 py-2">100件</td></tr>
+                                        <tr><td class="px-2 py-2">控制板</td><td class="px-2 py-2">100件</td></tr>
+                                        <tr><td class="px-2 py-2">外壳</td><td class="px-2 py-2">100件</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部按钮 -->
+            <div class="flex items-center justify-end gap-3 px-6 py-3 border-t border-gray-200 bg-gray-50 sticky bottom-0">
+                <button onclick="closeReportModal()" class="btn-ghost">取消</button>
+                <button onclick="saveTempReport()" class="btn-ghost" style="border-color: #faad14; color: #faad14;">
+                    <i class="fas fa-save mr-1"></i>暂存
+                </button>
+                <button onclick="submitReport()" class="btn-success">
+                    <i class="fas fa-check mr-1"></i>确认报工
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStepIndex = 0;
+        let selectedStaff = [];
+        const stepNames = ['测试开工饭', '演示质检', '组装工序', '终检包装', '入库'];
+        const stepDetails = ['第1步 | 行号:1 | 列号:1', '第2步 | 行号:1 | 列号:2', '第3步 | 行号:1 | 列号:3', '第4步 | 行号:1 | 列号:4', '第5步 | 行号:1 | 列号:5'];
+
+        // 显示报工弹窗
+        function showReportModal(orderNo, orderName) {
+            const modal = document.getElementById('reportModal');
+            document.getElementById('modalOrderNo').textContent = orderNo;
+            if (orderName) {
+                document.getElementById('productName').textContent = orderName;
+            }
+            modal.style.display = 'flex';
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+
+            // 重置
+            selectedStaff = [];
+            updateStaffSelection();
+            updateTable();
+            selectStep(0, document.querySelectorAll('.process-step')[0]);
+        }
+
+        // 关闭弹窗
+        function closeReportModal() {
+            const modal = document.getElementById('reportModal');
+            modal.style.display = 'none';
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // 选择工序
+        function selectStep(index, element) {
+            currentStepIndex = index;
+            document.querySelectorAll('.process-step').forEach((step, i) => {
+                step.classList.toggle('active', i === index);
+            });
+            document.getElementById('currentStepTitle').textContent = stepNames[index];
+            document.getElementById('stepDetail').textContent = stepDetails[index];
+
+            // 切换工序时保留已选人员但清空工时数据
+            updateTable();
+        }
+
+        // Tab切换
+        function switchTab(element, tab) {
+            document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('orderTab').classList.toggle('hidden', tab !== 'order');
+            document.getElementById('bomTab').classList.toggle('hidden', tab !== 'bom');
+        }
+
+        // 工人小组配置
+        const workerGroups = {
+            'assemblyA': ['张师傅', '李技工', '王操作', '刘装配'],
+            'assemblyB': ['赵工匠', '钱技师', '孙操作', '周组装'],
+            'quality': ['伍红卫', '黄慈幽', '吴质检', '郑检验'],
+            'packaging': ['王一博', '陈包装', '林装箱'],
+            'warehouse': ['郑入库', '王搬运', '冯仓管'],
+            'maintenance': ['test202411', 'ERP', '陈维保', '杨维修']
+        };
+
+        // 选择工人小组
+        function selectWorkerGroup(groupId) {
+            if (!groupId) {
+                // 清空选择
+                selectedStaff = [];
+                document.getElementById('selectedGroupMembers').classList.add('hidden');
+            } else {
+                // 获取该组人员
+                selectedStaff = workerGroups[groupId] || [];
+
+                // 显示组成员标签
+                const tagsContainer = document.getElementById('groupMembersTags');
+                tagsContainer.innerHTML = selectedStaff.map(name => `
+                    <span class="inline-flex items-center px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded border border-blue-200">
+                        <i class="fas fa-user mr-1"></i>${name}
+                    </span>
+                `).join('');
+
+                document.getElementById('selectedGroupMembers').classList.remove('hidden');
+            }
+            updateStaffSelection();
+            updateTable();
+        }
+
+        // 更新人员选择显示
+        function updateStaffSelection() {
+            document.getElementById('selectedCount').textContent = selectedStaff.length;
+            document.getElementById('batchActions').style.display = selectedStaff.length > 0 ? 'flex' : 'none';
+        }
+
+        // 添加自定义人员
+        function addCustomStaff() {
+            const input = document.getElementById('customStaffInput');
+            const name = input.value.trim();
+            if (!name) {
+                alert('请输入人员姓名');
+                return;
+            }
+            if (selectedStaff.includes(name)) {
+                alert('该人员已存在');
+                return;
+            }
+
+            selectedStaff.push(name);
+
+            // 添加到网格
+            const grid = document.getElementById('staffGrid');
+            const newStaff = document.createElement('div');
+            newStaff.className = 'staff-item selected';
+            newStaff.onclick = function() { toggleStaff(this, name); };
+            newStaff.innerHTML = `<i class="fas fa-user"></i><span>${name}</span>`;
+            grid.appendChild(newStaff);
+
+            input.value = '';
+            updateStaffSelection();
+            updateTable();
+        }
+
+        // 更新报工表格
+        function updateTable() {
+            const tbody = document.getElementById('reportTableBody');
+            tbody.innerHTML = '';
+
+            selectedStaff.forEach((name, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="row-checkbox" checked onchange="updateSummary()"></td>
+                    <td><span class="font-medium">${name}</span></td>
+                    <td><input type="number" step="0.5" class="input-field hours-input" placeholder="0" onchange="updateSummary()"></td>
+                    <td>
+                        <select class="input-field device-select">
+                            <option value="">-</option>
+                            <option>装配线-A01</option>
+                            <option>装配线-A02</option>
+                            <option>检测设备-D01</option>
+                            <option>包装机-P01</option>
+                        </select>
+                    </td>
+                    <td><input type="number" step="0.5" class="input-field device-hours" placeholder="0"></td>
+                    <td>
+                        <select class="input-field">
+                            <option>正常</option>
+                            <option>轻微故障</option>
+                            <option>严重故障</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="input-field" placeholder="工作内容描述..."></td>
+                    <td><div class="photo-upload-small" onclick="alert('上传照片功能')"><i class="fas fa-camera"></i> 上传</div></td>
+                    <td><button class="btn-danger" onclick="removeStaff('${name}')"><i class="fas fa-times"></i></button></td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updateSummary();
+        }
+
+        // 从表格移除人员
+        function removeStaff(name) {
+            selectedStaff = selectedStaff.filter(n => n !== name);
+            // 更新网格显示
+            document.querySelectorAll('.staff-item').forEach(item => {
+                if (item.querySelector('span').textContent === name) {
+                    item.classList.remove('selected');
+                }
+            });
+            updateStaffSelection();
+            updateTable();
+        }
+
+        // 全选/取消全选表格行
+        function toggleAllRows(checkbox) {
+            document.querySelectorAll('.row-checkbox').forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+            updateSummary();
+        }
+
+        // 批量设置
+        function batchSetDevice() {
+            const device = prompt('请输入批量设置的设备编号（如：装配线-A01）');
+            if (device) {
+                document.querySelectorAll('.device-select').forEach(select => {
+                    // 如果选项存在则选中，否则添加
+                    let option = Array.from(select.options).find(opt => opt.value === device);
+                    if (!option) {
+                        option = new Option(device, device);
+                        select.add(option);
+                    }
+                    select.value = device;
+                });
+            }
+        }
+
+        function batchSetTime() {
+            const hours = prompt('请输入批量设置的工时（小时）');
+            if (hours && !isNaN(hours)) {
+                document.querySelectorAll('.hours-input').forEach(input => {
+                    input.value = hours;
+                });
+                updateSummary();
+            }
+        }
+
+        function batchSetStatus() {
+            const status = prompt('请输入设备状态（正常/轻微故障/严重故障）');
+            if (status) {
+                document.querySelectorAll('.report-table tbody tr').forEach(row => {
+                    const select = row.cells[5].querySelector('select');
+                    if (select) select.value = status;
+                });
+            }
+        }
+
+        // 更新统计
+        function updateSummary() {
+            const rows = document.querySelectorAll('#reportTableBody tr');
+            let totalHours = 0;
+            let checkedCount = 0;
+
+            rows.forEach(row => {
+                const checkbox = row.querySelector('.row-checkbox');
+                if (checkbox && checkbox.checked) {
+                    checkedCount++;
+                    const hoursInput = row.querySelector('.hours-input');
+                    totalHours += parseFloat(hoursInput?.value) || 0;
+                }
+            });
+
+            document.getElementById('summaryCount').textContent = checkedCount + '人';
+            document.getElementById('summaryHours').textContent = totalHours.toFixed(1) + '小时';
+        }
+
+        // 暂存
+        function saveTempReport() {
+            alert('报工数据已暂存，' + selectedStaff.length + '人的数据已保存。');
+        }
+
+        // 提交报工
+        function submitReport() {
+            if (selectedStaff.length === 0) {
+                alert('请至少选择一名报工人员');
+                return;
+            }
+
+            const rows = document.querySelectorAll('#reportTableBody tr');
+            let valid = true;
+            let totalHours = 0;
+
+            rows.forEach((row, index) => {
+                const checkbox = row.querySelector('.row-checkbox');
+                if (checkbox && checkbox.checked) {
+                    const hours = row.querySelector('.hours-input')?.value;
+                    if (!hours || parseFloat(hours) <= 0) {
+                        alert(`第${index + 1}行：请填写实际工时`);
+                        valid = false;
+                        return;
+                    }
+                    totalHours += parseFloat(hours);
+                }
+            });
+
+            if (!valid) return;
+
+            alert(`工序【${stepNames[currentStepIndex]}】报工成功！
+
+报工人数：${selectedStaff.length}人
+累计工时：${totalHours.toFixed(1)}小时
+
+${currentStepIndex < stepNames.length - 1 ? '可继续报工下一工序。' : '所有工序已完成！'}`);
+
+            // 如果是最后一道工序，关闭弹窗；否则进入下一工序
+            if (currentStepIndex < stepNames.length - 1) {
+                // 标记当前工序为已完成
+                const steps = document.querySelectorAll('.process-step');
+                steps[currentStepIndex].classList.add('completed');
+                steps[currentStepIndex].classList.remove('active');
+                steps[currentStepIndex].querySelector('.step-icon').innerHTML = '<i class="fas fa-check"></i>';
+                steps[currentStepIndex].querySelector('.step-icon').className = 'step-icon completed';
+
+                // 自动进入下一工序
+                selectStep(currentStepIndex + 1, steps[currentStepIndex + 1]);
+                // 保留人员选择但清空工时
+                document.querySelectorAll('.hours-input').forEach(input => input.value = '');
+                updateSummary();
+            } else {
+                closeReportModal();
+            }
+        }
+
+        // 点击弹窗外部关闭
+        window.addEventListener('load', function() {
+            const modal = document.getElementById('reportModal');
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) closeReportModal();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeReportModal();
+            });
+        });
+    </script>
+</body>
+</html>
