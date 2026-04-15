@@ -484,11 +484,27 @@
                     <button onclick="showAddModal()" class="btn-primary px-4 py-2 rounded-lg flex items-center gap-2 text-sm cursor-pointer z-30">
                         <i class="fas fa-plus"></i> 新增
                     </button>
+                    <!-- 批量操作下拉按钮 -->
+                    <div class="relative inline-block">
+                        <button onclick="toggleBatchMenu()" class="px-4 py-2 rounded-lg border border-blue-300 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors text-sm flex items-center gap-2 cursor-pointer">
+                            <span>批量操作</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="batchMenu" class="hidden absolute top-full left-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 first:rounded-t-lg" onclick="batchDelete()">批量删除</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 last:rounded-b-lg" onclick="batchExport()">批量导出</a>
+                        </div>
+                    </div>
+                    <!-- 批量下发并开始按钮 -->
+                    <button onclick="batchIssueAndStart()" class="px-4 py-2 rounded-lg border border-blue-300 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors text-sm flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-play-circle"></i>
+                        <span>批量下发并开始</span>
+                    </button>
                     <button class="px-4 py-2 rounded-lg border border-blue-300 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors text-sm flex items-center gap-2 cursor-pointer">
                         <i class="fas fa-file-invoice"></i> 生成采购单
                     </button>
                     <button class="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors text-sm flex items-center gap-2 cursor-pointer">
-                        <i class="fas fa-cogs"></i> 工单工序管理
+                        <i class="fas fa-cogs"></i> 查看施工指导书
                     </button>
                 </div>
                 <div class="flex items-center gap-2">
@@ -1048,6 +1064,55 @@
                 closeAddModal();
             }
         });
-    </script>
+    
+// 批量操作菜单切换
+function toggleBatchMenu() {
+    const menu = document.getElementById('batchMenu');
+    menu.classList.toggle('hidden');
+}
+
+// 点击其他地方关闭批量操作菜单
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('batchMenu');
+    const button = e.target.closest('[onclick="toggleBatchMenu()"]');
+    if (!button && !e.target.closest('#batchMenu')) {
+        menu.classList.add('hidden');
+    }
+});
+
+// 批量删除
+function batchDelete() {
+    const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]:checked');
+    if (checkboxes.length === 0) {
+        alert('请先选择要删除的工单');
+        return;
+    }
+    if (confirm('确定要删除选中的 ' + checkboxes.length + ' 个工单吗？')) {
+        alert('批量删除成功！');
+    }
+}
+
+// 批量导出
+function batchExport() {
+    const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]:checked');
+    if (checkboxes.length === 0) {
+        alert('请先选择要导出的工单');
+        return;
+    }
+    alert('已导出 ' + checkboxes.length + ' 个工单数据');
+}
+
+// 批量下发并开始
+function batchIssueAndStart() {
+    const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]:checked');
+    if (checkboxes.length === 0) {
+        alert('请先选择要下发的工单');
+        return;
+    }
+    if (confirm('确定要批量下发并开始选中的 ' + checkboxes.length + ' 个工单吗？')) {
+        alert('批量下发并开始成功！工单状态已更新为"执行中"');
+    }
+}
+</script>
 </body>
 </html>

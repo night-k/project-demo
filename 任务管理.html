@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>云智工业互联平台 - 任务管理</title>
+    <title>云智工业互联平台 - 任务管理（整合版）</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -78,6 +80,22 @@
             box-shadow: 0 4px 12px rgba(82,196,26,0.4);
         }
 
+        .btn-warning {
+            background-color: #faad14;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-warning:hover { 
+            background-color: #ffc53d; 
+            transform: translateY(-1px);
+        }
+
         .status-tag {
             display: inline-flex;
             align-items: center;
@@ -110,6 +128,24 @@
             background-color: #fff2e8;
             color: #fa541c;
             border: 1px solid #ffbb96;
+        }
+
+        .status-created {
+            background-color: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+        }
+
+        .status-assigned {
+            background-color: #fff7e6;
+            color: #fa8c16;
+            border: 1px solid #ffd591;
+        }
+
+        .status-executing {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
         }
 
         .link-blue {
@@ -350,6 +386,11 @@
             transform: scale(1);
         }
 
+        /* 项目报工大模态框 */
+        .modal-container-large {
+            max-width: 1000px;
+        }
+
         .modal-header {
             padding: 16px 24px;
             border-bottom: 1px solid #f0f0f0;
@@ -457,114 +498,183 @@
             min-height: 80px;
         }
 
-        /* 文件上传样式 */
-        .upload-area {
-            border: 2px dashed #d9d9d9;
+        /* 工序流程样式 */
+        .process-container {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border: 1px solid #e8e8e8;
             border-radius: 8px;
-            padding: 24px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .process-step {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            background: #fafafa;
+            border-right: 1px solid #e8e8e8;
+            position: relative;
+            background: white;
         }
 
-        .upload-area:hover {
-            border-color: #1890ff;
+        .process-step:last-child { border-right: none; }
+        .process-step:hover { background: #f5f5f5; }
+        .process-step.active {
             background: #e6f7ff;
+            border-bottom: 3px solid #1890ff;
         }
+        .process-step.completed { background: #f6ffed; }
 
-        .upload-icon {
-            font-size: 32px;
+        .process-step .step-number {
+            font-size: 11px;
             color: #999;
-            margin-bottom: 8px;
+            margin-bottom: 2px;
         }
 
-        .upload-text {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
-
-        .upload-hint {
-            color: #999;
-            font-size: 12px;
-        }
-
-        .file-list {
-            margin-top: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 12px;
-            background: #f6ffed;
-            border: 1px solid #b7eb8f;
-            border-radius: 4px;
-        }
-
-        .file-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #262626;
-        }
-
-        .file-remove {
-            color: #999;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        .file-remove:hover {
-            color: #ff4d4f;
-        }
-
-        /* 批量导入特殊样式 */
-        .import-steps {
+        .process-step .step-icon {
+            width: 36px;
+            height: 36px;
+            margin: 0 auto 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 16px;
-            margin-bottom: 24px;
-            padding: 16px;
-            background: #f6ffed;
-            border-radius: 8px;
+            border-radius: 6px;
+            font-size: 18px;
         }
 
-        .step-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: #52c41a;
-            font-weight: 500;
+        .process-step.active .step-icon {
+            background: #1890ff;
+            color: white;
         }
 
-        .step-divider {
+        .process-step.completed .step-icon {
+            background: #52c41a;
+            color: white;
+        }
+
+        .process-step.pending .step-icon {
+            background: #f5f5f5;
             color: #999;
         }
 
-        .template-download {
-            display: inline-flex;
+        .process-step .step-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: #262626;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 人员选择网格 */
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .staff-item {
+            display: flex;
             align-items: center;
             gap: 6px;
-            color: #1890ff;
-            font-size: 13px;
+            padding: 6px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
             cursor: pointer;
-            margin-bottom: 16px;
+            transition: all 0.2s;
+            font-size: 13px;
+            background: white;
         }
 
-        .template-download:hover {
-            text-decoration: underline;
+        .staff-item:hover {
+            border-color: #1890ff;
+            background: #f0f7ff;
         }
 
-        /* 按钮组样式 - 修复下拉按钮 */
+        .staff-item.selected {
+            background: #e6f7ff;
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .staff-item i {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .staff-item.selected i {
+            color: #1890ff;
+        }
+
+        /* 报工表格样式 */
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .report-table th,
+        .report-table td {
+            border: 1px solid #e8e8e8;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .report-table th {
+            background: #fafafa;
+            font-weight: 500;
+            color: #666;
+            position: sticky;
+            top: 0;
+        }
+
+        .report-table tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        .report-table td {
+            background: white;
+        }
+
+        .batch-actions {
+            display: flex;
+            gap: 8px;
+            padding: 8px;
+            background: #f0f7ff;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-bar {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        /* 按钮组样式 */
         .btn-group-wrapper {
             position: relative;
             display: inline-flex;
@@ -625,87 +735,6 @@
             color: #1890ff;
         }
 
-        .menu-item:first-child {
-            border-radius: 6px 6px 0 0;
-        }
-
-        .menu-item:last-child {
-            border-radius: 0 0 6px 6px;
-        }
-
-        /* 照片预览网格 */
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .photo-item {
-            aspect-ratio: 1;
-            border: 1px solid #d9d9d9;
-            border-radius: 6px;
-            overflow: hidden;
-            position: relative;
-            background: #f5f5f5;
-        }
-
-        .photo-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .photo-remove {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            width: 20px;
-            height: 20px;
-            background: rgba(0,0,0,0.5);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .photo-item:hover .photo-remove {
-            opacity: 1;
-        }
-
-        .photo-add {
-            border: 2px dashed #d9d9d9;
-            border-radius: 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: #999;
-            aspect-ratio: 1;
-        }
-
-        .photo-add:hover {
-            border-color: #1890ff;
-            color: #1890ff;
-            background: #e6f7ff;
-        }
-
-        .photo-add i {
-            font-size: 24px;
-            margin-bottom: 4px;
-        }
-
-        .photo-add span {
-            font-size: 12px;
-        }
-
         /* 提示信息 */
         .tooltip {
             position: relative;
@@ -727,7 +756,80 @@
             margin-bottom: 6px;
             z-index: 100;
         }
+
+        /* Toast提示 */
+        #toast {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            z-index: 2000;
+            font-size: 14px;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid #d9d9d9;
+            color: #666;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .btn-ghost:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .btn-danger {
+            background-color: #ff4d4f;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .btn-info {
+            background-color: #1890ff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .btn-info:hover { background-color: #40a9ff; }
+
+        .photo-upload-small {
+            border: 1px dashed #d9d9d9;
+            border-radius: 4px;
+            padding: 4px 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .photo-upload-small:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+            background: #f0f7ff;
+        }
     </style>
+<base target="_blank">
 </head>
 <body class="h-screen overflow-hidden flex flex-col">
 
@@ -796,6 +898,14 @@
                     <div class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium">
                         <i class="fas fa-tasks w-5"></i>
                         <span>任务管理</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600">
+                        <i class="fas fa-chart-line w-5"></i>
+                        <span>任务统计</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600">
+                        <i class="fas fa-clock w-5"></i>
+                        <span>工时统计</span>
                     </div>
                 </div>
             </div>
@@ -872,10 +982,31 @@
                         </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-4 gap-4">
                     <div>
                         <label class="block text-sm text-gray-600 mb-1.5">产品名称</label>
                         <input type="text" placeholder="请输入 产品名称" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">进度状态</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>请选择 进度状态</option>
+                            <option>待领取</option>
+                            <option>待分发</option>
+                            <option>待开始</option>
+                            <option>进行中</option>
+                            <option>已完成</option>
+                            <option>终止</option>
+                            <option>入库中</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">状态</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>请选择 状态</option>
+                            <option>正常</option>
+                            <option>异常</option>
+                        </select>
                     </div>
                     <div class="flex items-end gap-2">
                         <button class="btn-primary px-6 py-2 rounded-lg text-sm flex items-center gap-2">
@@ -889,7 +1020,34 @@
             </div>
 
             <!-- 操作按钮区 -->
-            <div class="flex items-center justify-end mb-4 flex-wrap gap-2">
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <!-- 批量报工按钮组 -->
+                    <div class="btn-group-wrapper" id="batchBtnWrapper">
+                        <button class="btn-main btn-success" onclick="openBatchImportModal()">
+                            <i class="fas fa-file-import"></i>
+                            <span>批量报工</span>
+                        </button>
+                        <button class="btn-dropdown btn-success" onclick="toggleBatchMenu(this)">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div class="btn-group-menu" id="batchMenu">
+                            <div class="menu-item" onclick="openBatchImportModal()">
+                                <i class="fas fa-file-excel text-green-500"></i>
+                                <span>Excel导入</span>
+                            </div>
+                            <div class="menu-item" onclick="downloadTemplate()">
+                                <i class="fas fa-download text-blue-500"></i>
+                                <span>下载模板</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-success px-4 py-2 rounded-lg text-sm flex items-center gap-2" onclick="openProjectReportModal()">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span>项目报工</span>
+                    </button>
+                </div>
                 <div class="flex items-center gap-2">
                     <button class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:text-blue-600 hover:border-blue-500 transition-colors" title="刷新">
                         <i class="fas fa-sync-alt"></i>
@@ -922,12 +1080,14 @@
                             <th>工序资源</th>
                             <th>执行者</th>
                             <th>产品名称</th>
+                            <th>进度状态</th>
                             <th>创建时间</th>
-                            <th style="min-width: 220px;">操作</th>
+                            <th>状态</th>
+                            <th style="min-width: 280px;">操作</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr data-task-id="T20260408002" data-reported="false">
+                        <tr data-task-id="T20260408002" data-status="created" data-reported="false">
                             <td><input type="checkbox" class="rounded border-gray-300"></td>
                             <td class="text-gray-800">测试永城项目</td>
                             <td><span class="link-blue font-medium">T-HHHSCGD2602047</span></td>
@@ -937,14 +1097,28 @@
                             <td class="text-gray-600">工人</td>
                             <td class="text-gray-800">ERP</td>
                             <td class="text-gray-800">测试永城</td>
+                            <td><span class="status-tag status-distributed">待分发</span></td>
                             <td class="text-gray-600">2026-04-08 23:42</td>
+                            <td class="text-gray-600">正常</td>
                             <td>
+                                <span class="operate-btn" onclick="claimTask('T20260408002')">
+                                    <i class="fas fa-hand-paper"></i> 领取
+                                </span>
+                                <span class="operate-btn disabled">
+                                    <i class="fas fa-play"></i> 开始
+                                </span>
+                                <span class="operate-btn" onclick="openWorkReportModal('T20260408002')">
+                                    <i class="fas fa-clock"></i> 报工
+                                </span>
+                                <span class="operate-btn success" onclick="openProjectReportModal('T20260408002')">
+                                    <i class="fas fa-clipboard-check"></i> 项目报工
+                                </span>
                                 <span class="operate-btn warning">
                                     <i class="fas fa-eye"></i> 详情
                                 </span>
                             </td>
                         </tr>
-                        <tr data-task-id="T20260319002" data-reported="false">
+                        <tr data-task-id="T20260319002" data-status="assigned" data-reported="false">
                             <td><input type="checkbox" class="rounded border-gray-300"></td>
                             <td class="text-gray-800">永城基地扩建项目</td>
                             <td><span class="link-blue font-medium">T-HHHSCGD260319</span></td>
@@ -954,14 +1128,28 @@
                             <td class="text-gray-600">工人小组</td>
                             <td class="text-gray-800">admin</td>
                             <td class="text-gray-800">24K纯金绝缘子</td>
+                            <td><span class="status-tag status-processing">进行中</span></td>
                             <td class="text-gray-600">2026-03-19 16:27</td>
+                            <td class="text-gray-600">正常</td>
                             <td>
+                                <span class="operate-btn disabled">
+                                    <i class="fas fa-hand-paper"></i> 领取
+                                </span>
+                                <span class="operate-btn" onclick="startTask('T20260319002')">
+                                    <i class="fas fa-play"></i> 开始
+                                </span>
+                                <span class="operate-btn" onclick="openWorkReportModal('T20260319002')">
+                                    <i class="fas fa-clock"></i> 报工
+                                </span>
+                                <span class="operate-btn success" onclick="openProjectReportModal('T20260319002')">
+                                    <i class="fas fa-clipboard-check"></i> 项目报工
+                                </span>
                                 <span class="operate-btn warning">
                                     <i class="fas fa-eye"></i> 详情
                                 </span>
                             </td>
                         </tr>
-                        <tr data-task-id="T20260204004" data-reported="true">
+                        <tr data-task-id="T20260204004" data-status="executing" data-reported="true">
                             <td><input type="checkbox" class="rounded border-gray-300"></td>
                             <td class="text-gray-800">华南充电器交付项目</td>
                             <td><span class="link-blue font-medium">T-HHHSCGD260204</span></td>
@@ -971,14 +1159,22 @@
                             <td class="text-gray-600">工人小组</td>
                             <td class="text-gray-800">admin</td>
                             <td class="text-gray-800">二三产品</td>
+                            <td><span class="status-tag status-completed">已完成</span></td>
                             <td class="text-gray-600">2026-02-04 13:45</td>
+                            <td class="text-gray-600">正常</td>
                             <td>
+                                <span class="operate-btn" onclick="openWorkReportModal('T20260204004', true)">
+                                    <i class="fas fa-edit"></i> 修改报工
+                                </span>
+                                <span class="operate-btn success" onclick="openProjectReportModal('T20260204004')">
+                                    <i class="fas fa-clipboard-check"></i> 项目报工
+                                </span>
                                 <span class="operate-btn warning">
                                     <i class="fas fa-eye"></i> 详情
                                 </span>
                             </td>
                         </tr>
-                        <tr data-task-id="T20260204003" data-reported="true">
+                        <tr data-task-id="T20260204003" data-status="executing" data-reported="true">
                             <td><input type="checkbox" class="rounded border-gray-300"></td>
                             <td class="text-gray-800">华南充电器交付项目</td>
                             <td><span class="link-blue font-medium">T-HHHSCGD2602045</span></td>
@@ -988,14 +1184,22 @@
                             <td class="text-gray-600">工人小组</td>
                             <td class="text-gray-800">admin</td>
                             <td class="text-gray-800">二三产品</td>
+                            <td><span class="status-tag status-completed">已完成</span></td>
                             <td class="text-gray-600">2026-02-04 13:45</td>
+                            <td class="text-gray-600">正常</td>
                             <td>
+                                <span class="operate-btn" onclick="viewWorkReport('T20260204003')">
+                                    <i class="fas fa-file-alt"></i> 报工记录
+                                </span>
+                                <span class="operate-btn success" onclick="openProjectReportModal('T20260204003')">
+                                    <i class="fas fa-clipboard-check"></i> 项目报工
+                                </span>
                                 <span class="operate-btn warning">
                                     <i class="fas fa-eye"></i> 详情
                                 </span>
                             </td>
                         </tr>
-                        <tr data-task-id="T20260204002" data-reported="false">
+                        <tr data-task-id="T20260204002" data-status="created" data-reported="false">
                             <td><input type="checkbox" class="rounded border-gray-300"></td>
                             <td class="text-gray-800">华南充电器交付项目</td>
                             <td><span class="link-blue font-medium">T-HHHSCGD2602045</span></td>
@@ -1005,42 +1209,22 @@
                             <td class="text-gray-600">工人小组</td>
                             <td class="text-gray-800">admin</td>
                             <td class="text-gray-800">二三产品</td>
+                            <td><span class="status-tag status-distributed">待分发</span></td>
                             <td class="text-gray-600">2026-02-04 13:45</td>
+                            <td class="text-gray-600">正常</td>
                             <td>
-                                <span class="operate-btn warning">
-                                    <i class="fas fa-eye"></i> 详情
+                                <span class="operate-btn" onclick="claimTask('T20260204002')">
+                                    <i class="fas fa-hand-paper"></i> 领取
                                 </span>
-                            </td>
-                        </tr>
-                        <tr data-task-id="T20260203007" data-reported="true">
-                            <td><input type="checkbox" class="rounded border-gray-300"></td>
-                            <td class="text-gray-800">新能源电池组试制项目</td>
-                            <td><span class="link-blue font-medium">T-HHHSCGD2602033</span></td>
-                            <td class="text-gray-800">二三产品023</td>
-                            <td class="text-gray-600">T20260203007</td>
-                            <td class="text-gray-800">演示入库</td>
-                            <td class="text-gray-600">工人小组</td>
-                            <td class="text-gray-800">admin</td>
-                            <td class="text-gray-800">二三产品</td>
-                            <td class="text-gray-600">2026-02-03 21:25</td>
-                            <td>
-                                <span class="operate-btn warning">
-                                    <i class="fas fa-eye"></i> 详情
+                                <span class="operate-btn disabled">
+                                    <i class="fas fa-play"></i> 开始
                                 </span>
-                            </td>
-                        </tr>
-                        <tr data-task-id="T20260203005" data-reported="true">
-                            <td><input type="checkbox" class="rounded border-gray-300"></td>
-                            <td class="text-gray-800">新能源电池组试制项目</td>
-                            <td><span class="link-blue font-medium">T-HHHSCGD2602033</span></td>
-                            <td class="text-gray-800">二三产品023</td>
-                            <td class="text-gray-600">T20260203005</td>
-                            <td class="text-gray-800">演示瓷检</td>
-                            <td class="text-gray-600">工人小组</td>
-                            <td class="text-gray-800">admin</td>
-                            <td class="text-gray-800">二三产品</td>
-                            <td class="text-gray-600">2026-02-03 21:25</td>
-                            <td>
+                                <span class="operate-btn" onclick="openWorkReportModal('T20260204002')">
+                                    <i class="fas fa-clock"></i> 报工
+                                </span>
+                                <span class="operate-btn success" onclick="openProjectReportModal('T20260204002')">
+                                    <i class="fas fa-clipboard-check"></i> 项目报工
+                                </span>
                                 <span class="operate-btn warning">
                                     <i class="fas fa-eye"></i> 详情
                                 </span>
@@ -1086,13 +1270,326 @@
         </main>
     </div>
 
+    <!-- 单条报工模态框 -->
+    <div id="workReportModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-clock text-blue-500 mr-2"></i>
+                    <span id="workReportTitle">生产报工</span> - <span id="workReportTaskNo">T20260408002</span>
+                </h3>
+                <div class="modal-close" onclick="closeWorkReportModal()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">
+                            工作人员 <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-input" id="workReportPerson" value="自动带出工单执行人员" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            实际工时(小时) <span class="required">*</span>
+                        </label>
+                        <input type="number" class="form-input" id="workHours" placeholder="请输入实际工时" step="0.5" min="0.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            使用设备
+                        </label>
+                        <select class="form-select" id="workDevice" onchange="onDeviceChange()">
+                            <option value="">请选择设备（选填）</option>
+                            <option value="CNC-001">数控机床-001</option>
+                            <option value="CNC-002">数控机床-002</option>
+                            <option value="ROBOT-A1">焊接机器人-A1</option>
+                            <option value="QC-01">检测设备-QC01</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="deviceDurationGroup">
+                        <label class="form-label">
+                            设备运行时长(小时) <span id="durationRequired" style="display:none" class="required">*</span>
+                        </label>
+                        <input type="number" class="form-input" id="deviceDuration" placeholder="请先选择设备" step="0.5" min="0" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">设备状态</label>
+                        <select class="form-select" id="deviceStatus" disabled>
+                            <option value="normal">正常运行</option>
+                            <option value="fault">故障维修</option>
+                            <option value="standby">待机</option>
+                            <option value="maintain">停机保养</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">
+                            工作记录/备注 <span class="required">*</span>
+                        </label>
+                        <textarea class="form-textarea" id="workRecord" placeholder="请填写工作内容描述、完成情况及异常说明..." required></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors" onclick="closeWorkReportModal()">
+                    取消
+                </button>
+                <button class="btn-primary px-5 py-2 rounded-lg" onclick="submitWorkReport()">
+                    <i class="fas fa-check mr-1"></i> 确认报工
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量导入模态框 -->
+    <div id="batchImportModal" class="modal-overlay">
+        <div class="modal-container" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-file-import text-green-500 mr-2"></i>
+                    批量导入报工
+                </h3>
+                <div class="modal-close" onclick="closeBatchImportModal()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="import-steps" style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 24px; padding: 16px; background: #f6ffed; border-radius: 8px;">
+                    <div class="step-item" style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #52c41a; font-weight: 500;">
+                        <i class="fas fa-download"></i>
+                        <span>下载模板</span>
+                    </div>
+                    <i class="fas fa-arrow-right" style="color: #999;"></i>
+                    <div class="step-item" style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #52c41a; font-weight: 500;">
+                        <i class="fas fa-edit"></i>
+                        <span>填写数据</span>
+                    </div>
+                    <i class="fas fa-arrow-right" style="color: #999;"></i>
+                    <div class="step-item" style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #52c41a; font-weight: 500;">
+                        <i class="fas fa-upload"></i>
+                        <span>上传文件</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div style="display: inline-flex; align-items: center; gap: 6px; color: #1890ff; font-size: 13px; cursor: pointer; margin-bottom: 16px;" onclick="downloadTemplate()">
+                        <i class="fas fa-file-excel"></i>
+                        <span>点击下载报工导入模板(.xlsx)</span>
+                    </div>
+                </div>
+
+                <div style="border: 2px dashed #d9d9d9; border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.3s; background: #fafafa;" onclick="document.getElementById('batchFileInput').click()">
+                    <div style="font-size: 32px; color: #999; margin-bottom: 8px;">
+                        <i class="fas fa-file-excel" style="color: #52c41a;"></i>
+                    </div>
+                    <div style="font-size: 16px; margin-bottom: 8px; color: #262626;">点击上传Excel文件</div>
+                    <div style="color: #999; font-size: 12px;">仅支持.xlsx格式，文件大小不超过10MB<br>单次最多导入500条记录</div>
+                </div>
+                <input type="file" id="batchFileInput" accept=".xlsx, .xls" style="display: none;" onchange="handleBatchImport(this)">
+
+                <div style="margin-top: 16px; padding: 12px; background: #e6f7ff; border-radius: 6px; border: 1px solid #91d5ff;">
+                    <h4 style="font-size: 14px; font-weight: 500; color: #1890ff; margin-bottom: 8px;">
+                        <i class="fas fa-info-circle mr-1"></i> 导入说明
+                    </h4>
+                    <ul style="font-size: 12px; color: #096dd9; list-style: disc; padding-left: 16px; line-height: 1.8;">
+                        <li>请严格按照模板格式填写，不要修改列名和sheet名称</li>
+                        <li>必填字段：任务单号、工时、工作记录</li>
+                        <li>设备字段为选填，填写设备编码后必须填写设备运行时长</li>
+                        <li>日期格式：YYYY-MM-DD HH:mm</li>
+                        <li>重复导入将覆盖已存在的报工记录</li>
+                    </ul>
+                </div>
+
+                <div id="importProgress" style="display: none; margin-top: 16px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px;">
+                        <span style="color: #666;">正在导入...</span>
+                        <span style="color: #1890ff; font-weight: 500;" id="progressText">0%</span>
+                    </div>
+                    <div style="width: 100%; background: #f0f0f0; border-radius: 999px; height: 8px;">
+                        <div style="background: #1890ff; height: 8px; border-radius: 999px; transition: all 0.3s; width: 0%;" id="progressBar"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors" onclick="closeBatchImportModal()">
+                    取消
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 项目报工模态框（新增） -->
+    <div id="projectReportModal" class="modal-overlay">
+        <div class="modal-container modal-container-large">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-clipboard-check text-green-500 mr-2"></i>
+                    项目报工 - <span id="projectReportTaskNo">T20260408002</span>
+                    <span class="status-tag status-executing" style="margin-left: 12px;">执行中</span>
+                </h3>
+                <div class="modal-close" onclick="closeProjectReportModal()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <!-- 工序流程选择 -->
+                <div class="mb-4">
+                    <div class="text-sm font-medium text-gray-700 mb-2">选择报工工序 <span class="text-red-500">*</span></div>
+                    <div class="process-container" id="processContainer">
+                        <div class="process-step active" onclick="selectStep(0, this)">
+                            <div class="step-number">第1步</div>
+                            <div class="step-icon pending"><i class="fas fa-utensils"></i></div>
+                            <div class="step-name">测试开工饭</div>
+                        </div>
+                        <div class="process-step" onclick="selectStep(1, this)">
+                            <div class="step-number">第2步</div>
+                            <div class="step-icon pending"><i class="fas fa-search"></i></div>
+                            <div class="step-name">演示质检</div>
+                        </div>
+                        <div class="process-step" onclick="selectStep(2, this)">
+                            <div class="step-number">第3步</div>
+                            <div class="step-icon pending"><i class="fas fa-cogs"></i></div>
+                            <div class="step-name">组装工序</div>
+                        </div>
+                        <div class="process-step" onclick="selectStep(3, this)">
+                            <div class="step-number">第4步</div>
+                            <div class="step-icon pending"><i class="fas fa-box"></i></div>
+                            <div class="step-name">终检包装</div>
+                        </div>
+                        <div class="process-step" onclick="selectStep(4, this)">
+                            <div class="step-number">第5步</div>
+                            <div class="step-icon pending"><i class="fas fa-truck"></i></div>
+                            <div class="step-name">入库</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <!-- 左侧：人员选择与批量报工 -->
+                    <div class="col-span-2">
+                        <div class="section-title">
+                            <i class="fas fa-users text-blue-600"></i>
+                            <span id="currentStepTitle">测试开工饭</span> - 批量报工
+                            <span class="text-xs text-gray-500 font-normal ml-2">已自动带出本工序可报工人员</span>
+                        </div>
+
+                        <!-- 人员选择区域 -->
+                        <div id="staffSelectionArea" class="mb-4">
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-user-check mr-1 text-blue-600"></i>可报工人员 <span class="text-red-500">*</span>
+                                    <span class="text-xs text-gray-500 font-normal">（选择工序后自动带出）</span>
+                                </label>
+                                <div class="staff-grid" id="staffGrid">
+                                    <!-- 动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 批量操作栏 -->
+                        <div class="batch-actions" id="batchActions" style="display: none;">
+                            <span class="text-sm text-gray-600">批量设置：</span>
+                            <button class="btn-ghost text-xs" onclick="batchSetDevice()">
+                                <i class="fas fa-cog mr-1"></i>设备
+                            </button>
+                            <button class="btn-ghost text-xs" onclick="batchSetTime()">
+                                <i class="fas fa-clock mr-1"></i>工时
+                            </button>
+                            <button class="btn-ghost text-xs" onclick="batchSetStatus()">
+                                <i class="fas fa-info-circle mr-1"></i>设备状态
+                            </button>
+                            <span class="text-xs text-gray-500 ml-2">已选择 <span id="selectedCount" class="font-medium text-blue-600">0</span> 人</span>
+                        </div>
+
+                        <!-- 报工表格 -->
+                        <div style="max-height: 350px; overflow-y: auto;">
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th width="30"><input type="checkbox" onchange="toggleAllRows(this)"></th>
+                                        <th>工作人员</th>
+                                        <th width="100">实际工时(小时) <span class="text-red-500">*</span></th>
+                                        <th width="120">使用设备</th>
+                                        <th width="100">设备时长</th>
+                                        <th width="100">设备状态</th>
+                                        <th>备注</th>
+                                        <th width="80">照片</th>
+                                        <th width="50">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportTableBody">
+                                    <!-- 动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 统计 -->
+                        <div class="summary-bar">
+                            <div>
+                                <span class="text-gray-600">已选人员：</span>
+                                <span class="font-medium" id="summaryCount">0人</span>
+                                <span class="text-gray-400 mx-2">|</span>
+                                <span class="text-gray-600">累计工时：</span>
+                                <span class="font-medium text-green-600" id="summaryHours">0小时</span>
+                            </div>
+                            <div class="text-gray-500 text-xs">工序完成后自动进入下一工序</div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：任务信息 -->
+                    <div>
+                        <div class="section-title">
+                            <i class="fas fa-info-circle text-gray-600"></i>
+                            任务信息
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                            <div style="display: flex; gap: 8px; font-size: 13px; margin-bottom: 12px;">
+                                <span style="color: #666; min-width: 70px;">任务名称：</span>
+                                <span style="color: #262626; font-weight: 500;" id="projectTaskName">电池组-精密加工-工序1</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; font-size: 13px; margin-bottom: 12px;">
+                                <span style="color: #666; min-width: 70px;">项目名称：</span>
+                                <span style="color: #262626; font-weight: 500;" id="projectProjectName">华南充电器交付项目</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; font-size: 13px; margin-bottom: 12px;">
+                                <span style="color: #666; min-width: 70px;">负责人：</span>
+                                <span style="color: #262626; font-weight: 500;" id="projectOwner">李主管</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; font-size: 13px; margin-bottom: 12px;">
+                                <span style="color: #666; min-width: 70px;">作业地点：</span>
+                                <span style="color: #262626; font-weight: 500;">东莞工厂B区</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; font-size: 13px; margin-bottom: 12px;">
+                                <span style="color: #666; min-width: 70px;">计划日期：</span>
+                                <span style="color: #262626; font-weight: 500;" id="projectPlanDate">2026-04-09 至 2026-04-16</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeProjectReportModal()" class="btn-ghost">取消</button>
+                <button onclick="submitProjectReport()" class="btn-success">
+                    <i class="fas fa-check mr-1"></i>确认报工
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- 提示框（Toast） -->
-    <div id="toast" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 6px; z-index: 2000; font-size: 14px;">
+    <div id="toast">
         <i class="fas fa-info-circle mr-2"></i>
         <span id="toastMsg">提示信息</span>
     </div>
 
     <script>
+        // ==================== 原有功能代码 ====================
+        
+        // 当前登录用户（模拟）
+        const currentUser = "自动带出工单执行人员";
+        const currentUserId = "user001";
+
         // Tab切换功能
         document.querySelectorAll('.tab-item').forEach(tab => {
             tab.addEventListener('click', function() {
@@ -1108,6 +1605,19 @@
                 this.parentElement.remove();
             });
         });
+
+        // 批量报工下拉菜单
+        function toggleBatchMenu(btn) {
+            const menu = document.getElementById('batchMenu');
+            menu.classList.toggle('show');
+
+            document.addEventListener('click', function closeMenu(e) {
+                if (!btn.contains(e.target) && !menu.contains(e.target)) {
+                    menu.classList.remove('show');
+                    document.removeEventListener('click', closeMenu);
+                }
+            });
+        }
 
         // 显示提示
         function showToast(msg, type = 'info') {
@@ -1129,6 +1639,560 @@
             }, 3000);
         }
 
+        // 单条报工模态框控制
+        function openWorkReportModal(taskNo, isEdit = false) {
+            document.getElementById('workReportTaskNo').textContent = taskNo;
+            document.getElementById('workReportTitle').textContent = isEdit ? '修改报工' : '生产报工';
+            document.getElementById('workReportPerson').value = currentUser;
+
+            document.getElementById('workHours').value = '';
+            document.getElementById('workDevice').value = '';
+            document.getElementById('deviceDuration').value = '';
+            document.getElementById('deviceDuration').disabled = true;
+            document.getElementById('deviceStatus').value = 'normal';
+            document.getElementById('deviceStatus').disabled = true;
+            document.getElementById('workRecord').value = '';
+
+            document.getElementById('workReportModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeWorkReportModal() {
+            document.getElementById('workReportModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // 设备选择变化处理
+        function onDeviceChange() {
+            const device = document.getElementById('workDevice').value;
+            const durationInput = document.getElementById('deviceDuration');
+            const deviceStatus = document.getElementById('deviceStatus');
+            const durationRequired = document.getElementById('durationRequired');
+
+            if (device) {
+                durationInput.disabled = false;
+                durationInput.placeholder = '请输入设备运行时长';
+                deviceStatus.disabled = false;
+                durationRequired.style.display = 'inline';
+                durationInput.setAttribute('required', 'required');
+            } else {
+                durationInput.disabled = true;
+                durationInput.value = '';
+                durationInput.placeholder = '请先选择设备';
+                deviceStatus.disabled = true;
+                deviceStatus.value = 'normal';
+                durationRequired.style.display = 'none';
+                durationInput.removeAttribute('required');
+            }
+        }
+
+        // 批量导入模态框控制
+        function openBatchImportModal() {
+            document.getElementById('batchImportModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('batchMenu').classList.remove('show');
+        }
+
+        function closeBatchImportModal() {
+            document.getElementById('batchImportModal').classList.remove('active');
+            document.body.style.overflow = '';
+            setTimeout(() => {
+                document.getElementById('importProgress').style.display = 'none';
+                document.getElementById('progressBar').style.width = '0%';
+                document.getElementById('progressText').textContent = '0%';
+            }, 300);
+        }
+
+        // 批量导入处理
+        function handleBatchImport(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+                showToast('请选择Excel文件(.xlsx或.xls格式)', 'error');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('文件大小不能超过10MB', 'error');
+                return;
+            }
+
+            document.getElementById('importProgress').style.display = 'block';
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+
+                    setTimeout(() => {
+                        showToast(`成功导入45条报工记录`, 'success');
+                        closeBatchImportModal();
+                    }, 500);
+                }
+
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('progressText').textContent = Math.floor(progress) + '%';
+            }, 200);
+        }
+
+        // 下载模板
+        function downloadTemplate() {
+            const templateContent = `任务单号,工单号,工序,实际工时(小时),设备编码,设备运行时长(小时),工作记录,报工日期,报工人员
+T20260408002,T-HHHSCGD2602047,接线,2.5,CNC-001,2.0,完成接线工序，质量正常,2026-04-09,${currentUser}
+T20260319002,T-HHHSCGD260319,装发射工序,4.0,ROBOT-A1,3.5,发射装置安装完成,2026-04-09,${currentUser}`;
+
+            const blob = new Blob([templateContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', '报工导入模板.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('模板下载成功！', 'success');
+            document.getElementById('batchMenu').classList.remove('show');
+        }
+
+        // 提交单条报工
+        function submitWorkReport() {
+            const hours = document.getElementById('workHours').value;
+            const device = document.getElementById('workDevice').value;
+            const duration = document.getElementById('deviceDuration').value;
+            const record = document.getElementById('workRecord').value;
+            const taskNo = document.getElementById('workReportTaskNo').textContent;
+
+            if (!hours || parseFloat(hours) <= 0) {
+                showToast('请填写有效的实际工时', 'error');
+                document.getElementById('workHours').focus();
+                return;
+            }
+
+            if (device && (!duration || parseFloat(duration) <= 0)) {
+                showToast('请填写设备运行时长', 'error');
+                document.getElementById('deviceDuration').focus();
+                return;
+            }
+
+            if (!record.trim()) {
+                showToast('请填写工作记录', 'error');
+                document.getElementById('workRecord').focus();
+                return;
+            }
+
+            showToast('报工提交成功！', 'success');
+            closeWorkReportModal();
+        }
+
+        // ==================== 项目报工功能代码（新增） ====================
+
+        let currentStepIndex = 0;
+        let selectedStaff = [];
+        const stepNames = ['测试开工饭', '演示质检', '组装工序', '终检包装', '入库'];
+
+        // 每个工序对应的可报工人员
+        const stepStaffMap = {
+            0: ['张师傅', '李技工', '王操作'],
+            1: ['伍红卫', '黄慈幽', '吴质检'],
+            2: ['张师傅', '李技工', '王操作', '刘装配', '赵工匠'],
+            3: ['王一博', '陈包装', '林装箱'],
+            4: ['郑入库', '王搬运', '冯仓管']
+        };
+
+        // 打开项目报工模态框
+        function openProjectReportModal(taskNo) {
+            // 如果没有传入taskNo，尝试获取选中的任务
+            if (!taskNo) {
+                const selectedRow = document.querySelector('tr[data-task-id].selected');
+                if (selectedRow) {
+                    taskNo = selectedRow.getAttribute('data-task-id');
+                } else {
+                    showToast('请先选择一个任务', 'error');
+                    return;
+                }
+            }
+
+            const row = document.querySelector(`tr[data-task-id="${taskNo}"]`);
+            if (!row) {
+                showToast('未找到任务信息', 'error');
+                return;
+            }
+
+            const status = row.getAttribute('data-status');
+            if (status === 'created') {
+                showToast('该任务尚未领取，请先领取任务', 'error');
+                return;
+            }
+            if (status === 'assigned') {
+                showToast('该任务已领取但未开始，请先点击“开始”', 'error');
+                return;
+            }
+
+            document.getElementById('projectReportTaskNo').textContent = taskNo;
+            
+            // 填充任务信息
+            const cells = row.cells;
+            document.getElementById('projectTaskName').textContent = cells[3].textContent;
+            document.getElementById('projectProjectName').textContent = cells[1].textContent;
+            document.getElementById('projectOwner').textContent = cells[7].textContent;
+            document.getElementById('projectPlanDate').textContent = '2026-04-09 至 2026-04-16';
+
+            const modal = document.getElementById('projectReportModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // 重置工序和人员
+            currentStepIndex = 0;
+            selectedStaff = [];
+
+            // 重置工序选择
+            document.querySelectorAll('.process-step').forEach((step, i) => {
+                step.classList.remove('active', 'completed');
+                step.querySelector('.step-icon').className = 'step-icon pending';
+                step.querySelector('.step-icon').innerHTML = getStepIcon(i);
+                if (i === 0) {
+                    step.classList.add('active');
+                    step.querySelector('.step-icon').className = 'step-icon active';
+                }
+            });
+
+            document.getElementById('currentStepTitle').textContent = stepNames[0];
+
+            // 加载第一工序的人员
+            loadStepStaff(0);
+        }
+
+        function closeProjectReportModal() {
+            document.getElementById('projectReportModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function getStepIcon(index) {
+            const icons = ['fa-utensils', 'fa-search', 'fa-cogs', 'fa-box', 'fa-truck'];
+            return `<i class="fas ${icons[index]}"></i>`;
+        }
+
+        // 选择工序
+        function selectStep(index, element) {
+            currentStepIndex = index;
+            document.querySelectorAll('.process-step').forEach((step, i) => {
+                step.classList.toggle('active', i === index);
+            });
+            document.getElementById('currentStepTitle').textContent = stepNames[index];
+
+            loadStepStaff(index);
+        }
+
+        // 加载工序人员
+        function loadStepStaff(stepIndex) {
+            const staff = stepStaffMap[stepIndex] || [];
+            const grid = document.getElementById('staffGrid');
+            grid.innerHTML = staff.map(name => `
+                <div class="staff-item" onclick="toggleStaff('${name}')" id="staff-${name}">
+                    <i class="fas fa-user"></i>
+                    <span>${name}</span>
+                </div>
+            `).join('');
+
+            selectedStaff = [];
+            updateStaffSelection();
+            updateTable();
+        }
+
+        // 切换人员选择
+        function toggleStaff(name) {
+            const element = document.getElementById(`staff-${name}`);
+            if (selectedStaff.includes(name)) {
+                selectedStaff = selectedStaff.filter(n => n !== name);
+                element.classList.remove('selected');
+            } else {
+                selectedStaff.push(name);
+                element.classList.add('selected');
+            }
+            updateStaffSelection();
+            updateTable();
+        }
+
+        // 更新人员选择显示
+        function updateStaffSelection() {
+            document.getElementById('selectedCount').textContent = selectedStaff.length;
+            document.getElementById('batchActions').style.display = selectedStaff.length > 0 ? 'flex' : 'none';
+        }
+
+        // 更新报工表格
+        function updateTable() {
+            const tbody = document.getElementById('reportTableBody');
+            tbody.innerHTML = '';
+
+            selectedStaff.forEach((name, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="row-checkbox" checked onchange="updateSummary()"></td>
+                    <td><span class="font-medium">${name}</span></td>
+                    <td><input type="number" step="0.5" class="input-field hours-input" placeholder="0" style="width: 80px; padding: 4px 8px;" onchange="updateSummary()"></td>
+                    <td>
+                        <select class="input-field device-select" style="width: 110px; padding: 4px 8px;">
+                            <option value="">-</option>
+                            <option>装配线-A01</option>
+                            <option>装配线-A02</option>
+                            <option>检测设备-D01</option>
+                            <option>包装机-P01</option>
+                        </select>
+                    </td>
+                    <td><input type="number" step="0.5" class="input-field device-hours" placeholder="0" style="width: 80px; padding: 4px 8px;"></td>
+                    <td>
+                        <select class="input-field" style="width: 90px; padding: 4px 8px;">
+                            <option>正常</option>
+                            <option>轻微故障</option>
+                            <option>严重故障</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="input-field" placeholder="工作内容描述..." style="padding: 4px 8px;"></td>
+                    <td><div class="photo-upload-small" onclick="showToast('上传照片功能')"><i class="fas fa-camera"></i> 上传</div></td>
+                    <td><button class="btn-danger" onclick="removeStaff('${name}')"><i class="fas fa-times"></i></button></td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            updateSummary();
+        }
+
+        // 从表格移除人员
+        function removeStaff(name) {
+            selectedStaff = selectedStaff.filter(n => n !== name);
+            const element = document.getElementById(`staff-${name}`);
+            if (element) {
+                element.classList.remove('selected');
+            }
+            updateStaffSelection();
+            updateTable();
+        }
+
+        // 全选/取消全选表格行
+        function toggleAllRows(checkbox) {
+            document.querySelectorAll('.row-checkbox').forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+            updateSummary();
+        }
+
+        // 批量设置
+        function batchSetDevice() {
+            const device = prompt('请输入批量设置的设备编号（如：装配线-A01）');
+            if (device) {
+                document.querySelectorAll('.device-select').forEach(select => {
+                    let option = Array.from(select.options).find(opt => opt.value === device);
+                    if (!option) {
+                        option = new Option(device, device);
+                        select.add(option);
+                    }
+                    select.value = device;
+                });
+            }
+        }
+
+        function batchSetTime() {
+            const hours = prompt('请输入批量设置的工时（小时）');
+            if (hours && !isNaN(hours)) {
+                document.querySelectorAll('.hours-input').forEach(input => {
+                    input.value = hours;
+                });
+                updateSummary();
+            }
+        }
+
+        function batchSetStatus() {
+            const status = prompt('请输入设备状态（正常/轻微故障/严重故障）');
+            if (status) {
+                document.querySelectorAll('#reportTableBody tr').forEach(row => {
+                    const select = row.cells[5].querySelector('select');
+                    if (select) select.value = status;
+                });
+            }
+        }
+
+        // 更新统计
+        function updateSummary() {
+            const rows = document.querySelectorAll('#reportTableBody tr');
+            let totalHours = 0;
+            let checkedCount = 0;
+
+            rows.forEach(row => {
+                const checkbox = row.querySelector('.row-checkbox');
+                if (checkbox && checkbox.checked) {
+                    checkedCount++;
+                    const hoursInput = row.querySelector('.hours-input');
+                    totalHours += parseFloat(hoursInput?.value) || 0;
+                }
+            });
+
+            document.getElementById('summaryCount').textContent = checkedCount + '人';
+            document.getElementById('summaryHours').textContent = totalHours.toFixed(1) + '小时';
+        }
+
+        // 提交项目报工
+        function submitProjectReport() {
+            if (selectedStaff.length === 0) {
+                showToast('请至少选择一名报工人员', 'error');
+                return;
+            }
+
+            const rows = document.querySelectorAll('#reportTableBody tr');
+            let valid = true;
+            let totalHours = 0;
+
+            rows.forEach((row, index) => {
+                const checkbox = row.querySelector('.row-checkbox');
+                if (checkbox && checkbox.checked) {
+                    const hours = row.querySelector('.hours-input')?.value;
+                    if (!hours || parseFloat(hours) <= 0) {
+                        showToast(`第${index + 1}行：请填写实际工时`, 'error');
+                        valid = false;
+                        return;
+                    }
+                    totalHours += parseFloat(hours);
+                }
+            });
+
+            if (!valid) return;
+
+            showToast(`工序【${stepNames[currentStepIndex]}】报工成功！报工人数：${selectedStaff.length}人，累计工时：${totalHours.toFixed(1)}小时`, 'success');
+
+            // 标记当前工序为已完成并进入下一工序
+            if (currentStepIndex < stepNames.length - 1) {
+                const steps = document.querySelectorAll('.process-step');
+                steps[currentStepIndex].classList.add('completed');
+                steps[currentStepIndex].classList.remove('active');
+                steps[currentStepIndex].querySelector('.step-icon').innerHTML = '<i class="fas fa-check"></i>';
+                steps[currentStepIndex].querySelector('.step-icon').className = 'step-icon completed';
+
+                // 自动进入下一工序
+                selectStep(currentStepIndex + 1, steps[currentStepIndex + 1]);
+
+                // 保留已选人员中也在新工序列表中的人
+                const newStaffList = stepStaffMap[currentStepIndex + 1] || [];
+                const keepStaff = selectedStaff.filter(name => newStaffList.includes(name));
+
+                loadStepStaff(currentStepIndex + 1);
+
+                keepStaff.forEach(name => {
+                    const element = document.getElementById(`staff-${name}`);
+                    if (element) {
+                        element.classList.add('selected');
+                        if (!selectedStaff.includes(name)) {
+                            selectedStaff.push(name);
+                        }
+                    }
+                });
+
+                updateStaffSelection();
+                updateTable();
+            } else {
+                // 所有工序完成
+                closeProjectReportModal();
+                showToast('所有工序报工已完成！', 'success');
+            }
+        }
+
+        // ==================== 任务状态流转功能 ====================
+
+        function claimTask(taskNo) {
+            const row = document.querySelector(`tr[data-task-id="${taskNo}"]`);
+            if (row) {
+                row.setAttribute('data-status', 'assigned');
+                const statusCell = row.querySelector('td:nth-child(10)');
+                statusCell.innerHTML = '<span class="status-tag status-assigned">已领取</span>';
+                
+                // 更新操作按钮
+                const actionCell = row.querySelector('td:last-child');
+                actionCell.innerHTML = `
+                    <span class="operate-btn disabled">
+                        <i class="fas fa-hand-paper"></i> 领取
+                    </span>
+                    <span class="operate-btn" onclick="startTask('${taskNo}')">
+                        <i class="fas fa-play"></i> 开始
+                    </span>
+                    <span class="operate-btn" onclick="openWorkReportModal('${taskNo}')">
+                        <i class="fas fa-clock"></i> 报工
+                    </span>
+                    <span class="operate-btn success" onclick="openProjectReportModal('${taskNo}')">
+                        <i class="fas fa-clipboard-check"></i> 项目报工
+                    </span>
+                    <span class="operate-btn warning">
+                        <i class="fas fa-eye"></i> 详情
+                    </span>
+                `;
+                
+                showToast('任务领取成功！', 'success');
+            }
+        }
+
+        function startTask(taskNo) {
+            const row = document.querySelector(`tr[data-task-id="${taskNo}"]`);
+            if (row) {
+                row.setAttribute('data-status', 'executing');
+                const statusCell = row.querySelector('td:nth-child(10)');
+                statusCell.innerHTML = '<span class="status-tag status-executing">执行中</span>';
+                
+                const actionCell = row.querySelector('td:last-child');
+                actionCell.innerHTML = `
+                    <span class="operate-btn disabled">
+                        <i class="fas fa-hand-paper"></i> 领取
+                    </span>
+                    <span class="operate-btn disabled">
+                        <i class="fas fa-play"></i> 开始
+                    </span>
+                    <span class="operate-btn" onclick="openWorkReportModal('${taskNo}')">
+                        <i class="fas fa-clock"></i> 报工
+                    </span>
+                    <span class="operate-btn success" onclick="openProjectReportModal('${taskNo}')">
+                        <i class="fas fa-clipboard-check"></i> 项目报工
+                    </span>
+                    <span class="operate-btn warning">
+                        <i class="fas fa-eye"></i> 详情
+                    </span>
+                `;
+                
+                showToast('任务开始执行！', 'success');
+            }
+        }
+
+        function viewWorkReport(taskNo) {
+            showToast(`查看任务 ${taskNo} 的报工记录`, 'info');
+        }
+
+        // 点击模态框外部关闭
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    if (this.id === 'workReportModal') closeWorkReportModal();
+                    else if (this.id === 'batchImportModal') closeBatchImportModal();
+                    else if (this.id === 'projectReportModal') closeProjectReportModal();
+                }
+            });
+        });
+
+        // ESC键关闭模态框
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeWorkReportModal();
+                closeBatchImportModal();
+                closeProjectReportModal();
+            }
+        });
+
+        // 行点击选中效果
+        document.querySelectorAll('.data-table tbody tr').forEach(row => {
+            row.addEventListener('click', function(e) {
+                if (!e.target.closest('button') && !e.target.closest('.operate-btn')) {
+                    document.querySelectorAll('.data-table tbody tr').forEach(r => r.classList.remove('selected'));
+                    this.classList.add('selected');
+                }
+            });
+        });
     </script>
 </body>
 </html>

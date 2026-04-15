@@ -3,170 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文件访问导航</title>
+    <title>云智工业互联平台 - 页面导航</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --bg: #f3f6fb;
-            --panel: #ffffff;
-            --line: #d8e0ea;
-            --text: #1f2a37;
-            --muted: #6b7280;
-            --html: #0f766e;
-            --htm: #1d4ed8;
-        }
-        * { box-sizing: border-box; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
         body {
-            margin: 0;
-            font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
-            color: var(--text);
-            background: radial-gradient(circle at top right, #d8ecff 0%, var(--bg) 45%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
-        .container {
-            width: min(1080px, 92vw);
-            margin: 36px auto 56px;
-        }
-        .header {
-            background: linear-gradient(120deg, #123b66 0%, #0e7490 100%);
-            color: #fff;
-            padding: 28px;
-            border-radius: 18px;
-            box-shadow: 0 12px 30px rgba(13, 46, 84, 0.24);
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 28px;
-            letter-spacing: 0.5px;
-        }
-        .header p {
-            margin: 10px 0 0;
-            opacity: 0.9;
-            font-size: 14px;
-        }
-        .sections {
-            margin-top: 24px;
-            display: grid;
-            gap: 18px;
-        }
-        .section {
-            background: var(--panel);
-            border: 1px solid var(--line);
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: 16px;
-            padding: 18px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
-        .section-title {
-            margin: 0 0 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 18px;
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
         }
-        .tag {
-            font-size: 12px;
-            padding: 3px 8px;
-            border-radius: 999px;
-            font-weight: 600;
+
+        .nav-card {
+            cursor: pointer;
+            border: 2px solid transparent;
         }
-        .tag-html {
-            color: var(--html);
-            background: #d1fae5;
+
+        .nav-card:hover {
+            border-color: #1890ff;
         }
-        .tag-htm {
-            color: var(--htm);
-            background: #dbeafe;
-        }
-        .list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 10px;
-        }
-        .item a {
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 14px;
-            border: 1px solid var(--line);
+
+        .nav-icon {
+            width: 56px;
+            height: 56px;
             border-radius: 12px;
-            transition: all .18s ease;
-            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
         }
-        .item a:hover {
-            transform: translateY(-1px);
-            border-color: #7aa6d2;
-            box-shadow: 0 6px 16px rgba(28, 73, 121, .12);
+
+        .nav-card:hover .nav-icon {
+            transform: scale(1.1);
         }
-        .name {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 80%;
-            font-size: 14px;
-        }
-        .ext {
-            font-size: 11px;
-            color: var(--muted);
-            border: 1px solid var(--line);
-            padding: 2px 6px;
-            border-radius: 999px;
-        }
-        .empty {
-            margin: 4px 0 2px;
-            color: var(--muted);
-            font-size: 14px;
-        }
-        .footer {
-            margin-top: 16px;
-            color: var(--muted);
-            font-size: 13px;
+
+        .nav-icon.blue { background-color: #e6f7ff; color: #1890ff; }
+        .nav-icon.green { background-color: #f6ffed; color: #52c41a; }
+        .nav-icon.orange { background-color: #fff7e6; color: #fa8c16; }
+        .nav-icon.red { background-color: #fff1f0; color: #ff4d4f; }
+        .nav-icon.purple { background-color: #f9f0ff; color: #722ed1; }
+        .nav-icon.cyan { background-color: #e6fffb; color: #13c2c2; }
+
+        .header-glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
         }
     </style>
 </head>
-<body>
-    <main class="container">
-        <section class="header">
-            <h1>文件访问导航</h1>
-            <p>当前目录下全部网页入口已按文件类型分类展示</p>
-        </section>
-
-        <section class="sections">
-            <div class="section">
-                <h2 class="section-title">
-                    <span>HTML 文件（.html）</span>
-                    <span class="tag tag-html">15 个文件</span>
-                </h2>
-                <ul class="list">
-                    <li class="item"><a href="./业务流程图.html"><span class="name">业务流程图.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./人员画像.html"><span class="name">人员画像.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./人才管理.html"><span class="name">人才管理.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./人才评分规则.html"><span class="name">人才评分规则.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./任务管理.html"><span class="name">任务管理.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./培训记录.html"><span class="name">培训记录.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./工单管理-报工.html"><span class="name">工单管理-报工.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./工单管理.html"><span class="name">工单管理.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./工单详情.html"><span class="name">工单详情.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./工序维护.html"><span class="name">工序维护.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./施工指导书(改字段名称,不做样式修改).html"><span class="name">施工指导书(改字段名称,不做样式修改).html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./服务维护.html"><span class="name">服务维护.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./证书管理.html"><span class="name">证书管理.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./项目列表.html"><span class="name">项目列表.html</span><span class="ext">.html</span></a></li>
-                    <li class="item"><a href="./项目空间.html"><span class="name">项目空间.html</span><span class="ext">.html</span></a></li>
-                </ul>
+<body class="p-6">
+    <!-- 顶部标题栏 -->
+    <header class="header-glass rounded-2xl mb-8 p-6 shadow-lg">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-2xl shadow-lg">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">云智工业互联平台</h1>
+                    <p class="text-sm text-gray-500">页面导航中心 · 快速访问各功能模块</p>
+                </div>
             </div>
-
-            <div class="section">
-                <h2 class="section-title">
-                    <span>HTM 文件（.htm）</span>
-                    <span class="tag tag-htm">0 个文件</span>
-                </h2>
-                <p class="empty">当前目录暂无 .htm 文件。</p>
+            <div class="text-sm text-gray-400">
+                <i class="far fa-clock mr-1"></i>
+                <span id="currentTime"></span>
             </div>
-        </section>
+        </div>
+    </header>
 
-        <div class="footer">提示：若新增网页文件，请同步更新此导航页。</div>
-    </main>
+    <!-- 页面导航网格 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <!-- 业务流程图 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('业务流程图.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon blue">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">业务流程图</h3>
+                    <p class="text-xs text-gray-500">业务流程可视化展示</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-blue-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 人员画像 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('人员画像.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon green">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">人员画像</h3>
+                    <p class="text-xs text-gray-500">员工信息综合展示</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-green-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 人才管理 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('人才管理.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon blue">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">人才管理</h3>
+                    <p class="text-xs text-gray-500">人才信息维护管理</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-blue-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 人才评分规则 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('人才评分规则.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon orange">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">人才评分规则</h3>
+                    <p class="text-xs text-gray-500">评分标准与规则配置</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-orange-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 任务管理 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('任务管理.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon purple">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">任务管理</h3>
+                    <p class="text-xs text-gray-500">任务分配与进度跟踪</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-purple-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 任务详情 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('任务详情.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon cyan">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">任务详情</h3>
+                    <p class="text-xs text-gray-500">任务详细信息查看</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-cyan-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 培训记录 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('培训记录.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon green">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">培训记录</h3>
+                    <p class="text-xs text-gray-500">员工培训历史记录</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-green-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 工单管理 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('工单管理.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon blue">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">工单管理</h3>
+                    <p class="text-xs text-gray-500">工单创建与处理跟踪</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-blue-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 工序维护 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('工序维护.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon orange">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">工序维护</h3>
+                    <p class="text-xs text-gray-500">生产工艺工序管理</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-orange-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 施工指导书 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('施工指导书(改字段名称,不做样式修改).html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon red">
+                    <i class="fas fa-hard-hat"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">施工指导书</h3>
+                    <p class="text-xs text-gray-500">施工操作规范文档</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-red-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 服务维护 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('服务维护.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon purple">
+                    <i class="fas fa-wrench"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">服务维护</h3>
+                    <p class="text-xs text-gray-500">服务项目维护管理</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-purple-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 证书管理 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('证书管理.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon green">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">证书管理</h3>
+                    <p class="text-xs text-gray-500">员工证书资质管理</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-green-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 项目列表 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('项目列表.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon blue">
+                    <i class="fas fa-list-alt"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">项目列表</h3>
+                    <p class="text-xs text-gray-500">项目信息列表展示</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-blue-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 项目空间 -->
+        <div class="glass-card nav-card p-5" onclick="openPage('项目空间.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon cyan">
+                    <i class="fas fa-cubes"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">项目空间</h3>
+                    <p class="text-xs text-gray-500">项目协作工作空间</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-cyan-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部信息 -->
+    <footer class="mt-8 text-center text-white/70 text-sm">
+        <p>云智工业互联平台 · 页面导航中心</p>
+        <p class="mt-1 text-xs opacity-60">点击任意卡片即可在新窗口中打开对应页面</p>
+    </footer>
+
+    <script>
+        // 打开页面（新窗口）
+        function openPage(filename) {
+            window.open(filename, '_blank', 'noopener,noreferrer');
+        }
+
+        // 更新时间
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTime();
+            setInterval(updateTime, 1000);
+        });
+    </script>
 </body>
 </html>
