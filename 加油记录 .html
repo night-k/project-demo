@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加油记录维护</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            background: #fff;
+            border-bottom: 1px solid #e4e7ed;
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 600;
+            color: #409eff;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #606266;
+            transition: all 0.3s;
+        }
+
+        .nav-item:hover {
+            color: #409eff;
+            background: #ecf5ff;
+        }
+
+        .nav-item.active {
+            color: #409eff;
+            background: #ecf5ff;
+            font-weight: 500;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #606266;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #409eff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        /* 主内容区 */
+        .main-container {
+            margin-top: 56px;
+            padding: 24px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 页面标题 */
+        .page-header {
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #303133;
+        }
+
+        .breadcrumb {
+            font-size: 13px;
+            color: #909399;
+            margin-top: 4px;
+        }
+
+        /* 搜索卡片 */
+        .search-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px 0 rgba(0,0,0,0.05);
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px 24px;
+            align-items: end;
+        }
+
+        .form-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            color: #606266;
+            font-weight: 500;
+        }
+
+        .form-input, .form-select {
+            height: 32px;
+            padding: 0 12px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.3s;
+            width: 100%;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: #409eff;
+        }
+
+        .form-input::placeholder {
+            color: #c0c4cc;
+        }
+
+        .date-range {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-range .form-input {
+            flex: 1;
+        }
+
+        .search-buttons {
+            display: flex;
+            gap: 12px;
+            grid-column: span 1;
+            justify-content: flex-end;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 32px;
+        }
+
+        .btn-primary {
+            background: #409eff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #66b1ff;
+        }
+
+        .btn-default {
+            background: #fff;
+            color: #606266;
+            border: 1px solid #dcdfe6;
+        }
+
+        .btn-default:hover {
+            color: #409eff;
+            border-color: #c6e2ff;
+            background: #ecf5ff;
+        }
+
+        .btn-success {
+            background: #67c23a;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #85ce61;
+        }
+
+        .btn-danger {
+            background: #f56c6c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #f78989;
+        }
+
+        .btn-text {
+            background: transparent;
+            color: #409eff;
+            padding: 4px 8px;
+            height: auto;
+        }
+
+        .btn-text:hover {
+            color: #66b1ff;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            height: 28px;
+        }
+
+        /* 操作栏 */
+        .operation-bar {
+            background: #fff;
+            padding: 16px 24px;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 1px solid #ebeef5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .operation-left {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* 表格卡片 - 增加固定高度和滚动 */
+        .table-card {
+            background: #fff;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 12px 0 rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .table-wrapper {
+            max-height: 480px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        /* 固定表头 */
+        .table-wrapper thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 1200px;
+        }
+
+        .data-table th {
+            background: #f5f7fa;
+            color: #909399;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid #ebeef5;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #ebeef5;
+            color: #606266;
+            white-space: nowrap;
+        }
+
+        .data-table tr:hover {
+            background: #f5f7fa;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        /* 标签样式 */
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: nowrap;
+        }
+
+        .tag-blue {
+            background: #ecf5ff;
+            color: #409eff;
+        }
+
+        .tag-green {
+            background: #f0f9eb;
+            color: #67c23a;
+        }
+
+        .tag-orange {
+            background: #fdf6ec;
+            color: #e6a23c;
+        }
+
+        /* 分页 */
+        .pagination {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 16px;
+            border-top: 1px solid #ebeef5;
+            background: #fff;
+        }
+
+        .page-info {
+            font-size: 13px;
+            color: #606266;
+        }
+
+        .page-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .page-btn {
+            min-width: 32px;
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid #dcdfe6;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #606266;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn:hover {
+            color: #409eff;
+            border-color: #409eff;
+        }
+
+        .page-btn.active {
+            background: #409eff;
+            color: #fff;
+            border-color: #409eff;
+        }
+
+        .page-btn:disabled {
+            color: #c0c4cc;
+            cursor: not-allowed;
+            border-color: #e4e7ed;
+        }
+
+        /* 弹窗样式 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-container {
+            background: #fff;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 720px;
+            max-height: calc(100vh - 48px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #ebeef5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #303133;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #909399;
+            font-size: 18px;
+        }
+
+        .modal-close:hover {
+            background: #f5f7fa;
+            color: #606266;
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #ebeef5;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* 表单布局 - 改为3列 */
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #303133;
+            margin-bottom: 16px;
+            padding-left: 12px;
+            border-left: 3px solid #409eff;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px 20px;
+        }
+
+        .form-item.required .form-label::before {
+            content: '*';
+            color: #f56c6c;
+            margin-right: 4px;
+        }
+
+        .form-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 8px 12px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 13px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-textarea:focus {
+            border-color: #409eff;
+            outline: none;
+        }
+
+        /* 附件上传 */
+        .upload-area {
+            border: 2px dashed #dcdfe6;
+            border-radius: 6px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #409eff;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            color: #c0c4cc;
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #606266;
+            margin-bottom: 4px;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: #909399;
+        }
+
+        /* 统计数据 */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px 0 rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #909399;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #303133;
+        }
+
+        .stat-unit {
+            font-size: 13px;
+            color: #606266;
+            margin-left: 4px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .search-form {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-form {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* 空状态 */
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            color: #909399;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            color: #dcdfe6;
+        }
+
+        .empty-text {
+            font-size: 14px;
+        }
+
+        /* 跨列样式 */
+        .form-item-col-2 {
+            grid-column: span 2;
+        }
+
+        .form-item-col-3 {
+            grid-column: span 3;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="logo">油田服务MES系统</div>
+            <div class="nav-menu">
+                <div class="nav-item">首页</div>
+                <div class="nav-item">任务管理</div>
+                <div class="nav-item">项目管理</div>
+                <div class="nav-item">人员管理</div>
+                <div class="nav-item active">设备管理</div>
+                <div class="nav-item">质量管理</div>
+                <div class="nav-item">系统设置</div>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="user-info">
+                <div class="user-avatar">张</div>
+                <span>张工程师</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="main-container">
+        <!-- 页面标题 -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">加油记录维护</h1>
+                <div class="breadcrumb">设备管理 / 车辆管理 / 加油记录维护</div>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-label">本月加油总量</div>
+                <div class="stat-value">12,580<span class="stat-unit">升</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">本月加油金额</div>
+                <div class="stat-value">98,450<span class="stat-unit">元</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">平均单价</div>
+                <div class="stat-value">7.82<span class="stat-unit">元/升</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">加油次数</div>
+                <div class="stat-value">156<span class="stat-unit">次</span></div>
+            </div>
+        </div>
+
+        <!-- 搜索区域 -->
+        <div class="search-card">
+            <div class="search-form">
+                <div class="form-item">
+                    <label class="form-label">车牌号</label>
+                    <select class="form-select">
+                        <option value="">请选择</option>
+                        <option value="京A12345">京A12345</option>
+                        <option value="京B67890">京B67890</option>
+                        <option value="京C11111">京C11111</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label class="form-label">加油时间</label>
+                    <div class="date-range">
+                        <input type="date" class="form-input" placeholder="开始日期">
+                        <span>-</span>
+                        <input type="date" class="form-input" placeholder="结束日期">
+                    </div>
+                </div>
+                <div class="form-item">
+                    <label class="form-label">司机</label>
+                    <select class="form-select">
+                        <option value="">请选择</option>
+                        <option value="王师傅">王师傅</option>
+                        <option value="李师傅">李师傅</option>
+                        <option value="张师傅">张师傅</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label class="form-label">当前项目</label>
+                    <select class="form-select">
+                        <option value="">请选择</option>
+                        <option value="项目A">项目A-大庆油田作业</option>
+                        <option value="项目B">项目B-胜利油田作业</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label class="form-label">油号</label>
+                    <select class="form-select">
+                        <option value="">全部</option>
+                        <option value="0#">0#柴油</option>
+                        <option value="92#">92#汽油</option>
+                        <option value="95#">95#汽油</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label class="form-label">加油站</label>
+                    <input type="text" class="form-input" placeholder="请输入加油站名称">
+                </div>
+                <div class="search-buttons" style="grid-column: span 2;">
+                    <button class="btn btn-default" onclick="resetForm()">
+                        <span>重置</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="searchData()">
+                        <span>查询</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作栏 -->
+        <div class="operation-bar">
+            <div class="operation-left">
+                <button class="btn btn-primary" onclick="openModal()">
+                    <span>+ 新增加油记录</span>
+                </button>
+                <button class="btn btn-success" onclick="exportData()">
+                    <span>导出Excel</span>
+                </button>
+                <button class="btn btn-danger" onclick="batchDelete()">
+                    <span>批量删除</span>
+                </button>
+            </div>
+            <div class="operation-right">
+                <span style="font-size: 13px; color: #909399;">共 156 条记录</span>
+            </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="table-card">
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"><input type="checkbox"></th>
+                            <th>序号</th>
+                            <th>车牌号</th>
+                            <th>车辆类型</th>
+                            <th>加油时间</th>
+                            <th>加油量(升)</th>
+                            <th>单价(元)</th>
+                            <th>金额(元)</th>
+                            <th>油号</th>
+                            <th>当前里程(km)</th>
+                            <th>司机</th>
+                            <th>当前项目</th>
+                            <th>加油站</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>1</td>
+                            <td><span class="tag tag-blue">京A12345</span></td>
+                            <td>皮卡车</td>
+                            <td>2026-04-15 08:30</td>
+                            <td>45.5</td>
+                            <td>7.85</td>
+                            <td>357.18</td>
+                            <td><span class="tag tag-green">0#柴油</span></td>
+                            <td>12,580</td>
+                            <td>王师傅</td>
+                            <td>项目A-大庆油田作业</td>
+                            <td>中石油一号站</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn btn-text btn-sm" onclick="viewDetail(1)">查看</button>
+                                    <button class="btn btn-text btn-sm" onclick="editRecord(1)">编辑</button>
+                                    <button class="btn btn-text btn-sm" style="color: #f56c6c;" onclick="deleteRecord(1)">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>2</td>
+                            <td><span class="tag tag-blue">京B67890</span></td>
+                            <td>越野车</td>
+                            <td>2026-04-14 16:45</td>
+                            <td>62.3</td>
+                            <td>8.12</td>
+                            <td>505.88</td>
+                            <td><span class="tag tag-orange">95#汽油</span></td>
+                            <td>28,450</td>
+                            <td>李师傅</td>
+                            <td>项目B-胜利油田作业</td>
+                            <td>中石化二号站</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn btn-text btn-sm" onclick="viewDetail(2)">查看</button>
+                                    <button class="btn btn-text btn-sm" onclick="editRecord(2)">编辑</button>
+                                    <button class="btn btn-text btn-sm" style="color: #f56c6c;" onclick="deleteRecord(2)">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>3</td>
+                            <td><span class="tag tag-blue">京A12345</span></td>
+                            <td>皮卡车</td>
+                            <td>2026-04-13 09:15</td>
+                            <td>38.2</td>
+                            <td>7.85</td>
+                            <td>299.87</td>
+                            <td><span class="tag tag-green">0#柴油</span></td>
+                            <td>12,420</td>
+                            <td>王师傅</td>
+                            <td>项目A-大庆油田作业</td>
+                            <td>中石油一号站</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn btn-text btn-sm" onclick="viewDetail(3)">查看</button>
+                                    <button class="btn btn-text btn-sm" onclick="editRecord(3)">编辑</button>
+                                    <button class="btn btn-text btn-sm" style="color: #f56c6c;" onclick="deleteRecord(3)">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>4</td>
+                            <td><span class="tag tag-blue">京C11111</span></td>
+                            <td>载货卡车</td>
+                            <td>2026-04-12 14:20</td>
+                            <td>85.6</td>
+                            <td>7.82</td>
+                            <td>669.39</td>
+                            <td><span class="tag tag-green">0#柴油</span></td>
+                            <td>45,230</td>
+                            <td>张师傅</td>
+                            <td>项目A-大庆油田作业</td>
+                            <td>民营加油站</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn btn-text btn-sm" onclick="viewDetail(4)">查看</button>
+                                    <button class="btn btn-text btn-sm" onclick="editRecord(4)">编辑</button>
+                                    <button class="btn btn-text btn-sm" style="color: #f56c6c;" onclick="deleteRecord(4)">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>5</td>
+                            <td><span class="tag tag-blue">京B67890</span></td>
+                            <td>越野车</td>
+                            <td>2026-04-11 11:30</td>
+                            <td>55.8</td>
+                            <td>8.12</td>
+                            <td>453.10</td>
+                            <td><span class="tag tag-orange">95#汽油</span></td>
+                            <td>28,350</td>
+                            <td>李师傅</td>
+                            <td>项目B-胜利油田作业</td>
+                            <td>中石化二号站</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn btn-text btn-sm" onclick="viewDetail(5)">查看</button>
+                                    <button class="btn btn-text btn-sm" onclick="editRecord(5)">编辑</button>
+                                    <button class="btn btn-text btn-sm" style="color: #f56c6c;" onclick="deleteRecord(5)">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>6</td>
+                            <td><span class="tag tag-blue">京A12345</span></td>
+                            <td>皮卡车</td>
+                            <td>2026-04-10 07:45</td>
+                            <td>42.1</td>
+                            <td>7.88</td>
+                            <td>331.75</td>
+                            <td><span class="tag tag-green">0#柴油</span></td>
+                            <td>12,350</td>
+                            <td>王师傅</td>
+                            <td>项目A-大庆油田作业</td>
+                            <td>中石油三号站</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn btn-text btn-sm" onclick="viewDetail(6)">查看</button>
+                                    <button class="btn btn-text btn-sm" onclick="editRecord(6)">编辑</button>
+                                    <button class="btn btn-text btn-sm" style="color: #f56c6c;" onclick="deleteRecord(6)">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>7</td>
+                            <td><span class="tag tag-blue">京D22222</span></td>
+                            <td>商务车</td>
+                            <td>2026-04-09 18:20</td>
+                            <td>48.5</td>
+                            <td>8.05</td>
+                            <td>390.43</td>
+                            <td><span class="tag tag-orange">95#汽油</span></td>
+                            <td>35,680</td>
+                            <td>赵师傅</td>
+                            <td>项目C-辽河油田作业</td>
+                            <td>中石化四号站</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn btn-text btn-sm" onclick="viewDetail(7)">查看</button>
+                                    <button class="btn btn-text btn-sm" onclick="editRecord(7)">编辑</button>
+                                    <button class="btn btn-text btn-sm" style="color: #f56c6c;" onclick="deleteRecord(7)">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>8</td>
+                            <td><span class="tag tag-blue">京C11111</span></td>
+                            <td>载货卡车</td>
+                            <td>2026-04-08 13:10</td>
+                            <td>78.3</td>
+                            <td>7.80</td>
+                            <td>610.74</td>
+                            <td><span class="tag tag-green">0#柴油</span></td>
+                            <td>45,120</td>
+                            <td>张师傅</td>
+                            <td>项目A-大庆油田作业</td>
+                            <td>中石油一号站</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn btn-text btn-sm" onclick="viewDetail(8)">查看</button>
+                                    <button class="btn btn-text btn-sm" onclick="editRecord(8)">编辑</button>
+                                    <button class="btn btn-text btn-sm" style="color: #f56c6c;" onclick="deleteRecord(8)">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination">
+                <div class="page-info">显示第 1 到 8 条，共 156 条记录</div>
+                <div class="page-buttons">
+                    <button class="page-btn" disabled>&lt;</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <span style="color: #606266; padding: 0 8px;">...</span>
+                    <button class="page-btn">20</button>
+                    <button class="page-btn">&gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增/编辑弹窗 -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">新增加油记录</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="fuelForm">
+                    <!-- 车辆与加油信息 -->
+                    <div class="form-section">
+                        <div class="section-title">车辆与加油信息</div>
+                        <div class="form-grid">
+                            <div class="form-item required">
+                                <label class="form-label">车牌号</label>
+                                <select class="form-select" id="plateNumber" required>
+                                    <option value="">请选择车辆</option>
+                                    <option value="京A12345">京A12345（皮卡车）</option>
+                                    <option value="京B67890">京B67890（越野车）</option>
+                                    <option value="京C11111">京C11111（载货卡车）</option>
+                                    <option value="京D22222">京D22222（商务车）</option>
+                                </select>
+                            </div>
+                            <div class="form-item required">
+                                <label class="form-label">加油时间</label>
+                                <input type="datetime-local" class="form-input" id="fuelTime" required>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">当前里程表读数(km)</label>
+                                <input type="number" class="form-input" id="mileage" placeholder="请输入当前里程">
+                            </div>
+                            <div class="form-item required">
+                                <label class="form-label">加油量(升)</label>
+                                <input type="number" class="form-input" id="fuelAmount" step="0.01" placeholder="请输入加油量" required onchange="calculatePrice()">
+                            </div>
+                            <div class="form-item required">
+                                <label class="form-label">金额(元)</label>
+                                <input type="number" class="form-input" id="totalAmount" step="0.01" placeholder="请输入金额" required onchange="calculatePrice()">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">单价(元/升)</label>
+                                <input type="number" class="form-input" id="unitPrice" step="0.01" placeholder="自动计算" readonly style="background: #f5f7fa;">
+                            </div>
+                            <div class="form-item required">
+                                <label class="form-label">油号</label>
+                                <select class="form-select" id="fuelType" required>
+                                    <option value="">请选择</option>
+                                    <option value="0#">0#柴油</option>
+                                    <option value="92#">92#汽油</option>
+                                    <option value="95#">95#汽油</option>
+                                    <option value="98#">98#汽油</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">加油站</label>
+                                <input type="text" class="form-input" id="gasStation" placeholder="请输入加油站">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">枪号</label>
+                                <input type="text" class="form-input" id="pumpNo" placeholder="请输入枪号">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 人员与项目信息 -->
+                    <div class="form-section">
+                        <div class="section-title">人员与项目</div>
+                        <div class="form-grid">
+                            <div class="form-item required">
+                                <label class="form-label">司机</label>
+                                <select class="form-select" id="driver" required>
+                                    <option value="">请选择司机</option>
+                                    <option value="王师傅">王师傅</option>
+                                    <option value="李师傅">李师傅</option>
+                                    <option value="张师傅">张师傅</option>
+                                    <option value="赵师傅">赵师傅</option>
+                                </select>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">操作人</label>
+                                <input type="text" class="form-input" value="张工程师" readonly style="background: #f5f7fa;">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label">当前项目</label>
+                                <select class="form-select" id="project">
+                                    <option value="">请选择（可选）</option>
+                                    <option value="项目A">项目A-大庆油田作业</option>
+                                    <option value="项目B">项目B-胜利油田作业</option>
+                                    <option value="项目C">项目C-辽河油田作业</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 附件上传 -->
+                    <div class="form-section">
+                        <div class="section-title">附件上传</div>
+                        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                            <div class="upload-icon">📷</div>
+                            <div class="upload-text">点击上传加油票据照片</div>
+                            <div class="upload-hint">支持jpg、png格式，单张不超过5MB</div>
+                            <input type="file" id="fileInput" hidden accept="image/*" multiple onchange="handleFileUpload(this)">
+                        </div>
+                        <div id="fileList" style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;"></div>
+                    </div>
+
+                    <!-- 备注 -->
+                    <div class="form-section">
+                        <div class="section-title">备注说明</div>
+                        <textarea class="form-textarea" id="remark" placeholder="请输入备注信息（如：车辆异常、油品质量问题等）"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveRecord()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 打开弹窗
+        function openModal(type = 'add') {
+            document.getElementById('modal').classList.add('active');
+            document.getElementById('modalTitle').textContent = type === 'edit' ? '编辑加油记录' : '新增加油记录';
+            if (type === 'add') {
+                document.getElementById('fuelForm').reset();
+                document.getElementById('fileList').innerHTML = '';
+                document.getElementById('unitPrice').value = '';
+                // 设置默认时间为当前时间
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById('fuelTime').value = now.toISOString().slice(0, 16);
+            }
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // 计算单价（金额/加油量）
+        function calculatePrice() {
+            const amount = parseFloat(document.getElementById('fuelAmount').value) || 0;
+            const total = parseFloat(document.getElementById('totalAmount').value) || 0;
+
+            if (amount > 0 && total > 0) {
+                const price = (total / amount).toFixed(2);
+                document.getElementById('unitPrice').value = price;
+            }
+        }
+
+        // 文件上传处理
+        function handleFileUpload(input) {
+            const files = input.files;
+            const fileList = document.getElementById('fileList');
+
+            for (let file of files) {
+                const tag = document.createElement('div');
+                tag.style.cssText = 'background: #ecf5ff; color: #409eff; padding: 6px 12px; border-radius: 4px; font-size: 12px; display: flex; align-items: center; gap: 8px;';
+                tag.innerHTML = `
+                    <span>📄 ${file.name}</span>
+                    <span style="cursor: pointer; color: #f56c6c;" onclick="this.parentElement.remove()">×</span>
+                `;
+                fileList.appendChild(tag);
+            }
+        }
+
+        // 保存记录
+        function saveRecord() {
+            const form = document.getElementById('fuelForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // 模拟保存成功
+            alert('保存成功！');
+            closeModal();
+        }
+
+        // 查看详情
+        function viewDetail(id) {
+            alert('查看记录ID: ' + id);
+        }
+
+        // 编辑记录
+        function editRecord(id) {
+            openModal('edit');
+        }
+
+        // 删除记录
+        function deleteRecord(id) {
+            if (confirm('确定要删除这条加油记录吗？')) {
+                alert('删除成功！');
+            }
+        }
+
+        // 批量删除
+        function batchDelete() {
+            alert('批量删除功能');
+        }
+
+        // 导出数据
+        function exportData() {
+            alert('导出Excel功能');
+        }
+
+        // 搜索数据
+        function searchData() {
+            alert('搜索功能');
+        }
+
+        // 重置表单
+        function resetForm() {
+            document.querySelectorAll('.search-form input, .search-form select').forEach(el => {
+                el.value = '';
+            });
+        }
+
+        // 点击遮罩关闭弹窗
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
