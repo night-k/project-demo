@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 项目问题</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar-item {
+            transition: all 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .sidebar-item.active {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .risk-level-high {
+            background-color: #fff1f0;
+            color: #ff4d4f;
+            border: 1px solid #ffa39e;
+        }
+
+        .risk-level-medium {
+            background-color: #fff7e6;
+            color: #fa8c16;
+            border: 1px solid #ffd591;
+        }
+
+        .risk-level-low {
+            background-color: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .type-issue {
+            background-color: #f6ffed;
+            color: #52c41a;
+        }
+
+        .status-unsolved {
+            background-color: #fff1f0;
+            color: #ff4d4f;
+        }
+
+        .status-solved {
+            background-color: #f6ffed;
+            color: #52c41a;
+        }
+
+        .input-field {
+            transition: all 0.3s;
+            border: 1px solid #d9d9d9;
+        }
+
+        .input-field:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #40a9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24,144,255,0.4);
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #e8e8e8;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .table-container table {
+            min-width: 1300px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .upload-area {
+            border: 2px dashed #d9d9d9;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #1890ff;
+            background-color: #f0f7ff;
+        }
+
+        .upload-area.has-file {
+            border-color: #52c41a;
+            background-color: #f6ffed;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
+            </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="项目列表.html" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-home"></i> 首页
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-desktop"></i> 工作台
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-project-diagram"></i> 流程管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-cogs"></i> 产品工艺
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-shopping-cart"></i> 销售管理
+                </a>
+                <a href="项目列表.html" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600">
+                    <i class="fas fa-tasks"></i> 项目管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-industry"></i> 生产管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-warehouse"></i> 库存管理
+                </a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 text-gray-500 hover:text-blue-600 relative">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>admin-admin</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 左侧边栏 -->
+        <aside class="w-64 bg-white border-r border-gray-200 overflow-y-auto">
+            <div class="p-4">
+                <div class="mb-6">
+                    <a href="项目监控中心.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-chart-line w-5"></i>
+                        <span>项目监控中心</span>
+                    </a>
+                    <a href="项目列表.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-list-ul w-5"></i>
+                        <span>项目列表</span>
+                    </a>
+                    <a href="项目风险.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-shield-alt w-5"></i>
+                        <span>项目风险</span>
+                    </a>
+                    <a href="项目问题.html" class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-bug w-5"></i>
+                        <span>项目问题</span>
+                    </a>
+                    <a href="项目空间.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-cube w-5"></i>
+                        <span>项目空间</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
+
+            <!-- 面包屑 -->
+            <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                <span>首页</span>
+                <i class="fas fa-chevron-right text-xs"></i>
+                <span>项目管理</span>
+                <i class="fas fa-chevron-right text-xs"></i>
+                <span class="text-blue-600 font-medium">项目问题</span>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-500 text-sm">问题总数</span>
+                        <i class="fas fa-bug text-blue-500"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-800">12</div>
+                    <div class="text-xs text-gray-400 mt-1">本月新增 2</div>
+                </div>
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-500 text-sm">未解决</span>
+                        <i class="fas fa-times-circle text-red-500"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-red-600">3</div>
+                    <div class="text-xs text-red-400 mt-1">需尽快处理</div>
+                </div>
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-500 text-sm">已解决</span>
+                        <i class="fas fa-check-circle text-green-500"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-green-600">9</div>
+                    <div class="text-xs text-gray-400 mt-1">本月解决 4</div>
+                </div>
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-500 text-sm">解决率</span>
+                        <i class="fas fa-chart-line text-blue-500"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-blue-600">75%</div>
+                    <div class="text-xs text-gray-400 mt-1">较上月提升 8%</div>
+                </div>
+            </div>
+
+            <!-- 筛选区 -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-4">
+                <div class="grid grid-cols-5 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">所属项目</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>全部项目</option>
+                            <option>智能仓储系统研发</option>
+                            <option>工厂自动化改造</option>
+                            <option>cs项目-设备合同</option>
+                            <option>供应链协同平台</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">等级</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>全部等级</option>
+                            <option>高</option>
+                            <option>中</option>
+                            <option>低</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">状态</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>全部状态</option>
+                            <option>未解决</option>
+                            <option>已解决</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">登记日期</label>
+                        <input type="date" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button class="btn-primary px-6 py-2 rounded-lg text-sm flex items-center gap-2">
+                            <i class="fas fa-search"></i> 搜索
+                        </button>
+                        <button class="px-6 py-2 rounded-lg text-sm border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors">
+                            清空
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 功能按钮区 -->
+            <div class="mb-4">
+                <button onclick="showRegisterModal()" class="btn-primary px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-medium shadow-lg shadow-blue-500/30">
+                    <i class="fas fa-plus"></i> 登记问题
+                </button>
+            </div>
+
+            <!-- 问题列表 -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden fade-in">
+                <div class="table-container">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 text-gray-600">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-medium w-10"><input type="checkbox" class="rounded border-gray-300"></th>
+                                <th class="px-4 py-3 text-left font-medium w-32">编号</th>
+                                <th class="px-4 py-3 text-left font-medium w-48">标题</th>
+                                <th class="px-4 py-3 text-left font-medium w-40">所属项目</th>
+                                <th class="px-4 py-3 text-center font-medium w-16">等级</th>
+                                <th class="px-4 py-3 text-center font-medium w-20">状态</th>
+                                <th class="px-4 py-3 text-left font-medium w-24">登记人</th>
+                                <th class="px-4 py-3 text-left font-medium w-28">登记日期</th>
+                                <th class="px-4 py-3 text-left font-medium w-28">解决日期</th>
+                                <th class="px-4 py-3 text-center font-medium w-32">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="hover:bg-gray-50 transition-colors group">
+                                <td class="px-4 py-3"><input type="checkbox" class="rounded border-gray-300"></td>
+                                <td class="px-4 py-3 text-gray-600 font-mono text-xs">WT-20260414-001</td>
+                                <td class="px-4 py-3">
+                                    <div class="font-medium text-gray-900">设备到货延迟</div>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">工厂自动化改造</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="risk-level-medium px-2 py-1 rounded text-xs font-medium">中</span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="status-solved px-2 py-1 rounded text-xs font-medium">已解决</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">刘采购</td>
+                                <td class="px-4 py-3 text-gray-600">2026-04-14</td>
+                                <td class="px-4 py-3 text-green-600">2026-04-16</td>
+                                <td class="px-4 py-3 text-center">
+                                    <button onclick="showDetailModal('WT-20260414-001')" class="text-blue-600 hover:text-blue-800 mx-1" title="查看"><i class="fas fa-eye"></i></button>
+                                    <button class="text-blue-600 hover:text-blue-800 mx-1" title="编辑"><i class="fas fa-edit"></i></button>
+                                    <button onclick="toggleSolveStatus(this)" class="text-orange-600 hover:text-orange-800 mx-1" title="标记未解决"><i class="fas fa-undo"></i></button>
+                                </td>
+                            </tr>
+
+                            <tr class="hover:bg-gray-50 transition-colors group">
+                                <td class="px-4 py-3"><input type="checkbox" class="rounded border-gray-300"></td>
+                                <td class="px-4 py-3 text-gray-600 font-mono text-xs">WT-20260405-002</td>
+                                <td class="px-4 py-3">
+                                    <div class="font-medium text-gray-900">测试环境不稳定</div>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">智能仓储系统研发</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="risk-level-low px-2 py-1 rounded text-xs font-medium">低</span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="status-unsolved px-2 py-1 rounded text-xs font-medium">未解决</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">陈运维</td>
+                                <td class="px-4 py-3 text-gray-600">2026-04-05</td>
+                                <td class="px-4 py-3 text-gray-400">--</td>
+                                <td class="px-4 py-3 text-center">
+                                    <button onclick="showDetailModal('WT-20260405-002')" class="text-blue-600 hover:text-blue-800 mx-1" title="查看"><i class="fas fa-eye"></i></button>
+                                    <button class="text-blue-600 hover:text-blue-800 mx-1" title="编辑"><i class="fas fa-edit"></i></button>
+                                    <button onclick="toggleSolveStatus(this)" class="text-green-600 hover:text-green-800 mx-1" title="标记已解决"><i class="fas fa-check-circle"></i></button>
+                                </td>
+                            </tr>
+
+                            <tr class="hover:bg-gray-50 transition-colors group">
+                                <td class="px-4 py-3"><input type="checkbox" class="rounded border-gray-300"></td>
+                                <td class="px-4 py-3 text-gray-600 font-mono text-xs">WT-20260403-003</td>
+                                <td class="px-4 py-3">
+                                    <div class="font-medium text-gray-900">数据库连接超时</div>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">供应链协同平台</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="risk-level-high px-2 py-1 rounded text-xs font-medium">高</span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="status-solved px-2 py-1 rounded text-xs font-medium">已解决</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">李开发</td>
+                                <td class="px-4 py-3 text-gray-600">2026-04-03</td>
+                                <td class="px-4 py-3 text-green-600">2026-04-05</td>
+                                <td class="px-4 py-3 text-center">
+                                    <button onclick="showDetailModal('WT-20260403-003')" class="text-blue-600 hover:text-blue-800 mx-1" title="查看"><i class="fas fa-eye"></i></button>
+                                    <button class="text-blue-600 hover:text-blue-800 mx-1" title="编辑"><i class="fas fa-edit"></i></button>
+                                    <button onclick="toggleSolveStatus(this)" class="text-orange-600 hover:text-orange-800 mx-1" title="标记未解决"><i class="fas fa-undo"></i></button>
+                                </td>
+                            </tr>
+
+                            <tr class="hover:bg-gray-50 transition-colors group">
+                                <td class="px-4 py-3"><input type="checkbox" class="rounded border-gray-300"></td>
+                                <td class="px-4 py-3 text-gray-600 font-mono text-xs">WT-20260401-004</td>
+                                <td class="px-4 py-3">
+                                    <div class="font-medium text-gray-900">接口文档不完整</div>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">智能仓储系统研发</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="risk-level-medium px-2 py-1 rounded text-xs font-medium">中</span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="status-unsolved px-2 py-1 rounded text-xs font-medium">未解决</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">王测试</td>
+                                <td class="px-4 py-3 text-gray-600">2026-04-01</td>
+                                <td class="px-4 py-3 text-gray-400">--</td>
+                                <td class="px-4 py-3 text-center">
+                                    <button onclick="showDetailModal('WT-20260401-004')" class="text-blue-600 hover:text-blue-800 mx-1" title="查看"><i class="fas fa-eye"></i></button>
+                                    <button class="text-blue-600 hover:text-blue-800 mx-1" title="编辑"><i class="fas fa-edit"></i></button>
+                                    <button onclick="toggleSolveStatus(this)" class="text-green-600 hover:text-green-800 mx-1" title="标记已解决"><i class="fas fa-check-circle"></i></button>
+                                </td>
+                            </tr>
+
+                            <tr class="hover:bg-gray-50 transition-colors group">
+                                <td class="px-4 py-3"><input type="checkbox" class="rounded border-gray-300"></td>
+                                <td class="px-4 py-3 text-gray-600 font-mono text-xs">WT-20260328-005</td>
+                                <td class="px-4 py-3">
+                                    <div class="font-medium text-gray-900">权限配置错误</div>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">工厂自动化改造</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="risk-level-low px-2 py-1 rounded text-xs font-medium">低</span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="status-solved px-2 py-1 rounded text-xs font-medium">已解决</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-700">张运维</td>
+                                <td class="px-4 py-3 text-gray-600">2026-03-28</td>
+                                <td class="px-4 py-3 text-green-600">2026-03-29</td>
+                                <td class="px-4 py-3 text-center">
+                                    <button onclick="showDetailModal('WT-20260328-005')" class="text-blue-600 hover:text-blue-800 mx-1" title="查看"><i class="fas fa-eye"></i></button>
+                                    <button class="text-blue-600 hover:text-blue-800 mx-1" title="编辑"><i class="fas fa-edit"></i></button>
+                                    <button onclick="toggleSolveStatus(this)" class="text-orange-600 hover:text-orange-800 mx-1" title="标记未解决"><i class="fas fa-undo"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 分页 -->
+                <div class="flex items-center justify-end gap-4 bg-white px-4 py-3 border-t border-gray-100">
+                    <span class="text-sm text-gray-600">共 12 条</span>
+                    <select class="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:border-blue-500">
+                        <option>10条/页</option>
+                        <option>20条/页</option>
+                        <option>50条/页</option>
+                    </select>
+                    <div class="flex items-center gap-1">
+                        <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-300 text-gray-500 hover:border-blue-500 hover:text-blue-600 disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded bg-blue-600 text-white text-sm">1</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-300 text-gray-500 hover:border-blue-500 hover:text-blue-600">2</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-300 text-gray-500 hover:border-blue-500 hover:text-blue-600">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                        <span>前往</span>
+                        <input type="text" value="1" class="w-12 px-2 py-1 border border-gray-300 rounded text-center focus:outline-none focus:border-blue-500">
+                        <span>页</span>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- 登记弹窗 -->
+    <div id="registerModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeRegisterModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800">
+                        <i class="fas fa-plus-circle text-green-600 mr-2"></i>登记问题
+                    </h3>
+                    <button onclick="closeRegisterModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <!-- 所属项目和等级 -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <span class="text-red-500 mr-1">*</span>所属项目
+                            </label>
+                            <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                                <option>请选择项目</option>
+                                <option>智能仓储系统研发</option>
+                                <option>工厂自动化改造</option>
+                                <option>cs项目-设备合同</option>
+                                <option>供应链协同平台</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <span class="text-red-500 mr-1">*</span>等级
+                            </label>
+                            <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                                <option>高</option>
+                                <option selected>中</option>
+                                <option>低</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 状态和解决时间 -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <span class="text-red-500 mr-1">*</span>状态
+                            </label>
+                            <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white" id="statusSelect" onchange="toggleSolutionField()">
+                                <option selected>未解决</option>
+                                <option>已解决</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                解决日期 <span class="text-gray-400 font-normal text-xs">（已解决时填写）</span>
+                            </label>
+                            <input type="date" class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white" id="solveDateField" disabled>
+                        </div>
+                    </div>
+
+                    <!-- 标题 -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="text-red-500 mr-1">*</span>标题
+                        </label>
+                        <input type="text" placeholder="请输入问题标题" class="input-field w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+
+                    <!-- 描述 -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">详细描述</label>
+                        <textarea rows="3" placeholder="请详细描述问题的具体情况、影响范围等" class="input-field w-full px-3 py-2 rounded-lg text-sm resize-none"></textarea>
+                    </div>
+
+                    <!-- 解决方案（已解决时显示） -->
+                    <div class="mb-4" id="solutionField" style="display: none;">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="text-red-500 mr-1">*</span>解决方案
+                        </label>
+                        <textarea rows="2" placeholder="请描述解决方案" class="input-field w-full px-3 py-2 rounded-lg text-sm resize-none"></textarea>
+                    </div>
+
+                    <!-- 附件上传 -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            相关附件 <span class="text-gray-400 font-normal text-xs">（选填）</span>
+                        </label>
+                        <div class="upload-area" onclick="document.getElementById('fileInput').click()" id="uploadArea">
+                            <input type="file" id="fileInput" class="hidden" multiple onchange="handleFileSelect(this)">
+                            <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2" id="uploadIcon"></i>
+                            <p class="text-sm text-gray-500" id="uploadText">点击上传或拖拽文件到此处</p>
+                            <p class="text-xs text-gray-400 mt-1">支持图片、文档、压缩包等格式，单个文件不超过50MB</p>
+                        </div>
+                        <div id="fileList" class="mt-2 space-y-1"></div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
+                    <button onclick="closeRegisterModal()" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
+                        取消
+                    </button>
+                    <button onclick="saveRegister()" class="btn-primary px-6 py-2 rounded-lg">
+                        <i class="fas fa-save mr-2"></i>保存
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情弹窗 -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0" onclick="closeDetailModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-lg font-bold text-gray-800">问题详情</h3>
+                        <span class="type-issue px-2 py-1 rounded text-xs font-medium">问题</span>
+                        <span class="status-solved px-2 py-1 rounded text-xs font-medium" id="detailStatus">已解决</span>
+                    </div>
+                    <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <!-- 基本信息 -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div><span class="text-gray-500">编号：</span><span class="font-mono">WT-20260414-001</span></div>
+                            <div><span class="text-gray-500">所属项目：</span><span>工厂自动化改造</span></div>
+                            <div><span class="text-gray-500">等级：</span><span class="risk-level-medium px-2 py-0.5 rounded text-xs">中</span></div>
+                            <div><span class="text-gray-500">登记日期：</span><span>2026-04-14</span></div>
+                            <div><span class="text-gray-500">解决日期：</span><span class="text-green-600">2026-04-16</span></div>
+                            <div><span class="text-gray-500">登记人：</span><span>刘采购</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 标题 -->
+                    <div class="mb-4">
+                        <h4 class="font-bold text-gray-800 mb-2 text-lg">设备到货延迟</h4>
+                    </div>
+
+                    <!-- 描述 -->
+                    <div class="mb-4">
+                        <h5 class="font-medium text-gray-700 mb-2">详细描述</h5>
+                        <div class="bg-gray-50 rounded-lg p-3 text-sm text-gray-600 leading-relaxed">
+                            订购的自动化设备因供应商生产排期问题，预计到货时间延迟5个工作日，影响现场安装调试进度。已与供应商沟通确认新的交货日期。
+                        </div>
+                    </div>
+
+                    <!-- 解决方案 -->
+                    <div class="mb-4">
+                        <h5 class="font-medium text-gray-700 mb-2">解决方案</h5>
+                        <div class="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
+                            与供应商协商加急生产，同时调整现场施工计划，先进行其他区域的安装工作。设备到货后立即安排人员加班完成安装调试。
+                        </div>
+                    </div>
+
+                    <!-- 附件 -->
+                    <div class="mb-4">
+                        <h5 class="font-medium text-gray-700 mb-2">相关附件</h5>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                                <i class="fas fa-file-alt text-blue-500"></i>
+                                <span class="text-sm text-gray-700 flex-1">供应商延期说明.docx</span>
+                                <button class="text-blue-600 text-sm hover:underline">下载</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 px-6 py-4 border-t border-gray-200 bg-gray-50">
+                    <button class="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg text-sm hover:bg-blue-200 transition-colors">
+                        <i class="fas fa-edit mr-1"></i>编辑
+                    </button>
+                    <button onclick="toggleSolveFromDetail()" class="px-4 py-2 bg-orange-100 text-orange-600 rounded-lg text-sm hover:bg-orange-200 transition-colors" id="detailSolveBtn">
+                        <i class="fas fa-undo mr-1"></i>标记未解决
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 切换解决方案字段显示
+        function toggleSolutionField() {
+            const status = document.getElementById('statusSelect').value;
+            const solutionField = document.getElementById('solutionField');
+            const solveDateField = document.getElementById('solveDateField');
+
+            if (status === '已解决') {
+                solutionField.style.display = 'block';
+                solveDateField.disabled = false;
+            } else {
+                solutionField.style.display = 'none';
+                solveDateField.disabled = true;
+                solveDateField.value = '';
+            }
+        }
+
+        // 文件选择处理
+        function handleFileSelect(input) {
+            const fileList = document.getElementById('fileList');
+            const uploadArea = document.getElementById('uploadArea');
+            const uploadIcon = document.getElementById('uploadIcon');
+            const uploadText = document.getElementById('uploadText');
+
+            fileList.innerHTML = '';
+
+            if (input.files.length > 0) {
+                uploadArea.classList.add('has-file');
+                uploadIcon.classList.remove('text-gray-400');
+                uploadIcon.classList.add('text-green-500');
+                uploadText.textContent = `已选择 ${input.files.length} 个文件`;
+
+                Array.from(input.files).forEach(file => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'flex items-center gap-2 p-2 bg-green-50 rounded-lg text-sm';
+                    fileItem.innerHTML = `
+                        <i class="fas fa-file text-green-600"></i>
+                        <span class="flex-1 text-gray-700">${file.name}</span>
+                        <span class="text-gray-400">${(file.size / 1024).toFixed(1)} KB</span>
+                    `;
+                    fileList.appendChild(fileItem);
+                });
+            } else {
+                uploadArea.classList.remove('has-file');
+                uploadIcon.classList.add('text-gray-400');
+                uploadIcon.classList.remove('text-green-500');
+                uploadText.textContent = '点击上传或拖拽文件到此处';
+            }
+        }
+
+        // 打开登记弹窗
+        function showRegisterModal() {
+            document.getElementById('registerModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('statusSelect').value = '未解决';
+            toggleSolutionField();
+        }
+
+        // 关闭登记弹窗
+        function closeRegisterModal() {
+            document.getElementById('registerModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // 保存登记
+        function saveRegister() {
+            alert('问题登记成功！');
+            closeRegisterModal();
+        }
+
+        // 打开详情弹窗
+        function showDetailModal(code) {
+            document.getElementById('detailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭详情弹窗
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // 切换解决状态
+        function toggleSolveStatus(btn) {
+            const row = btn.closest('tr');
+            const statusCell = row.querySelector('td:nth-child(6) span');
+            const solveDateCell = row.querySelector('td:nth-child(9)');
+
+            if (statusCell.classList.contains('status-unsolved')) {
+                if (confirm('确定标记为已解决？')) {
+                    statusCell.classList.remove('status-unsolved');
+                    statusCell.classList.add('status-solved');
+                    statusCell.textContent = '已解决';
+                    solveDateCell.textContent = new Date().toISOString().split('T')[0];
+                    solveDateCell.classList.add('text-green-600');
+                    btn.innerHTML = '<i class="fas fa-undo"></i>';
+                    btn.title = '标记未解决';
+                    btn.classList.remove('text-green-600', 'hover:text-green-800');
+                    btn.classList.add('text-orange-600', 'hover:text-orange-800');
+                }
+            } else {
+                if (confirm('确定标记为未解决？')) {
+                    statusCell.classList.remove('status-solved');
+                    statusCell.classList.add('status-unsolved');
+                    statusCell.textContent = '未解决';
+                    solveDateCell.textContent = '--';
+                    solveDateCell.classList.remove('text-green-600');
+                    btn.innerHTML = '<i class="fas fa-check-circle"></i>';
+                    btn.title = '标记已解决';
+                    btn.classList.remove('text-orange-600', 'hover:text-orange-800');
+                    btn.classList.add('text-green-600', 'hover:text-green-800');
+                }
+            }
+        }
+
+        // 从详情页标记解决
+        function toggleSolveFromDetail() {
+            const statusSpan = document.getElementById('detailStatus');
+            const btn = document.getElementById('detailSolveBtn');
+
+            if (statusSpan.classList.contains('status-unsolved')) {
+                if (confirm('确定标记为已解决？')) {
+                    statusSpan.classList.remove('status-unsolved');
+                    statusSpan.classList.add('status-solved');
+                    statusSpan.textContent = '已解决';
+                    btn.innerHTML = '<i class="fas fa-undo mr-1"></i>标记未解决';
+                    btn.classList.remove('bg-green-100', 'text-green-600', 'hover:bg-green-200');
+                    btn.classList.add('bg-orange-100', 'text-orange-600', 'hover:bg-orange-200');
+                }
+            } else {
+                if (confirm('确定标记为未解决？')) {
+                    statusSpan.classList.remove('status-solved');
+                    statusSpan.classList.add('status-unsolved');
+                    statusSpan.textContent = '未解决';
+                    btn.innerHTML = '<i class="fas fa-check mr-1"></i>标记已解决';
+                    btn.classList.remove('bg-orange-100', 'text-orange-600', 'hover:bg-orange-200');
+                    btn.classList.add('bg-green-100', 'text-green-600', 'hover:bg-green-200');
+                }
+            }
+        }
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeRegisterModal();
+                closeDetailModal();
+            }
+        });
+    </script>
+</body>
+</html>

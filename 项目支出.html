@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 项目支出管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar-item {
+            transition: all 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .sidebar-item.active {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .input-field {
+            transition: all 0.3s;
+            border: 1px solid #d9d9d9;
+        }
+
+        .input-field:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #40a9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24,144,255,0.4);
+        }
+
+        .table-row {
+            transition: background-color 0.2s;
+        }
+
+        .table-row:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* 弹窗样式 */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tag-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .required::after {
+            content: '*';
+            color: #ff4d4f;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <!-- 顶部导航 -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
+            </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-home"></i> 首页
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-desktop"></i> 工作台
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-project-diagram"></i> 流程管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-cogs"></i> 产品工艺
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-shopping-cart"></i> 销售管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600">
+                    <i class="fas fa-tasks"></i> 项目管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-industry"></i> 生产管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-warehouse"></i> 库存管理
+                </a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 text-gray-500 hover:text-blue-600 relative">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>admin-admin</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 左侧菜单 -->
+        <aside class="w-64 bg-white border-r border-gray-200 overflow-y-auto">
+            <div class="p-4">
+                <div class="mb-6">
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-cube w-5"></i>
+                        <span>项目空间</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-chart-line w-5"></i>
+                        <span>项目列表</span>
+                    </div>
+                    <div class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-wallet w-5"></i>
+                        <span>项目支出</span>
+                    </div>
+                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-exclamation-triangle w-5"></i>
+                        <span>风险与问题</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
+
+            <!-- 面包屑 -->
+            <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+                <span class="cursor-pointer hover:text-blue-600">首页</span>
+                <i class="fas fa-chevron-right text-xs"></i>
+                <span class="cursor-pointer hover:text-blue-600">项目管理</span>
+                <i class="fas fa-chevron-right text-xs"></i>
+                <span class="text-blue-600 font-medium">项目支出</span>
+            </div>
+
+            <!-- 查询条件 -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-4">
+                <div class="space-y-4">
+                    <!-- 第一行：所属项目、费用类型 -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center gap-3">
+                            <label class="block text-sm font-medium text-gray-700 w-24 flex-shrink-0">所属项目</label>
+                            <select id="searchProject" class="input-field flex-1 px-3 py-2 rounded-lg text-sm bg-white">
+                                <option value="">全部项目</option>
+                                <option value="1">cs 项目 - 设备合同 (XM-20260331-3)</option>
+                                <option value="2">智能仓储系统研发 (XM-20260126-3)</option>
+                                <option value="3">工厂自动化改造 (XM-20260215-1)</option>
+                                <option value="4">供应链协同平台 (XM-20260310-2)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="block text-sm font-medium text-gray-700 w-24 flex-shrink-0">费用类型</label>
+                            <select id="searchType" class="input-field flex-1 px-3 py-2 rounded-lg text-sm bg-white">
+                                <option value="">全部类型</option>
+                                <option value="差旅费">差旅费</option>
+                                <option value="运输费">运输费</option>
+                                <option value="材料费">材料费</option>
+                                <option value="人工费">人工费</option>
+                                <option value="设备费">设备费</option>
+                                <option value="管理费">管理费</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- 第二行：发生日期、经办人 -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center gap-3">
+                            <label class="block text-sm font-medium text-gray-700 w-24 flex-shrink-0">发生日期</label>
+                            <div class="flex items-center gap-2 flex-1">
+                                <input type="date" id="searchDateStart" class="input-field flex-1 px-3 py-2 rounded-lg text-sm">
+                                <span class="text-gray-400">-</span>
+                                <input type="date" id="searchDateEnd" class="input-field flex-1 px-3 py-2 rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="block text-sm font-medium text-gray-700 w-24 flex-shrink-0">经办人</label>
+                            <select id="searchOperator" class="input-field flex-1 px-3 py-2 rounded-lg text-sm bg-white">
+                                <option value="">全部人员</option>
+                                <option value="伍红卫">伍红卫</option>
+                                <option value="李工程师">李工程师</option>
+                                <option value="王师傅">王师傅</option>
+                                <option value="陈质检">陈质检</option>
+                                <option value="刘助理">刘助理</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- 第三行：搜索按钮 -->
+                    <div class="flex items-center gap-3 pt-2">
+                        <label class="block text-sm font-medium text-gray-700 w-24 flex-shrink-0"></label>
+                        <button onclick="searchData()" class="btn-primary px-6 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                            <i class="fas fa-search"></i>搜索
+                        </button>
+                        <button onclick="resetSearch()" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:border-gray-400 hover:text-gray-800 transition-colors">
+                            清空
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 列表区域 -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+                <!-- 列表操作按钮 -->
+                <div class="px-4 py-3 border-b border-gray-200">
+                    <button onclick="openModal()" class="btn-primary px-5 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                        <i class="fas fa-plus"></i>新增支出
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 text-gray-600 font-medium border-b border-gray-200">
+                            <tr>
+                                <th class="px-4 py-3 text-left w-12">
+                                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                </th>
+                                <th class="px-4 py-3 text-left">审批流程号</th>
+                                <th class="px-4 py-3 text-left">所属项目</th>
+                                <th class="px-4 py-3 text-left">费用名称</th>
+                                <th class="px-4 py-3 text-left">费用类型</th>
+                                <th class="px-4 py-3 text-left">发生日期</th>
+                                <th class="px-4 py-3 text-right">金额</th>
+                                <th class="px-4 py-3 text-left">付款方式</th>
+                                <th class="px-4 py-3 text-left">经办人</th>
+                                <th class="px-4 py-3 text-center">附件</th>
+                                <th class="px-4 py-3 text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenseList" class="divide-y divide-gray-100">
+                            <tr class="table-row">
+                                <td class="px-4 py-3">
+                                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-3 text-gray-600 font-mono text-xs">AP-20260315-001</td>
+                                <td class="px-4 py-3 text-gray-800">
+                                    <div class="font-medium">cs项目-设备合同</div>
+                                    <div class="text-xs text-gray-500 font-mono">XM-20260331-3</div>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-800">差旅费-广州往返</td>
+                                <td class="px-4 py-3">
+                                    <span class="tag-status bg-blue-50 text-blue-600 border border-blue-100">差旅费</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-600">2026-03-15</td>
+                                <td class="px-4 py-3 text-right font-medium text-red-600">¥5,000.00</td>
+                                <td class="px-4 py-3 text-gray-600">银行转账</td>
+                                <td class="px-4 py-3 text-gray-600">伍红卫</td>
+                                <td class="px-4 py-3 text-center">
+                                    <i class="fas fa-paperclip text-blue-500 cursor-pointer" title="查看附件"></i>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button onclick="editExpense(1)" class="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteExpense(1)" class="p-1 text-red-600 hover:bg-red-50 rounded transition-colors" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="px-4 py-3">
+                                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-3 text-gray-600 font-mono text-xs">AP-20260320-002</td>
+                                <td class="px-4 py-3 text-gray-800">
+                                    <div class="font-medium">cs项目-设备合同</div>
+                                    <div class="text-xs text-gray-500 font-mono">XM-20260331-3</div>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-800">设备运输费</td>
+                                <td class="px-4 py-3">
+                                    <span class="tag-status bg-orange-50 text-orange-600 border border-orange-100">运输费</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-600">2026-03-20</td>
+                                <td class="px-4 py-3 text-right font-medium text-red-600">¥3,000.00</td>
+                                <td class="px-4 py-3 text-gray-600">现金</td>
+                                <td class="px-4 py-3 text-gray-600">李工程师</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="text-gray-300">-</span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button onclick="editExpense(2)" class="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteExpense(2)" class="p-1 text-red-600 hover:bg-red-50 rounded transition-colors" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="px-4 py-3">
+                                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-3 text-gray-600 font-mono text-xs">AP-20260328-005</td>
+                                <td class="px-4 py-3 text-gray-800">
+                                    <div class="font-medium">智能仓储系统研发</div>
+                                    <div class="text-xs text-gray-500 font-mono">XM-20260126-3</div>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-800">培训材料印制</td>
+                                <td class="px-4 py-3">
+                                    <span class="tag-status bg-purple-50 text-purple-600 border border-purple-100">材料费</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-600">2026-03-28</td>
+                                <td class="px-4 py-3 text-right font-medium text-red-600">¥800.00</td>
+                                <td class="px-4 py-3 text-gray-600">支付宝</td>
+                                <td class="px-4 py-3 text-gray-600">刘助理</td>
+                                <td class="px-4 py-3 text-center">
+                                    <i class="fas fa-paperclip text-blue-500 cursor-pointer" title="查看附件"></i>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button onclick="editExpense(3)" class="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteExpense(3)" class="p-1 text-red-600 hover:bg-red-50 rounded transition-colors" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="px-4 py-3">
+                                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-3 text-gray-600 font-mono text-xs">AP-20260325-003</td>
+                                <td class="px-4 py-3 text-gray-800">
+                                    <div class="font-medium">工厂自动化改造</div>
+                                    <div class="text-xs text-gray-500 font-mono">XM-20260215-1</div>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-800">现场餐饮补贴</td>
+                                <td class="px-4 py-3">
+                                    <span class="tag-status bg-green-50 text-green-600 border border-green-100">管理费</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-600">2026-03-25</td>
+                                <td class="px-4 py-3 text-right font-medium text-red-600">¥1,200.00</td>
+                                <td class="px-4 py-3 text-gray-600">微信</td>
+                                <td class="px-4 py-3 text-gray-600">王师傅</td>
+                                <td class="px-4 py-3 text-center">
+                                    <span class="text-gray-300">-</span>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button onclick="editExpense(4)" class="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteExpense(4)" class="p-1 text-red-600 hover:bg-red-50 rounded transition-colors" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="table-row">
+                                <td class="px-4 py-3">
+                                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                </td>
+                                <td class="px-4 py-3 text-gray-600 font-mono text-xs">AP-20260401-012</td>
+                                <td class="px-4 py-3 text-gray-800">
+                                    <div class="font-medium">供应链协同平台</div>
+                                    <div class="text-xs text-gray-500 font-mono">XM-20260310-2</div>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-800">第三方检测费</td>
+                                <td class="px-4 py-3">
+                                    <span class="tag-status bg-red-50 text-red-600 border border-red-100">其他</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-600">2026-04-01</td>
+                                <td class="px-4 py-3 text-right font-medium text-red-600">¥5,000.00</td>
+                                <td class="px-4 py-3 text-gray-600">银行转账</td>
+                                <td class="px-4 py-3 text-gray-600">陈质检</td>
+                                <td class="px-4 py-3 text-center">
+                                    <i class="fas fa-paperclip text-blue-500 cursor-pointer" title="查看附件"></i>
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button onclick="editExpense(5)" class="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors" title="编辑">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteExpense(5)" class="p-1 text-red-600 hover:bg-red-50 rounded transition-colors" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 分页 -->
+                <div class="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+                    <div class="text-sm text-gray-500">
+                        共 <span class="font-medium text-gray-800">32</span> 条
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <select class="px-2 py-1 border border-gray-300 rounded text-sm mr-2">
+                            <option>10条/页</option>
+                            <option>20条/页</option>
+                            <option>50条/页</option>
+                        </select>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:border-blue-500 hover:text-blue-600 disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="px-3 py-1 bg-blue-600 text-white rounded text-sm">1</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:border-blue-500 hover:text-blue-600">2</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:border-blue-500 hover:text-blue-600">3</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:border-blue-500 hover:text-blue-600">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <span class="text-sm text-gray-600 ml-2">前往</span>
+                        <input type="number" value="1" class="w-12 px-2 py-1 border border-gray-300 rounded text-sm text-center">
+                        <span class="text-sm text-gray-600">页</span>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- 弹窗（新增/编辑） -->
+    <div id="modalOverlay" class="fixed inset-0 modal-overlay z-40 hidden flex items-center justify-center" onclick="closeModal()">
+        <div class="modal-content bg-white rounded-xl shadow-2xl w-[600px] max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+            <!-- 弹窗头部 -->
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10 rounded-t-xl">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800" id="modalTitle">新增支出</h3>
+                    <p class="text-sm text-gray-500 mt-1">录入项目支出明细</p>
+                </div>
+                <button onclick="closeModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <!-- 弹窗内容 -->
+            <div class="p-6">
+                <form id="expenseForm" class="space-y-5">
+                    <input type="hidden" id="expenseId">
+
+                    <!-- 项目选择 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 required">所属项目</label>
+                        <select id="projectId" class="input-field w-full px-3 py-2.5 rounded-lg text-sm bg-white" required>
+                            <option value="">请选择项目</option>
+                            <option value="1">cs项目-设备合同 (XM-20260331-3)</option>
+                            <option value="2">智能仓储系统研发 (XM-20260126-3)</option>
+                            <option value="3">工厂自动化改造 (XM-20260215-1)</option>
+                            <option value="4">供应链协同平台 (XM-20260310-2)</option>
+                        </select>
+                        <p class="text-xs text-gray-400 mt-1">选择支出所属的项目</p>
+                    </div>
+
+                    <!-- 费用名称 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 required">费用名称</label>
+                        <input type="text" id="expenseName" placeholder="请输入费用名称，如：差旅费-广州往返" class="input-field w-full px-3 py-2.5 rounded-lg text-sm" required>
+                        <p class="text-xs text-gray-400 mt-1">建议格式：费用类型-用途简述</p>
+                    </div>
+
+                    <!-- 费用类型 & 发生日期 -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">费用类型</label>
+                            <select id="expenseType" class="input-field w-full px-3 py-2.5 rounded-lg text-sm bg-white">
+                                <option value="差旅费">差旅费</option>
+                                <option value="运输费">运输费</option>
+                                <option value="材料费">材料费</option>
+                                <option value="人工费">人工费</option>
+                                <option value="设备费">设备费</option>
+                                <option value="管理费">管理费</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 required">发生日期</label>
+                            <input type="date" id="expenseDate" class="input-field w-full px-3 py-2.5 rounded-lg text-sm" required>
+                        </div>
+                    </div>
+
+                    <!-- 金额 & 付款方式 -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">金额（元）</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-gray-500 text-sm">¥</span>
+                                <input type="number" id="expenseAmount" placeholder="0.00" step="0.01" min="0" class="input-field w-full pl-8 pr-3 py-2.5 rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">付款方式</label>
+                            <select id="paymentMethod" class="input-field w-full px-3 py-2.5 rounded-lg text-sm bg-white">
+                                <option value="银行转账">银行转账</option>
+                                <option value="现金">现金</option>
+                                <option value="支付宝">支付宝</option>
+                                <option value="微信">微信</option>
+                                <option value="票据">票据</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 经办人 & 发票号 -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">经办人</label>
+                            <select id="operator" class="input-field w-full px-3 py-2.5 rounded-lg text-sm bg-white">
+                                <option value="">请选择经办人</option>
+                                <option value="伍红卫">伍红卫</option>
+                                <option value="李工程师">李工程师</option>
+                                <option value="王师傅">王师傅</option>
+                                <option value="陈质检">陈质检</option>
+                                <option value="刘助理">刘助理</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">发票号</label>
+                            <input type="text" id="invoiceNo" placeholder="选填" class="input-field w-full px-3 py-2.5 rounded-lg text-sm">
+                        </div>
+                    </div>
+
+                    <!-- 备注 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">备注说明</label>
+                        <textarea id="remark" rows="3" placeholder="填写费用详细说明、用途等信息..." class="input-field w-full px-3 py-2.5 rounded-lg text-sm resize-none"></textarea>
+                    </div>
+
+                    <!-- 附件上传 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">附件上传</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-sm text-gray-600">点击上传发票、收据等凭证</p>
+                            <p class="text-xs text-gray-400 mt-1">支持 PDF、JPG、PNG，单个文件不超过 10MB</p>
+                            <input type="file" id="fileInput" class="hidden" accept=".pdf,.jpg,.jpeg,.png" multiple>
+                        </div>
+                        <div id="fileList" class="mt-3 space-y-2"></div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 弹窗底部按钮 -->
+            <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex items-center justify-end gap-3 rounded-b-xl">
+                <button onclick="closeModal()" class="px-5 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:border-gray-400 hover:text-gray-800 transition-colors">
+                    取消
+                </button>
+                <button onclick="saveExpense()" class="btn-primary px-5 py-2 rounded-lg text-sm font-medium">
+                    <i class="fas fa-save mr-1"></i>保存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEditId = null;
+        let uploadedFiles = [];
+
+        // 打开弹窗（新增）
+        function openModal() {
+            currentEditId = null;
+            document.getElementById('modalTitle').textContent = '新增支出';
+            document.getElementById('expenseForm').reset();
+            document.getElementById('fileList').innerHTML = '';
+            uploadedFiles = [];
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+
+            document.getElementById('modalOverlay').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 编辑支出
+        function editExpense(id) {
+            currentEditId = id;
+            document.getElementById('modalTitle').textContent = '编辑支出';
+
+            // 模拟填充数据
+            const mockData = {
+                1: { projectId: '1', name: '差旅费-广州往返', type: '差旅费', date: '2026-03-15', amount: '5000', method: '银行转账', operator: '伍红卫', invoice: 'INV-20260315-001', remark: '现场安装调试往返交通住宿' },
+                2: { projectId: '1', name: '设备运输费', type: '运输费', date: '2026-03-20', amount: '3000', method: '现金', operator: '李工程师', invoice: '', remark: '设备发货至客户现场运费' },
+                3: { projectId: '2', name: '培训材料印制', type: '材料费', date: '2026-03-28', amount: '800', method: '支付宝', operator: '刘助理', invoice: 'INV-20260328-005', remark: '操作手册、培训资料印制' },
+                4: { projectId: '3', name: '现场餐饮补贴', type: '管理费', date: '2026-03-25', amount: '1200', method: '微信', operator: '王师傅', invoice: '', remark: '现场实施人员工作餐补贴' },
+                5: { projectId: '4', name: '第三方检测费', type: '其他', date: '2026-04-01', amount: '5000', method: '银行转账', operator: '陈质检', invoice: 'INV-20260401-012', remark: '设备性能第三方检测认证' }
+            };
+
+            const data = mockData[id];
+            if (data) {
+                document.getElementById('projectId').value = data.projectId;
+                document.getElementById('expenseName').value = data.name;
+                document.getElementById('expenseType').value = data.type;
+                document.getElementById('expenseDate').value = data.date;
+                document.getElementById('expenseAmount').value = data.amount;
+                document.getElementById('paymentMethod').value = data.method;
+                document.getElementById('operator').value = data.operator;
+                document.getElementById('invoiceNo').value = data.invoice;
+                document.getElementById('remark').value = data.remark;
+            }
+
+            document.getElementById('modalOverlay').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // 保存支出
+        function saveExpense() {
+            const projectId = document.getElementById('projectId').value;
+            const name = document.getElementById('expenseName').value.trim();
+            const date = document.getElementById('expenseDate').value;
+
+            if (!projectId) {
+                alert('请选择所属项目');
+                document.getElementById('projectId').focus();
+                return;
+            }
+            if (!name) {
+                alert('请填写费用名称');
+                document.getElementById('expenseName').focus();
+                return;
+            }
+            if (!date) {
+                alert('请选择发生日期');
+                document.getElementById('expenseDate').focus();
+                return;
+            }
+
+            if (currentEditId) {
+                alert('支出记录已更新！');
+            } else {
+                alert('支出记录已保存！');
+            }
+            closeModal();
+        }
+
+        // 删除支出
+        function deleteExpense(id) {
+            if (confirm('确定要删除这条支出记录吗？\n\n删除后不可恢复。')) {
+                alert('记录已删除');
+            }
+        }
+
+        // 查询数据
+        function searchData() {
+            const project = document.getElementById('searchProject').value;
+            const name = document.getElementById('searchName').value;
+            const type = document.getElementById('searchType').value;
+            const dateStart = document.getElementById('searchDateStart').value;
+            const dateEnd = document.getElementById('searchDateEnd').value;
+            const operator = document.getElementById('searchOperator').value;
+
+            console.log('查询条件：', { project, name, type, dateStart, dateEnd, operator });
+            alert('查询功能已执行（演示模式）');
+        }
+
+        // 重置查询
+        function resetSearch() {
+            document.getElementById('searchProject').value = '';
+            document.getElementById('searchName').value = '';
+            document.getElementById('searchType').value = '';
+            document.getElementById('searchDateStart').value = '';
+            document.getElementById('searchDateEnd').value = '';
+            document.getElementById('searchOperator').value = '';
+        }
+
+        // 导出数据
+        function exportData() {
+            alert('正在导出Excel文件...');
+        }
+
+        // 文件上传处理
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const fileList = document.getElementById('fileList');
+
+            for (let file of files) {
+                uploadedFiles.push(file);
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200';
+                div.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-file text-blue-500"></i>
+                        <span class="text-sm text-gray-700">${file.name}</span>
+                        <span class="text-xs text-gray-400">(${(file.size / 1024).toFixed(1)} KB)</span>
+                    </div>
+                    <button type="button" class="text-red-500 hover:text-red-700" onclick="this.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                fileList.appendChild(div);
+            }
+        });
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置默认日期为今天
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('searchDateEnd').value = today;
+        });
+    </script>
+</body>
+</html>
