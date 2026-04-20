@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>加油记录维护</title>
+    <title>云智工业互联平台 - 加油记录</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -670,51 +671,121 @@
             width: 20px;
             text-align: center;
         }
+
+        /* Tab 容器样式 */
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #e8e8e8;
+            background: white;
+            padding: 0 24px;
+        }
+        .tab-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            color: #666;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .tab-item:hover {
+            color: #1890ff;
+        }
+        .tab-item.active {
+            color: #1890ff;
+            border-bottom-color: #1890ff;
+            font-weight: 500;
+        }
+        .tab-close {
+            margin-left: 8px;
+            font-size: 12px;
+            color: #999;
+        }
+        .tab-close:hover {
+            color: #ff4d4f;
+        }
     </style>
 </head>
 <body>
     <!-- 导航栏 -->
-    <nav class="navbar">
-        <div class="nav-left">
-            <div class="logo">云智工业互联平台</div>
-            <div class="nav-menu">
-                <div class="nav-item">首页</div>
-                <div class="nav-item">工作台</div>
-                <div class="nav-item">流程管理</div>
-                <div class="nav-item">产品工艺</div>
-                <div class="nav-item">销售管理</div>
-                <div class="nav-item">项目管理</div>
-                <div class="nav-item">生产管理</div>
-                <div class="nav-item active">设备管理</div>
-                <div class="nav-item">库存管理</div>
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20 flex-shrink-0">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
             </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-bars"></i>
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-home"></i> 首页
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-desktop"></i> 工作台
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-project-diagram"></i> 流程管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-cogs"></i> 产品工艺
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-shopping-cart"></i> 销售管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-tasks"></i> 项目管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-industry"></i> 生产管理
+                </a>
+                <a href="车辆档案.html" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600">
+                    <i class="fas fa-truck"></i> 设备管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-warehouse"></i> 库存管理
+                </a>
+            </nav>
         </div>
-        <div class="nav-right">
-            <div class="user-info">
-                <div class="user-avatar">张</div>
-                <span>张工程师</span>
-            </div>
+        <div class="flex items-center gap-4">
+            <button class="px-3 py-1.5 bg-blue-500 text-white rounded text-sm flex items-center gap-1">
+                更多 <i class="fas fa-chevron-down"></i>
+            </button>
+            <button class="p-2 text-gray-500 hover:text-blue-600 relative">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
         </div>
-    </nav>
+    </header>
 
-    <div class="flex flex-1 overflow-hidden" style="margin-top: 56px;">
+    <!-- Tab 栏 -->
+    <div class="tab-container">
+        <div class="tab-item">首页</div>
+        <div class="tab-item active">
+            加油记录
+            <span class="tab-close"><i class="fas fa-times"></i></span>
+        </div>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden">
         <!-- 左侧边栏 -->
-        <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0" style="position: fixed; left: 0; top: 56px; bottom: 0; z-index: 50;">
+        <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
             <div class="p-4">
                 <div class="space-y-1">
-                    <a href="车辆档案.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600" style="display: flex; padding: 12px 16px; border-radius: 8px; color: #606266; text-decoration: none; transition: all 0.3s;">
+                    <a href="车辆档案.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
                         <i class="fas fa-car w-5"></i>
                         <span>车辆档案</span>
                     </a>
-                    <a href="车辆维护.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600" style="display: flex; padding: 12px 16px; border-radius: 8px; color: #606266; text-decoration: none; transition: all 0.3s;">
+                    <a href="车辆维护.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
                         <i class="fas fa-tools w-5"></i>
                         <span>车辆维护</span>
                     </a>
-                    <a href="车辆维护(新增).html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600" style="display: flex; padding: 12px 16px; border-radius: 8px; color: #606266; text-decoration: none; transition: all 0.3s;">
+                    <a href="车辆维护新增页面.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
                         <i class="fas fa-plus-circle w-5"></i>
                         <span>车辆维护 - 新增</span>
                     </a>
-                    <a href="加油记录 .html" class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium bg-blue-50 text-blue-600 border-r-2 border-blue-600" style="display: flex; padding: 12px 16px; border-radius: 8px; background: #e6f7ff; color: #1890ff; border-right: 3px solid #1890ff; text-decoration: none;">
+                    <a href="加油记录 .html" class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium bg-blue-50 text-blue-600 border-r-2 border-blue-600">
                         <i class="fas fa-gas-pump w-5"></i>
                         <span>加油记录</span>
                     </a>
@@ -723,32 +794,53 @@
         </aside>
 
         <!-- 主内容区 -->
-        <div class="main-container" style="margin-left: 224px; flex: 1;">
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6 min-w-0">
+        
         <!-- 页面标题 -->
-        <div class="page-header">
+        <div class="flex justify-between items-center mb-6">
             <div>
-                <h1 class="page-title">加油记录维护</h1>
-                <div class="breadcrumb">设备管理 / 车辆管理 / 加油记录维护</div>
+                <h1 class="text-2xl font-bold text-gray-900">加油记录</h1>
+                <p class="text-sm text-gray-500 mt-1">记录车辆加油信息，统计油耗数据</p>
             </div>
         </div>
 
-        <!-- 统计卡片 -->
-        <div class="stats-bar">
+        <!-- 统计卡片区域 -->
+        <div class="grid grid-cols-4 gap-4 mb-6">
             <div class="stat-card">
-                <div class="stat-label">本月加油总量</div>
-                <div class="stat-value">12,580<span class="stat-unit">升</span></div>
+                <div class="stat-icon blue" style="width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; background-color: #e6f7ff; color: #1890ff;">
+                    <i class="fas fa-gas-pump"></i>
+                </div>
+                <div class="stat-content" style="flex: 1;">
+                    <div class="stat-title" style="font-size: 14px; color: #666; margin-bottom: 4px;">本月加油总量</div>
+                    <div class="stat-value" style="font-size: 28px; font-weight: 600; color: #262626;">12,580</div>
+                </div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">本月加油金额</div>
-                <div class="stat-value">98,450<span class="stat-unit">元</span></div>
+                <div class="stat-icon green" style="width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; background-color: #f6ffed; color: #52c41a;">
+                    <i class="fas fa-yen-sign"></i>
+                </div>
+                <div class="stat-content" style="flex: 1;">
+                    <div class="stat-title" style="font-size: 14px; color: #666; margin-bottom: 4px;">本月加油金额</div>
+                    <div class="stat-value" style="font-size: 28px; font-weight: 600; color: #262626;">98,450</div>
+                </div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">平均单价</div>
-                <div class="stat-value">7.82<span class="stat-unit">元/升</span></div>
+                <div class="stat-icon cyan" style="width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; background-color: #e6fffb; color: #13c2c2;">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-content" style="flex: 1;">
+                    <div class="stat-title" style="font-size: 14px; color: #666; margin-bottom: 4px;">平均单价</div>
+                    <div class="stat-value" style="font-size: 28px; font-weight: 600; color: #262626;">7.82</div>
+                </div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">加油次数</div>
-                <div class="stat-value">156<span class="stat-unit">次</span></div>
+                <div class="stat-icon orange" style="width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; background-color: #fff7e6; color: #fa8c16;">
+                    <i class="fas fa-list-ol"></i>
+                </div>
+                <div class="stat-content" style="flex: 1;">
+                    <div class="stat-title" style="font-size: 14px; color: #666; margin-bottom: 4px;">加油次数</div>
+                    <div class="stat-value" style="font-size: 28px; font-weight: 600; color: #262626;">156</div>
+                </div>
             </div>
         </div>
 
@@ -1052,7 +1144,7 @@
         </div>
     </div>
 
-        </div>
+        </main>
     </div>
 
     <!-- 新增/编辑弹窗 -->

@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 系统通知中心</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: rgba(0, 0, 0, 0.85);
+        }
+
+        /* 顶部导航栏 */
+        .header {
+            background: white;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1890ff;
+            text-decoration: none;
+        }
+
+        .brand i { font-size: 22px; }
+
+        .top-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .top-nav a {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 12px;
+            height: 64px;
+            color: rgba(0,0,0,0.65);
+            font-size: 14px;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .top-nav a:hover { color: #1890ff; }
+        .top-nav a.active {
+            color: #1890ff;
+            border-bottom-color: #1890ff;
+            font-weight: 500;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .demo-bell {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(0,0,0,0.65);
+            cursor: pointer;
+            transition: all 0.3s;
+            background: transparent;
+            border: none;
+            font-size: 18px;
+        }
+
+        .demo-bell:hover {
+            background: #f5f5f5;
+            color: #1890ff;
+        }
+
+        .demo-bell .badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            min-width: 18px;
+            height: 18px;
+            background: #ff4d4f;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border: 2px solid white;
+        }
+
+        .demo-bell .badge.hidden { display: none; }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(0,0,0,0.65);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .user-area:hover { background: #f5f5f5; }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1890ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* 演示内容区 */
+        .demo-main {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .demo-card {
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            border: 1px solid #f0f0f0;
+        }
+
+        .demo-card h2 {
+            font-size: 24px;
+            color: rgba(0,0,0,0.85);
+            margin-bottom: 12px;
+        }
+
+        .demo-card p {
+            font-size: 14px;
+            color: rgba(0,0,0,0.45);
+            margin-bottom: 24px;
+        }
+
+        .demo-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .demo-btn:hover {
+            background: #40a9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24,144,255,0.4);
+        }
+
+        /* ========== 通知弹窗组件 ========== */
+        .notify-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .notify-modal-overlay.show { display: flex; }
+
+        .notify-modal {
+            background: white;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 900px;
+            max-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            overflow: hidden;
+            animation: modalSlideIn 0.25s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .notify-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            flex-shrink: 0;
+        }
+
+        .notify-modal-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.85);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notify-modal-header h2 i {
+            color: #1890ff;
+            font-size: 18px;
+        }
+
+        .notify-modal-header .sub {
+            font-size: 13px;
+            color: rgba(0,0,0,0.45);
+            font-weight: 400;
+            margin-left: 8px;
+        }
+
+        .notify-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: rgba(0,0,0,0.45);
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .notify-close:hover {
+            background: #f5f5f5;
+            color: rgba(0,0,0,0.85);
+        }
+
+        .notify-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+
+        .notify-modal-body::-webkit-scrollbar { width: 6px; }
+        .notify-modal-body::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
+
+        .notify-stat-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 6px;
+        }
+
+        .notify-stat-bar .stat-text {
+            font-size: 14px;
+            color: #52c41a;
+            font-weight: 500;
+        }
+
+        .notify-stat-bar .stat-num {
+            font-size: 20px;
+            font-weight: 700;
+            color: #52c41a;
+        }
+
+        .notify-filter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-item label {
+            font-size: 13px;
+            color: rgba(0,0,0,0.65);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .notify-input {
+            height: 32px;
+            padding: 0 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+            color: rgba(0,0,0,0.65);
+            background: white;
+            outline: none;
+            transition: all 0.3s;
+            min-width: 140px;
+        }
+
+        .notify-input:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
+        }
+
+        .notify-input.search {
+            min-width: 220px;
+        }
+
+        .nbtn {
+            height: 32px;
+            padding: 0 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: none;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .nbtn-primary {
+            background: #1890ff;
+            color: white;
+        }
+
+        .nbtn-primary:hover { background: #40a9ff; }
+
+        .nbtn-default {
+            background: white;
+            color: rgba(0,0,0,0.65);
+            border: 1px solid #d9d9d9;
+        }
+
+        .nbtn-default:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .nbtn-danger {
+            background: #ff4d4f;
+            color: white;
+        }
+
+        .nbtn-danger:hover { background: #ff7875; }
+
+        .nbtn-success {
+            background: #52c41a;
+            color: white;
+        }
+
+        .nbtn-success:hover { background: #73d13d; }
+
+        .notify-batch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 0;
+        }
+
+        .batch-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .batch-left input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #1890ff;
+        }
+
+        .batch-left label {
+            font-size: 13px;
+            color: rgba(0,0,0,0.65);
+            cursor: pointer;
+        }
+
+        .batch-right {
+            font-size: 13px;
+            color: rgba(0,0,0,0.45);
+        }
+
+        .notify-list-wrap {
+            border: 1px solid #f0f0f0;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .notify-list {
+            width: 100%;
+        }
+
+        .n-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 14px 16px;
+            border-bottom: 1px solid #f5f5f5;
+            transition: all 0.2s;
+            position: relative;
+            gap: 12px;
+        }
+
+        .n-item:last-child { border-bottom: none; }
+        .n-item:hover { background: #fafafa; }
+
+        .n-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #1890ff;
+        }
+
+        .n-item.selected { background: #e6f7ff; }
+
+        .n-check {
+            padding-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .n-check input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #1890ff;
+        }
+
+        .n-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .n-icon.red { background: #fff1f0; color: #ff4d4f; }
+        .n-icon.orange { background: #fff7e6; color: #fa8c16; }
+        .n-icon.blue { background: #e6f7ff; color: #1890ff; }
+
+        .n-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .n-title-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .n-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.85);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .n-title:hover { color: #1890ff; }
+        .n-item.unread .n-title { color: #1890ff; }
+
+        .n-source {
+            font-size: 12px;
+            color: rgba(0,0,0,0.45);
+            background: #f5f5f5;
+            padding: 2px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .n-content {
+            font-size: 13px;
+            color: rgba(0,0,0,0.65);
+            line-height: 1.6;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .n-content:hover { color: rgba(0,0,0,0.85); }
+
+        .n-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: rgba(0,0,0,0.35);
+        }
+
+        .n-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+
+        .n-item:hover .n-actions { opacity: 1; }
+
+        .n-act {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: rgba(0,0,0,0.45);
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .n-act:hover {
+            background: #f5f5f5;
+            color: #1890ff;
+        }
+
+        .n-act.del:hover {
+            background: #fff1f0;
+            color: #ff4d4f;
+        }
+
+        .n-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #1890ff;
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .n-link-btn:hover {
+            background: #1890ff;
+            color: white;
+            border-color: #1890ff;
+        }
+
+        .n-empty {
+            text-align: center;
+            padding: 48px 20px;
+            color: rgba(0,0,0,0.25);
+        }
+
+        .n-empty i { font-size: 48px; margin-bottom: 12px; display: block; }
+        .n-empty p { font-size: 14px; }
+
+        .n-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 16px;
+            padding: 0 4px;
+        }
+
+        .n-page-btns {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .n-page-btn {
+            min-width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #d9d9d9;
+            background: white;
+            color: rgba(0,0,0,0.65);
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0 8px;
+        }
+
+        .n-page-btn:hover:not(:disabled) {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .n-page-btn.active {
+            background: #1890ff;
+            border-color: #1890ff;
+            color: white;
+            font-weight: 600;
+        }
+
+        .n-page-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            background: #f5f5f5;
+        }
+
+        .n-page-jump {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: rgba(0,0,0,0.65);
+        }
+
+        .n-page-jump input {
+            width: 48px;
+            height: 32px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .n-page-jump input:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
+        }
+
+        .notify-modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            border-top: 1px solid #f0f0f0;
+            background: #fafafa;
+            flex-shrink: 0;
+        }
+
+        .notify-modal-footer .hint {
+            font-size: 12px;
+            color: rgba(0,0,0,0.35);
+        }
+
+        .n-toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .n-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .n-toast.success { background: #52c41a; }
+        .n-toast.error { background: #ff4d4f; }
+
+        @media (max-width: 768px) {
+            .notify-modal { max-width: 100%; }
+            .notify-filter { flex-direction: column; align-items: flex-start; }
+            .n-item:hover .n-actions { opacity: 1; }
+            .top-nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast -->
+    <div class="n-toast" id="nToast"><i class="fas fa-check-circle"></i><span id="nToastMsg"></span></div>
+
+    <!-- 演示页面顶部导航 -->
+    <header class="header">
+        <div class="header-left">
+            <a href="#" class="brand">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
+            </a>
+            <nav class="top-nav">
+                <a href="#"><i class="fas fa-home"></i> 首页</a>
+                <a href="#"><i class="fas fa-desktop"></i> 工作台</a>
+                <a href="#"><i class="fas fa-project-diagram"></i> 流程管理</a>
+                <a href="#"><i class="fas fa-cogs"></i> 产品工艺</a>
+                <a href="#"><i class="fas fa-shopping-cart"></i> 销售管理</a>
+                <a href="#"><i class="fas fa-tasks"></i> 项目管理</a>
+                <a href="#" class="active"><i class="fas fa-users"></i> 人力资源</a>
+                <a href="#"><i class="fas fa-warehouse"></i> 库存管理</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <button class="demo-bell" onclick="openNotifyModal()" title="系统通知">
+                <i class="fas fa-bell"></i>
+                <span class="badge" id="demoBadge">5</span>
+            </button>
+            <div class="user-area">
+                <div class="user-avatar">管</div>
+                <span>管理员</span>
+                <i class="fas fa-chevron-down" style="font-size: 10px; opacity: 0.5;"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- 演示内容 -->
+    <div class="demo-main">
+        <div class="demo-card">
+            <h2><i class="fas fa-bell" style="color: #1890ff;"></i> 系统通知组件演示</h2>
+            <p>点击顶部导航栏的铃铛图标，或下方按钮，即可唤起通知弹窗。<br>点击通知标题或「查看详情」按钮，可跳转到对应业务页面。</p>
+            <button class="demo-btn" onclick="openNotifyModal()">
+                <i class="fas fa-bell"></i> 打开通知中心
+            </button>
+        </div>
+    </div>
+
+    <!-- 通知弹窗组件 -->
+    <div class="notify-modal-overlay" id="notifyOverlay" onclick="closeNotifyModalOnOverlay(event)">
+        <div class="notify-modal" onclick="event.stopPropagation()">
+            <div class="notify-modal-header">
+                <h2>
+                    <i class="fas fa-bell"></i>
+                    系统通知中心
+                    <span class="sub" id="modalSub">您有 5 条未读通知</span>
+                </h2>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button class="nbtn nbtn-default" onclick="markAllRead()" style="height: 28px; padding: 0 12px; font-size: 12px;">
+                        <i class="fas fa-check-double"></i> 全部已读
+                    </button>
+                    <button class="notify-close" onclick="closeNotifyModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="notify-modal-body">
+                <div class="notify-stat-bar" id="statBar">
+                    <span class="stat-text"><i class="fas fa-envelope-open-text" style="margin-right: 6px;"></i>当前未读通知</span>
+                    <span class="stat-num" id="statUnread">5</span>
+                </div>
+
+                <!-- 筛选栏 -->
+                <div class="notify-filter">
+                    <div class="filter-item">
+                        <label>类型</label>
+                        <select class="notify-input" id="fType" onchange="applyFilter()">
+                            <option value="all" selected>全部</option>
+                            <option value="warning">预警</option>
+                            <option value="todo">待办</option>
+                            <option value="system">系统</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>状态</label>
+                        <select class="notify-input" id="fStatus" onchange="applyFilter()">
+                            <option value="all">全部</option>
+                            <option value="unread" selected>未读</option>
+                            <option value="read">已读</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>时间</label>
+                        <select class="notify-input" id="fTime" onchange="applyFilter()">
+                            <option value="all" selected>全部时间</option>
+                            <option value="today">今天</option>
+                            <option value="week">近7天</option>
+                            <option value="month">近30天</option>
+                        </select>
+                    </div>
+                    <div class="filter-item" style="flex: 1; max-width: 260px;">
+                        <input type="text" class="notify-input search" id="fSearch" placeholder="搜索通知标题或内容..." oninput="applyFilter()">
+                    </div>
+                    <button class="nbtn nbtn-default" onclick="resetFilter()">
+                        <i class="fas fa-trash-alt"></i> 重置
+                    </button>
+                </div>
+
+                <div class="notify-batch">
+                    <div class="batch-left">
+                        <input type="checkbox" id="checkAll" onchange="toggleSelectAll()">
+                        <label for="checkAll">全选</label>
+                        <button class="nbtn nbtn-primary" onclick="batchRead()" id="btnBatchRead" style="height: 28px; padding: 0 12px; font-size: 12px; opacity: 0.5;">
+                            <i class="fas fa-check"></i> 标记已读
+                        </button>
+                        <button class="nbtn nbtn-danger" onclick="batchDelete()" id="btnBatchDelete" style="height: 28px; padding: 0 12px; font-size: 12px; opacity: 0.5;">
+                            <i class="fas fa-trash-alt"></i> 删除
+                        </button>
+                    </div>
+                    <div class="batch-right">
+                        共 <strong id="totalCount">0</strong> 条通知
+                    </div>
+                </div>
+
+                <div class="notify-list-wrap">
+                    <div class="notify-list" id="notifyList"></div>
+                </div>
+
+                <div class="n-pagination">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <select id="pageSize" onchange="changePageSize()" class="notify-input" style="min-width: 90px;">
+                            <option value="10">10 条/页</option>
+                            <option value="20">20 条/页</option>
+                            <option value="50">50 条/页</option>
+                        </select>
+                    </div>
+                    <div class="n-page-btns" id="pageBtns"></div>
+                    <div class="n-page-jump">
+                        <span>前往</span>
+                        <input type="number" id="jumpInput" min="1" onkeydown="if(event.key==='Enter')jumpToPage()">
+                        <span>页</span>
+                        <button class="nbtn nbtn-primary" onclick="jumpToPage()" style="height: 28px; padding: 0 12px; font-size: 12px;">确定</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notify-modal-footer">
+                <span class="hint"><i class="fas fa-info-circle" style="margin-right: 4px;"></i>点击通知标题可跳转至对应业务页面</span>
+                <span class="hint">ESC 键可关闭弹窗</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据
+        let notifications = [
+            {
+                id: 1,
+                type: 'warning',
+                title: '证书即将到期预警',
+                content: '员工【张伟】的「特种作业操作证（电工）」将于 30 天后到期（2025-05-20），请及时安排复审或换证。',
+                time: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+                read: false,
+                source: '人才管理',
+                link: '人才管理.html',
+                linkText: '查看员工'
+            },
+            {
+                id: 2,
+                type: 'warning',
+                title: '车辆年审到期提醒',
+                content: '车牌号【川A·K89012】的年审到期月份为 2025-03，当前已进入年审窗口期，请尽快办理年审手续。',
+                time: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+                read: false,
+                source: '车辆维护',
+                link: '车辆维护.html',
+                linkText: '查看车辆'
+            },
+            {
+                id: 3,
+                type: 'warning',
+                title: '车辆保险已过期',
+                content: '车牌号【川A·K89015】的保险已过期 15 天（到期日：2025-01-15），请立即续保以避免脱保风险。',
+                time: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
+                read: false,
+                source: '车辆维护',
+                link: '车辆维护.html',
+                linkText: '查看车辆'
+            },
+            {
+                id: 4,
+                type: 'todo',
+                title: '待处理：新员工证书录入',
+                content: '新入职员工【李芳】尚未上传「安全员C证」扫描件，请督促其在 3 个工作日内完成证书录入。',
+                time: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+                read: false,
+                source: '人才管理',
+                link: '人才管理.html',
+                linkText: '查看员工'
+            },
+            {
+                id: 5,
+                type: 'system',
+                title: '系统维护公告',
+                content: '平台将于今晚 22:00 - 次日 02:00 进行例行升级维护，期间部分功能可能无法访问，请提前保存工作内容。',
+                time: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
+                read: true,
+                source: '系统',
+                link: null,
+                linkText: null
+            },
+            {
+                id: 6,
+                type: 'warning',
+                title: '证书已过期',
+                content: '员工【王强】的「焊工特种作业证」已于 2025-02-01 过期，该员工已被自动标记为「不具备上岗资格」，请立即处理。',
+                time: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(),
+                read: true,
+                source: '人才管理',
+                link: '人才管理.html',
+                linkText: '查看员工'
+            },
+            {
+                id: 7,
+                type: 'system',
+                title: '功能更新：车辆维护模块升级',
+                content: '车辆维护模块已新增「保险到期前30天自动预警」功能，相关提醒将通过本通知中心推送。',
+                time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
+                read: true,
+                source: '系统',
+                link: null,
+                linkText: null
+            },
+            {
+                id: 8,
+                type: 'todo',
+                title: '待审批：车辆维修申请',
+                content: '驾驶员【张伟强】提交了对川A·K89012 的维修申请（预估费用 ¥3,500），等待您审批。',
+                time: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
+                read: true,
+                source: '车辆维护',
+                link: '车辆维护.html',
+                linkText: '查看车辆'
+            }
+        ];
+
+        let currentPage = 1;
+        let pageSize = 10;
+        let selectedIds = new Set();
+        let filteredData = [];
+
+        // 弹窗控制
+        function openNotifyModal() {
+            document.getElementById('notifyOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            // 默认筛选：类型=全部，状态=未读，时间=全部时间
+            document.getElementById('fType').value = 'all';
+            document.getElementById('fStatus').value = 'unread';
+            document.getElementById('fTime').value = 'all';
+            document.getElementById('fSearch').value = '';
+            applyFilter();
+        }
+
+        function closeNotifyModal() {
+            document.getElementById('notifyOverlay').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function closeNotifyModalOnOverlay(e) {
+            if (e.target === document.getElementById('notifyOverlay')) {
+                closeNotifyModal();
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeNotifyModal();
+        });
+
+        // 筛选逻辑
+        function applyFilter() {
+            const type = document.getElementById('fType').value;
+            const status = document.getElementById('fStatus').value;
+            const time = document.getElementById('fTime').value;
+            const search = document.getElementById('fSearch').value.trim().toLowerCase();
+
+            const now = Date.now();
+            filteredData = notifications.filter(n => {
+                if (type !== 'all' && n.type !== type) return false;
+                if (status === 'unread' && n.read) return false;
+                if (status === 'read' && !n.read) return false;
+                const nTime = new Date(n.time).getTime();
+                const diff = now - nTime;
+                if (time === 'today' && diff > 86400000) return false;
+                if (time === 'week' && diff > 604800000) return false;
+                if (time === 'month' && diff > 2592000000) return false;
+                if (search && !n.title.toLowerCase().includes(search) && !n.content.toLowerCase().includes(search)) return false;
+                return true;
+            });
+
+            currentPage = 1;
+            selectedIds.clear();
+            document.getElementById('checkAll').checked = false;
+            renderList();
+            renderPagination();
+            updateStats();
+        }
+
+        function resetFilter() {
+            document.getElementById('fType').value = 'all';
+            document.getElementById('fStatus').value = 'unread';
+            document.getElementById('fTime').value = 'all';
+            document.getElementById('fSearch').value = '';
+            applyFilter();
+        }
+
+        // 渲染列表
+        function renderList() {
+            const container = document.getElementById('notifyList');
+            const start = (currentPage - 1) * pageSize;
+            const pageData = filteredData.slice(start, start + pageSize);
+
+            if (pageData.length === 0) {
+                container.innerHTML = `
+                    <div class="n-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>暂无符合条件的通知</p>
+                    </div>
+                `;
+                document.getElementById('totalCount').textContent = 0;
+                return;
+            }
+
+            document.getElementById('totalCount').textContent = filteredData.length;
+
+            container.innerHTML = pageData.map(n => {
+                const timeStr = formatTime(new Date(n.time));
+                const iconCfg = {
+                    warning: { icon: 'fa-exclamation-triangle', cls: 'red' },
+                    todo: { icon: 'fa-clock', cls: 'orange' },
+                    system: { icon: 'fa-bullhorn', cls: 'blue' }
+                }[n.type];
+                const isSelected = selectedIds.has(n.id);
+                const hasLink = n.link && n.linkText;
+
+                return `
+                    <div class="n-item ${n.read ? '' : 'unread'} ${isSelected ? 'selected' : ''}" data-id="${n.id}">
+                        <div class="n-check">
+                            <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleSelect(${n.id})" onclick="event.stopPropagation()">
+                        </div>
+                        <div class="n-icon ${iconCfg.cls}">
+                            <i class="fas ${iconCfg.icon}"></i>
+                        </div>
+                        <div class="n-body">
+                            <div class="n-title-row">
+                                <span class="n-title" onclick="handleNotifyClick(${n.id})">${n.title}</span>
+                                <span class="n-source">${n.source}</span>
+                                ${hasLink ? `<a class="n-link-btn" onclick="handleNotifyClick(${n.id})" title="${n.linkText}"><i class="fas fa-external-link-alt"></i>${n.linkText}</a>` : ''}
+                            </div>
+                            <div class="n-content" onclick="handleNotifyClick(${n.id})">${n.content}</div>
+                            <div class="n-meta">
+                                <span><i class="far fa-clock" style="margin-right: 4px;"></i>${timeStr}</span>
+                                ${n.read ? '<span style="color: #52c41a;"><i class="fas fa-check" style="margin-right: 4px;"></i>已读</span>' : '<span style="color: #1890ff; font-weight: 500;">未读</span>'}
+                            </div>
+                        </div>
+                        <div class="n-actions">
+                            ${!n.read ? `<button class="n-act" onclick="markRead(${n.id})" title="标记已读"><i class="fas fa-check"></i></button>` : ''}
+                            <button class="n-act del" onclick="deleteNotify(${n.id})" title="删除"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 点击通知处理
+        function handleNotifyClick(id) {
+            const n = notifications.find(x => x.id === id);
+            if (!n) return;
+            if (!n.read) {
+                n.read = true;
+                updateBellBadge();
+                updateStats();
+                renderList();
+            }
+            if (n.link) {
+                closeNotifyModal();
+                window.open(n.link, '_blank', 'noopener,noreferrer');
+            }
+        }
+
+        // 分页
+        function renderPagination() {
+            const total = filteredData.length;
+            const totalPages = Math.ceil(total / pageSize) || 1;
+            const btns = document.getElementById('pageBtns');
+
+            let html = `<button class="n-page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left" style="font-size: 10px;"></i></button>`;
+
+            const maxVisible = 5;
+            let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let end = Math.min(totalPages, start + maxVisible - 1);
+            if (end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
+
+            if (start > 1) {
+                html += `<button class="n-page-btn ${1 === currentPage ? 'active' : ''}" onclick="goPage(1)">1</button>`;
+                if (start > 2) html += `<button class="n-page-btn" disabled>···</button>`;
+            }
+            for (let i = start; i <= end; i++) {
+                html += `<button class="n-page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+            }
+            if (end < totalPages) {
+                if (end < totalPages - 1) html += `<button class="n-page-btn" disabled>···</button>`;
+                html += `<button class="n-page-btn ${totalPages === currentPage ? 'active' : ''}" onclick="goPage(${totalPages})">${totalPages}</button>`;
+            }
+
+            html += `<button class="n-page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right" style="font-size: 10px;"></i></button>`;
+
+            btns.innerHTML = html;
+            document.getElementById('jumpInput').value = currentPage;
+            document.getElementById('jumpInput').max = totalPages;
+        }
+
+        function goPage(p) {
+            const totalPages = Math.ceil(filteredData.length / pageSize) || 1;
+            if (p < 1 || p > totalPages) return;
+            currentPage = p;
+            renderList();
+            renderPagination();
+        }
+
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('pageSize').value);
+            currentPage = 1;
+            renderList();
+            renderPagination();
+        }
+
+        function jumpToPage() {
+            const p = parseInt(document.getElementById('jumpInput').value);
+            const totalPages = Math.ceil(filteredData.length / pageSize) || 1;
+            if (p >= 1 && p <= totalPages) goPage(p);
+        }
+
+        // 操作逻辑
+        function markRead(id) {
+            const n = notifications.find(x => x.id === id);
+            if (n && !n.read) {
+                n.read = true;
+                showToast('已标记为已读', 'success');
+                applyFilter();
+                updateBellBadge();
+            }
+        }
+
+        function markAllRead() {
+            let changed = false;
+            notifications.forEach(n => {
+                if (!n.read) { n.read = true; changed = true; }
+            });
+            if (changed) {
+                showToast('全部标记为已读', 'success');
+                applyFilter();
+                updateBellBadge();
+            }
+        }
+
+        function deleteNotify(id) {
+            if (!confirm('确定要删除这条通知吗？')) return;
+            notifications = notifications.filter(n => n.id !== id);
+            selectedIds.delete(id);
+            showToast('通知已删除', 'success');
+            applyFilter();
+            updateBellBadge();
+        }
+
+        function toggleSelect(id) {
+            if (selectedIds.has(id)) selectedIds.delete(id);
+            else selectedIds.add(id);
+            renderList();
+            updateBatchButtons();
+        }
+
+        function toggleSelectAll() {
+            const checked = document.getElementById('checkAll').checked;
+            const start = (currentPage - 1) * pageSize;
+            const pageData = filteredData.slice(start, start + pageSize);
+            if (checked) pageData.forEach(n => selectedIds.add(n.id));
+            else pageData.forEach(n => selectedIds.delete(n.id));
+            renderList();
+            updateBatchButtons();
+        }
+
+        function updateBatchButtons() {
+            const has = selectedIds.size > 0;
+            document.getElementById('btnBatchRead').style.opacity = has ? 1 : 0.5;
+            document.getElementById('btnBatchDelete').style.opacity = has ? 1 : 0.5;
+        }
+
+        function batchRead() {
+            if (selectedIds.size === 0) return;
+            let changed = false;
+            notifications.forEach(n => {
+                if (selectedIds.has(n.id) && !n.read) { n.read = true; changed = true; }
+            });
+            if (changed) {
+                showToast(`已标记 ${selectedIds.size} 条通知为已读`, 'success');
+                selectedIds.clear();
+                document.getElementById('checkAll').checked = false;
+                applyFilter();
+                updateBellBadge();
+            }
+        }
+
+        function batchDelete() {
+            if (selectedIds.size === 0) return;
+            if (!confirm(`确定要删除选中的 ${selectedIds.size} 条通知吗？`)) return;
+            notifications = notifications.filter(n => !selectedIds.has(n.id));
+            showToast(`已删除 ${selectedIds.size} 条通知`, 'success');
+            selectedIds.clear();
+            document.getElementById('checkAll').checked = false;
+            applyFilter();
+            updateBellBadge();
+        }
+
+        function updateStats() {
+            const unread = notifications.filter(n => !n.read).length;
+            document.getElementById('statUnread').textContent = unread;
+            document.getElementById('modalSub').textContent = `您有 ${unread} 条未读通知`;
+
+            const bar = document.getElementById('statBar');
+            if (unread === 0) {
+                bar.style.background = '#f5f5f5';
+                bar.style.borderColor = '#d9d9d9';
+                bar.querySelector('.stat-text').style.color = 'rgba(0,0,0,0.45)';
+                bar.querySelector('.stat-num').style.color = 'rgba(0,0,0,0.45)';
+            } else {
+                bar.style.background = '#f6ffed';
+                bar.style.borderColor = '#b7eb8f';
+                bar.querySelector('.stat-text').style.color = '#52c41a';
+                bar.querySelector('.stat-num').style.color = '#52c41a';
+            }
+        }
+
+        function updateBellBadge() {
+            const unread = notifications.filter(n => !n.read).length;
+            const badge = document.getElementById('demoBadge');
+            if (unread > 0) {
+                badge.textContent = unread;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function formatTime(date) {
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+            if (diff < 60) return '刚刚';
+            if (diff < 3600) return `${Math.floor(diff / 60)} 分钟前`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)} 小时前`;
+            if (diff < 172800) return '昨天';
+            if (diff < 604800) return `${Math.floor(diff / 86400)} 天前`;
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            const h = String(date.getHours()).padStart(2, '0');
+            const min = String(date.getMinutes()).padStart(2, '0');
+            return `${y}-${m}-${d} ${h}:${min}`;
+        }
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('nToast');
+            const toastMsg = document.getElementById('nToastMsg');
+            toastMsg.textContent = msg;
+            toast.className = 'n-toast show ' + (type || '');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+    </script>
+</body>
+</html>

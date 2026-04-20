@@ -475,15 +475,7 @@
                         <div class="stat-value">28</div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon green">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-title">在用车辆</div>
-                        <div class="stat-value">22</div>
-                    </div>
-                </div>
+                
                 <div class="stat-card">
                     <div class="stat-icon orange">
                         <i class="fas fa-tools"></i>
@@ -498,7 +490,7 @@
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-title">到期日期前30天</div>
+                        <div class="stat-title">脱保(30天内)</div>
                         <div class="stat-value">3</div>
                     </div>
                 </div>
@@ -539,14 +531,6 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-sm text-gray-600 mb-1.5">购置日期</label>
-                        <div class="date-range">
-                            <input type="date" class="input-field px-3 py-2 rounded-lg text-sm">
-                            <span class="separator">至</span>
-                            <input type="date" class="input-field px-3 py-2 rounded-lg text-sm">
-                        </div>
-                    </div>
                     <div class="flex items-end gap-2">
                         <button class="btn-primary" onclick="search()">
                             <i class="fas fa-search"></i> 搜索
@@ -561,7 +545,7 @@
             <!-- 操作按钮区 -->
             <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                 <div class="flex items-center gap-2 flex-wrap">
-                    <button class="btn-success" onclick="openAddModal()">
+                    <button class="btn-success" onclick="window.location.href='车辆维护新增页面.html'">
                         <i class="fas fa-plus"></i> 新增车辆
                     </button>
                     <button class="btn-primary">

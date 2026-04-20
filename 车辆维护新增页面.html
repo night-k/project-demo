@@ -610,8 +610,11 @@
                                 <option value="8x8">8×8</option>
                             </select>
                         </div>
-                        <div class="form-group"></div>
-                        <div class="form-group"></div>
+                        
+                        <div class="form-group">
+                            <label>燃油箱容积 (L)</label>
+                            <input type="number" placeholder="请输入燃油箱容积">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -625,26 +628,28 @@
                 </div>
                 <div class="section-body">
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>外形尺寸(长×宽×高)</label>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>外形尺寸 (长×宽×高)</label>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <input type="number" placeholder="长(m)" style="flex: 1;">
-                                <span class="text-gray-400">×</span>
-                                <input type="number" placeholder="宽(m)" style="flex: 1;">
-                                <span class="text-gray-400">×</span>
-                                <input type="number" placeholder="高(m)" style="flex: 1;">
+                                <input type="number" placeholder="长 (m)" style="flex: 1; min-width: 0;">
+                                <span class="text-gray-400" style="flex-shrink: 0;">×</span>
+                                <input type="number" placeholder="宽 (m)" style="flex: 1; min-width: 0;">
+                                <span class="text-gray-400" style="flex-shrink: 0;">×</span>
+                                <input type="number" placeholder="高 (m)" style="flex: 1; min-width: 0;">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>整车重量(kg)</label>
+                            <label>整车重量 (kg)</label>
                             <input type="number" placeholder="请输入整车重量">
                         </div>
                         <div class="form-group">
-                            <label>核定载质量(kg)</label>
+                            <label>核定载质量 (kg)</label>
                             <input type="number" placeholder="请输入核定载质量">
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
-                            <label>轴距(mm)</label>
+                            <label>轴距 (mm)</label>
                             <input type="number" placeholder="请输入轴距">
                         </div>
                     </div>
@@ -655,7 +660,7 @@
                 <div class="section-header">
                     <div class="section-header-left">
                         <i class="fas fa-oil-can text-blue-500"></i>
-                        油田作业专用参数
+                        特殊作业专用参数
                     </div>
                 </div>
                 <div class="section-body">
@@ -671,10 +676,6 @@
                         <div class="form-group">
                             <label>罐体容积(L)</label>
                             <input type="number" placeholder="请输入罐体容积">
-                        </div>
-                        <div class="form-group">
-                            <label>燃油箱容积(L)</label>
-                            <input type="number" placeholder="请输入燃油箱容积">
                         </div>
                     </div>
                 </div>
