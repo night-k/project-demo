@@ -280,7 +280,7 @@
             <nav class="flex items-center gap-6 text-sm">
                 <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-home"></i> 首页</a>
                 <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-desktop"></i> 工作台</a>
-                <a href="#" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600"><i class="fas fa-user-tie"></i> 人才画像</a>
+                <a href="人才管理.html" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600"><i class="fas fa-users"></i> 人力资源</a>
                 <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-chart-line"></i> 能力评价规则</a>
             </nav>
         </div>
@@ -303,26 +303,26 @@
         <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
             <div class="p-4">
                 <div class="space-y-1">
-                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                    <a href="人才管理.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
                         <i class="fas fa-users w-5"></i>
-                        <span>人员管理</span>
-                    </div>
-                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600">
-                        <i class="fas fa-id-card w-5"></i>
+                        <span>人才管理</span>
+                    </a>
+                    <a href="人员画像.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-user-circle w-5"></i>
                         <span>人员画像</span>
-                    </div>
-                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600">
-                        <i class="fas fa-clipboard-check w-5"></i>
-                        <span>技能考核</span>
-                    </div>
-                    <div class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-blue-600 bg-blue-50 border-r-3 border-blue-600">
+                    </a>
+                    <a href="人才评分规则.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-star w-5"></i>
+                        <span>人才评分规则</span>
+                    </a>
+                    <a href="培训记录.html" class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-blue-600 bg-blue-50 border-r-2 border-blue-600">
                         <i class="fas fa-chalkboard-teacher w-5"></i>
-                        <span>培训结果录入</span>
-                    </div>
-                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <span>培训记录</span>
+                    </a>
+                    <a href="证书管理.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
                         <i class="fas fa-certificate w-5"></i>
                         <span>证书管理</span>
-                    </div>
+                    </a>
                 </div>
             </div>
         </aside>
@@ -595,14 +595,8 @@
             <form id="singleForm" class="space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">选择培训 <span class="text-red-500">*</span></label>
-                        <select class="search-input w-full" required>
-                            <option value="">请选择培训项目</option>
-                            <option>安全生产规范培训</option>
-                            <option>CNC机床操作培训</option>
-                            <option>ISO质量管理体系</option>
-                            <option>急救技能培训</option>
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">培训名称 <span class="text-red-500">*</span></label>
+                        <input type="text" class="search-input w-full" placeholder="请输入培训名称" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">选择员工 <span class="text-red-500">*</span></label>

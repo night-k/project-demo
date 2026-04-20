@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 项目甘特图</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f2f5;
+            overflow: hidden;
+        }
+        
+        .gantt-container {
+            display: flex;
+            height: calc(100vh - 180px);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .gantt-left {
+            width: 400px;
+            flex-shrink: 0;
+            border-right: 1px solid #e8e8e8;
+            overflow-y: auto;
+            background: white;
+        }
+        
+        .gantt-right {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            background: white;
+        }
+        
+        .timeline-header {
+            height: 48px;
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .day-cell {
+            min-width: 60px;
+            height: 48px;
+            border-right: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+            background: #fafafa;
+        }
+        
+        .day-cell.weekend {
+            background: #f5f5f5;
+            color: #999;
+        }
+        
+        .day-cell.today {
+            background: #e6f7ff;
+            color: #1890ff;
+            font-weight: 600;
+        }
+        
+        .tree-row {
+            height: 48px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .tree-row:hover {
+            background: #f5f5f5;
+        }
+        
+        .tree-row.project {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .tree-row.task {
+            padding-left: 36px;
+            color: #595959;
+        }
+        
+        .tree-row.order {
+            padding-left: 60px;
+            color: #8c8c8c;
+            font-size: 13px;
+        }
+        
+        .expand-icon {
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            cursor: pointer;
+            color: #8c8c8c;
+            transition: transform 0.2s;
+        }
+        
+        .expand-icon.expanded {
+            transform: rotate(90deg);
+        }
+        
+        .gantt-bar {
+            position: absolute;
+            height: 28px;
+            border-radius: 4px;
+            top: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            font-size: 12px;
+            color: white;
+            font-weight: 500;
+            overflow: hidden;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .gantt-bar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .gantt-bar.project-bar {
+            background: linear-gradient(90deg, #1890ff, #40a9ff);
+            height: 32px;
+            top: 8px;
+        }
+        
+        .gantt-bar.task-bar {
+            background: linear-gradient(90deg, #52c41a, #73d13d);
+        }
+        
+        .gantt-bar.order-bar {
+            background: linear-gradient(90deg, #faad14, #ffc53d);
+            height: 24px;
+            top: 12px;
+        }
+        
+        .gantt-bar.completed {
+            background: linear-gradient(90deg, #52c41a, #73d13d);
+        }
+        
+        .gantt-bar.in-progress {
+            background: linear-gradient(90deg, #1890ff, #40a9ff);
+        }
+        
+        .gantt-bar.delayed {
+            background: linear-gradient(90deg, #ff4d4f, #ff7875);
+        }
+        
+        .today-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ff4d4f;
+            z-index: 5;
+            pointer-events: none;
+        }
+        
+        .today-label {
+            position: absolute;
+            top: -24px;
+            left: -20px;
+            background: #ff4d4f;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .grid-lines {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            pointer-events: none;
+        }
+        
+        .grid-line {
+            min-width: 60px;
+            border-right: 1px solid #f0f0f0;
+            height: 100%;
+        }
+        
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .tag-doing {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+        
+        .tag-done {
+            background-color: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+        
+        .tag-pending {
+            background-color: #fff7e6;
+            color: #fa8c16;
+            border: 1px solid #ffd591;
+        }
+        
+        .tag-delayed {
+            background-color: #fff1f0;
+            color: #ff4d4f;
+            border: 1px solid #ffa39e;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 720px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #1890ff, #40a9ff);
+            height: 100%;
+            border-radius: 100px;
+            transition: width 0.6s ease;
+        }
+        
+        .time-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .time-box {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+        }
+        
+        .time-box.plan {
+            background: #fafafa;
+            border-color: #e8e8e8;
+        }
+        
+        .time-box.actual {
+            background: #f0f7ff;
+            border-color: #91d5ff;
+        }
+        
+        .time-box.actual.completed {
+            background: #f6ffed;
+            border-color: #b7eb8f;
+        }
+        
+        .time-box.actual.pending {
+            background: #f5f5f5;
+            border-color: #d9d9d9;
+            opacity: 0.6;
+        }
+        
+        .time-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .time-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #262626;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20 flex-shrink-0">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
+            </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-home"></i> 首页
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-desktop"></i> 工作台
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-project-diagram"></i> 流程管理
+                </a>
+                <a href="项目列表.html" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600">
+                    <i class="fas fa-tasks"></i> 营销管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-industry"></i> 生产管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-warehouse"></i> 库存管理
+                </a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 text-gray-500 hover:text-blue-600 relative">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>admin-admin</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 左侧边栏 -->
+        <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
+            <div class="p-4">
+                <div class="space-y-1">
+                    <a href="项目列表.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-list-ul w-5"></i>
+                        <span>项目列表</span>
+                    </a>
+                    <a href="项目空间.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-cube w-5"></i>
+                        <span>项目空间</span>
+                    </a>
+                    <a href="项目甘特图.html" class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium bg-blue-50 text-blue-600 border-r-2 border-blue-600">
+                        <i class="fas fa-chart-gantt w-5"></i>
+                        <span>项目甘特图</span>
+                    </a>
+                    <a href="项目超期预警表.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-exclamation-triangle w-5"></i>
+                        <span>项目超期预警表</span>
+                    </a>
+                    <a href="项目支出.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-yen-sign w-5"></i>
+                        <span>项目支出</span>
+                    </a>
+                    <a href="项目问题.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-bug w-5"></i>
+                        <span>项目问题</span>
+                    </a>
+                    <a href="项目风险.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-shield-alt w-5"></i>
+                        <span>项目风险</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6 min-w-0">
+            
+            <!-- 面包屑和标题 -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                    <span class="cursor-pointer hover:text-blue-600">首页</span>
+                    <i class="fas fa-chevron-right text-xs"></i>
+                    <span class="cursor-pointer hover:text-blue-600">项目管理</span>
+                    <i class="fas fa-chevron-right text-xs"></i>
+                    <span class="text-blue-600 font-medium">项目甘特图</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500">当前时间：</span>
+                    <span class="text-sm font-medium text-gray-800" id="currentDate">2026-04-17</span>
+                </div>
+            </div>
+
+            <!-- 工具栏 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                        <option>全部项目</option>
+                        <option>永城基地扩建项目</option>
+                        <option>华南充电器交付项目</option>
+                        <option>新能源电池组试制项目</option>
+                    </select>
+                    <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                        <option>全部状态</option>
+                        <option>进行中</option>
+                        <option>已完成</option>
+                        <option>已延期</option>
+                    </select>
+                    <button onclick="resetView()" class="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                        <i class="fas fa-compress-arrows-alt mr-1"></i>重置视图
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="goToToday()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors flex items-center gap-2">
+                        <i class="fas fa-crosshairs"></i>今天
+                    </button>
+                    <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                        <button onclick="zoomOut()" class="px-3 py-2 hover:bg-gray-100 border-r border-gray-300 text-gray-600">
+                            <i class="fas fa-minus text-xs"></i>
+                        </button>
+                        <span class="px-3 py-2 text-sm text-gray-600 bg-white">100%</span>
+                        <button onclick="zoomIn()" class="px-3 py-2 hover:bg-gray-100 border-l border-gray-300 text-gray-600">
+                            <i class="fas fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                    <button class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm hover:border-blue-500 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-download mr-1"></i>导出
+                    </button>
+                </div>
+            </div>
+
+            <!-- 甘特图主体 -->
+            <div class="gantt-container">
+                <!-- 左侧树形列表 -->
+                <div class="gantt-left">
+                    <div class="h-12 border-b border-gray-200 bg-gray-50 flex items-center px-4 font-medium text-sm text-gray-700 sticky top-0 z-10">
+                        <div class="flex-1">名称</div>
+                        <div class="w-20 text-center">负责人</div>
+                        <div class="w-20 text-center">状态</div>
+                    </div>
+                    <div id="treeContent">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 右侧时间轴 -->
+                <div class="gantt-right" id="ganttRight">
+                    <div class="timeline-header" id="timelineHeader">
+                        <!-- 动态生成日期 -->
+                    </div>
+                    <div class="grid-lines" id="gridLines">
+                        <!-- 动态生成网格 -->
+                    </div>
+                    <div class="today-line" id="todayLine">
+                        <div class="today-label">今天</div>
+                    </div>
+                    <div id="ganttBars">
+                        <!-- 动态生成甘特条 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图例 -->
+            <div class="mt-4 flex items-center gap-6 text-sm text-gray-600 bg-white p-3 rounded-lg border border-gray-200 inline-flex">
+                <span class="font-medium">图例：</span>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded bg-blue-500"></div>
+                    <span>项目</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded bg-green-500"></div>
+                    <span>任务</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded bg-orange-400"></div>
+                    <span>工单</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded bg-red-500"></div>
+                    <span>已延期</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 详情弹窗 -->
+    <div id="detailModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800" id="modalTitle">详情</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="p-6" id="modalBody">
+                <!-- 动态内容 -->
+            </div>
+            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <button onclick="closeModal()" class="px-5 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors text-sm">
+                    关闭
+                </button>
+                <button onclick="viewFullDetail()" class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                    查看完整信息
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据 - 包含实际时间字段
+        const data = [
+            {
+                id: 'P1',
+                name: '永城基地扩建项目',
+                type: 'project',
+                start: '2026-04-01',
+                end: '2026-04-30',
+                actualStart: '2026-04-01',
+                actualEnd: null,
+                status: 'doing',
+                progress: 65,
+                manager: '伍红卫',
+                children: [
+                    {
+                        id: 'T1',
+                        name: '设备安装调试',
+                        type: 'task',
+                        start: '2026-04-01',
+                        end: '2026-04-15',
+                        actualStart: '2026-04-01',
+                        actualEnd: null,
+                        status: 'doing',
+                        progress: 80,
+                        manager: '李工程师',
+                        children: [
+                            {
+                                id: 'O1',
+                                name: '主机安装',
+                                type: 'order',
+                                start: '2026-04-01',
+                                end: '2026-04-05',
+                                actualStart: '2026-04-01',
+                                actualEnd: '2026-04-05',
+                                status: 'done',
+                                progress: 100,
+                                manager: '王师傅'
+                            },
+                            {
+                                id: 'O2',
+                                name: '辅机调试',
+                                type: 'order',
+                                start: '2026-04-06',
+                                end: '2026-04-12',
+                                actualStart: '2026-04-06',
+                                actualEnd: null,
+                                status: 'doing',
+                                progress: 60,
+                                manager: '张技工'
+                            },
+                            {
+                                id: 'O3',
+                                name: '系统联调',
+                                type: 'order',
+                                start: '2026-04-13',
+                                end: '2026-04-15',
+                                actualStart: null,
+                                actualEnd: null,
+                                status: 'pending',
+                                progress: 0,
+                                manager: '刘技师'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'T2',
+                        name: '土建施工',
+                        type: 'task',
+                        start: '2026-04-10',
+                        end: '2026-04-25',
+                        actualStart: '2026-04-11',
+                        actualEnd: null,
+                        status: 'doing',
+                        progress: 45,
+                        manager: '陈工头',
+                        children: [
+                            {
+                                id: 'O4',
+                                name: '地基浇筑',
+                                type: 'order',
+                                start: '2026-04-10',
+                                end: '2026-04-18',
+                                actualStart: '2026-04-11',
+                                actualEnd: null,
+                                status: 'doing',
+                                progress: 70,
+                                manager: '赵班组'
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'P2',
+                name: '华南充电器交付项目',
+                type: 'project',
+                start: '2026-04-05',
+                end: '2026-04-20',
+                actualStart: '2026-04-06',
+                actualEnd: null,
+                status: 'delayed',
+                progress: 40,
+                manager: '张经理',
+                children: [
+                    {
+                        id: 'T3',
+                        name: '充电器组装',
+                        type: 'task',
+                        start: '2026-04-05',
+                        end: '2026-04-15',
+                        actualStart: '2026-04-06',
+                        actualEnd: null,
+                        status: 'delayed',
+                        progress: 50,
+                        manager: '王主管',
+                        children: [
+                            {
+                                id: 'O5',
+                                name: 'PCB焊接',
+                                type: 'order',
+                                start: '2026-04-05',
+                                end: '2026-04-08',
+                                actualStart: '2026-04-06',
+                                actualEnd: '2026-04-08',
+                                status: 'done',
+                                progress: 100,
+                                manager: '李焊接'
+                            },
+                            {
+                                id: 'O6',
+                                name: '外壳装配',
+                                type: 'order',
+                                start: '2026-04-09',
+                                end: '2026-04-15',
+                                actualStart: '2026-04-10',
+                                actualEnd: null,
+                                status: 'delayed',
+                                progress: 30,
+                                manager: '王装配'
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'P3',
+                name: '新能源电池组试制',
+                type: 'project',
+                start: '2026-04-12',
+                end: '2026-05-10',
+                actualStart: null,
+                actualEnd: null,
+                status: 'pending',
+                progress: 10,
+                manager: '刘总监',
+                children: [
+                    {
+                        id: 'T4',
+                        name: '样品试制',
+                        type: 'task',
+                        start: '2026-04-12',
+                        end: '2026-04-28',
+                        actualStart: null,
+                        actualEnd: null,
+                        status: 'pending',
+                        progress: 5,
+                        manager: '周工程师',
+                        children: [
+                            {
+                                id: 'O7',
+                                name: '电芯分选',
+                                type: 'order',
+                                start: '2026-04-12',
+                                end: '2026-04-16',
+                                actualStart: null,
+                                actualEnd: null,
+                                status: 'pending',
+                                progress: 0,
+                                manager: '吴质检'
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        let expanded = new Set(['P1', 'P2', 'P3']); // 默认展开所有项目
+        const dayWidth = 60;
+        let startDate, endDate;
+        let currentZoom = 1;
+
+        // 初始化日期范围
+        function initDateRange() {
+            const dates = [];
+            data.forEach(p => {
+                dates.push(new Date(p.start));
+                dates.push(new Date(p.end));
+                p.children.forEach(t => {
+                    dates.push(new Date(t.start));
+                    dates.push(new Date(t.end));
+                    t.children.forEach(o => {
+                        dates.push(new Date(o.start));
+                        dates.push(new Date(o.end));
+                    });
+                });
+            });
+            
+            startDate = new Date(Math.min(...dates));
+            endDate = new Date(Math.max(...dates));
+            
+            // 前后各扩展3天
+            startDate.setDate(startDate.getDate() - 3);
+            endDate.setDate(endDate.getDate() + 3);
+        }
+
+        // 生成日期头部
+        function renderTimelineHeader() {
+            const header = document.getElementById('timelineHeader');
+            const gridLines = document.getElementById('gridLines');
+            header.innerHTML = '';
+            gridLines.innerHTML = '';
+            
+            const current = new Date(startDate);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            while (current <= endDate) {
+                const dateStr = current.toISOString().split('T')[0];
+                const isWeekend = current.getDay() === 0 || current.getDay() === 6;
+                const isToday = current.getTime() === today.getTime();
+                
+                // 日期单元格
+                const dayCell = document.createElement('div');
+                dayCell.className = `day-cell ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}`;
+                dayCell.style.minWidth = `${dayWidth * currentZoom}px`;
+                dayCell.innerHTML = `
+                    <span class="font-medium">${current.getMonth() + 1}/${current.getDate()}</span>
+                    <span class="text-xs opacity-70">${['日','一','二','三','四','五','六'][current.getDay()]}</span>
+                `;
+                header.appendChild(dayCell);
+                
+                // 网格线
+                const gridLine = document.createElement('div');
+                gridLine.className = 'grid-line';
+                gridLine.style.minWidth = `${dayWidth * currentZoom}px`;
+                gridLines.appendChild(gridLine);
+                
+                current.setDate(current.getDate() + 1);
+            }
+        }
+
+        // 计算位置
+        function getPosition(start, end) {
+            const startDiff = Math.floor((new Date(start) - startDate) / (1000 * 60 * 60 * 24));
+            const duration = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) + 1;
+            
+            return {
+                left: startDiff * dayWidth * currentZoom,
+                width: duration * dayWidth * currentZoom
+            };
+        }
+
+        // 渲染树形列表和甘特条
+        function render() {
+            const treeContent = document.getElementById('treeContent');
+            const ganttBars = document.getElementById('ganttBars');
+            treeContent.innerHTML = '';
+            ganttBars.innerHTML = '';
+            
+            let rowIndex = 0;
+            
+            data.forEach((project, pIndex) => {
+                // 项目行
+                renderRow(project, rowIndex, 0, treeContent, ganttBars);
+                rowIndex++;
+                
+                if (expanded.has(project.id)) {
+                    project.children.forEach((task, tIndex) => {
+                        // 任务行
+                        renderRow(task, rowIndex, 1, treeContent, ganttBars);
+                        rowIndex++;
+                        
+                        if (expanded.has(task.id)) {
+                            task.children.forEach((order, oIndex) => {
+                                // 工单行
+                                renderRow(order, rowIndex, 2, treeContent, ganttBars);
+                                rowIndex++;
+                            });
+                        }
+                    });
+                }
+            });
+            
+            // 设置今天线位置
+            updateTodayLine();
+        }
+
+        function renderRow(item, index, level, treeContainer, barsContainer) {
+            // 左侧树形行
+            const row = document.createElement('div');
+            row.className = `tree-row ${item.type} hover:bg-gray-50 cursor-pointer`;
+            row.style.top = `${index * 48}px`;
+            
+            const hasChildren = item.children && item.children.length > 0;
+            const isExpanded = expanded.has(item.id);
+            
+            let statusTag = '';
+            if (item.status === 'done') statusTag = '<span class="status-tag tag-done">已完成</span>';
+            else if (item.status === 'doing') statusTag = '<span class="status-tag tag-doing">进行中</span>';
+            else if (item.status === 'delayed') statusTag = '<span class="status-tag tag-delayed">已延期</span>';
+            else statusTag = '<span class="status-tag tag-pending">未开始</span>';
+            
+            const indent = level === 0 ? '' : level === 1 ? 'ml-6' : 'ml-12';
+            const icon = hasChildren ? 
+                `<i class="fas fa-chevron-right expand-icon ${isExpanded ? 'expanded' : ''}" onclick="toggleExpand('${item.id}', event)"></i>` : 
+                '<span class="w-4 inline-block"></span>';
+            
+            row.innerHTML = `
+                <div class="flex-1 flex items-center ${indent}">
+                    ${icon}
+                    <i class="fas ${item.type === 'project' ? 'fa-folder text-blue-500' : item.type === 'task' ? 'fa-tasks text-green-500' : 'fa-ticket-alt text-orange-400'} mr-2 w-4"></i>
+                    <span class="truncate" title="${item.name}">${item.name}</span>
+                </div>
+                <div class="w-20 text-center text-sm text-gray-600">${item.manager}</div>
+                <div class="w-20 text-center">${statusTag}</div>
+            `;
+            
+            row.onclick = (e) => {
+                if (!e.target.closest('.expand-icon')) {
+                    showDetail(item);
+                }
+            };
+            
+            treeContainer.appendChild(row);
+            
+            // 右侧甘特条
+            const pos = getPosition(item.start, item.end);
+            const bar = document.createElement('div');
+            bar.className = `gantt-bar ${item.type}-bar ${item.status === 'delayed' ? 'delayed' : item.status === 'done' ? 'completed' : 'in-progress'}`;
+            bar.style.left = `${pos.left}px`;
+            bar.style.width = `${pos.width}px`;
+            bar.style.top = `${index * 48 + 10}px`;
+            bar.textContent = item.progress > 0 ? `${item.progress}%` : '';
+            bar.onclick = () => showDetail(item);
+            bar.title = `${item.name} (${item.start} 至 ${item.end})`;
+            
+            barsContainer.appendChild(bar);
+        }
+
+        function toggleExpand(id, event) {
+            event.stopPropagation();
+            if (expanded.has(id)) {
+                expanded.delete(id);
+            } else {
+                expanded.add(id);
+            }
+            render();
+        }
+
+        function updateTodayLine() {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const diff = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+            const left = diff * dayWidth * currentZoom;
+            document.getElementById('todayLine').style.left = `${left}px`;
+        }
+
+        function goToToday() {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const diff = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+            const scrollLeft = (diff * dayWidth * currentZoom) - document.getElementById('ganttRight').clientWidth / 2;
+            document.getElementById('ganttRight').scrollLeft = Math.max(0, scrollLeft);
+        }
+
+        function resetView() {
+            expanded = new Set(['P1', 'P2', 'P3']);
+            currentZoom = 1;
+            render();
+            goToToday();
+        }
+
+        function zoomIn() {
+            currentZoom = Math.min(currentZoom + 0.2, 2);
+            renderTimelineHeader();
+            render();
+        }
+
+        function zoomOut() {
+            currentZoom = Math.max(currentZoom - 0.2, 0.5);
+            renderTimelineHeader();
+            render();
+        }
+
+        function showDetail(item) {
+            const modal = document.getElementById('detailModal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            const typeName = item.type === 'project' ? '项目' : item.type === 'task' ? '任务' : '工单';
+            title.textContent = `${typeName}详情 - ${item.name}`;
+            
+            let statusText = item.status === 'done' ? '已完成' : item.status === 'doing' ? '进行中' : item.status === 'delayed' ? '已延期' : '未开始';
+            let statusColor = item.status === 'done' ? 'text-green-600' : item.status === 'doing' ? 'text-blue-600' : item.status === 'delayed' ? 'text-red-600' : 'text-gray-600';
+            
+            // 判断是否延期（简单逻辑：如果计划结束日期已过但未完成）
+            const today = new Date();
+            const planEnd = new Date(item.end);
+            const isDelayed = item.status !== 'done' && planEnd < today;
+            
+            // 时间信息展示
+            const actualStartDisplay = item.actualStart || '-';
+            const actualEndDisplay = item.actualEnd || (item.progress > 0 ? '进行中' : '-');
+            const actualStartClass = item.actualStart ? 'text-gray-800' : 'text-gray-400';
+            const actualEndClass = item.actualEnd ? 'text-green-700' : (item.progress > 0 ? 'text-blue-600' : 'text-gray-400');
+            
+            // 延期提示
+            const delayBadge = isDelayed ? 
+                '<span class="ml-2 px-2 py-1 bg-red-100 text-red-600 text-xs rounded font-medium">已延期</span>' : '';
+            
+            body.innerHTML = `
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        <div class="text-xs text-gray-500 mb-1">编号</div>
+                        <div class="text-sm font-medium text-gray-800">${item.id}</div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        <div class="text-xs text-gray-500 mb-1">负责人</div>
+                        <div class="text-sm font-medium text-gray-800">${item.manager}</div>
+                    </div>
+                </div>
+                
+                <!-- 计划时间 -->
+                <div class="mb-4">
+                    <div class="text-xs text-gray-500 mb-2 font-medium">计划时间</div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <div class="text-xs text-gray-500 mb-1">计划开始</div>
+                            <div class="text-sm font-medium text-gray-800">${item.start}</div>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <div class="text-xs text-gray-500 mb-1">计划结束</div>
+                            <div class="text-sm font-medium text-gray-800 flex items-center">
+                                ${item.end}
+                                ${delayBadge}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 实际时间 -->
+                <div class="mb-4">
+                    <div class="text-xs text-gray-500 mb-2 font-medium">实际时间</div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="${item.actualStart ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'} p-3 rounded-lg border">
+                            <div class="text-xs ${item.actualStart ? 'text-blue-600' : 'text-gray-500'} mb-1">实际开始</div>
+                            <div class="text-sm font-medium ${actualStartClass}">${actualStartDisplay}</div>
+                        </div>
+                        <div class="${item.actualEnd ? 'bg-green-50 border-green-200' : (item.progress > 0 ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200')} p-3 rounded-lg border">
+                            <div class="text-xs ${item.actualEnd ? 'text-green-600' : (item.progress > 0 ? 'text-blue-600' : 'text-gray-500')} mb-1">实际结束</div>
+                            <div class="text-sm font-medium ${actualEndClass}">${actualEndDisplay}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 进度 -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-gray-600">当前进度</span>
+                        <span class="text-sm font-bold ${statusColor}">${statusText} (${item.progress}%)</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="progress-fill" style="width: ${item.progress}%"></div>
+                    </div>
+                    ${isDelayed ? `
+                    <div class="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded">
+                        <i class="fas fa-exclamation-circle mr-1"></i>
+                        该${typeName}已延期，计划结束时间为 ${item.end}，请尽快处理
+                    </div>
+                    ` : ''}
+                </div>
+                
+                ${item.children ? `
+                <div class="border-t border-gray-200 pt-4">
+                    <div class="text-sm font-medium text-gray-700 mb-3">下级${item.type === 'project' ? '任务' : '工单'} (${item.children.length}个)</div>
+                    <div class="space-y-2 max-h-48 overflow-y-auto">
+                        ${item.children.map(child => {
+                            const childStatusColor = child.status === 'done' ? 'text-green-600' : child.status === 'doing' ? 'text-blue-600' : child.status === 'delayed' ? 'text-red-600' : 'text-gray-600';
+                            const childStatusText = child.status === 'done' ? '已完成' : child.status === 'doing' ? '进行中' : child.status === 'delayed' ? '已延期' : '未开始';
+                            return `
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors border border-gray-100" onclick="showDetailById('${child.id}')">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas ${child.type === 'task' ? 'fa-tasks text-green-500' : 'fa-ticket-alt text-orange-400'}"></i>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-800">${child.name}</div>
+                                        <div class="text-xs text-gray-500 mt-1">
+                                            计划：${child.start} 至 ${child.end}
+                                            ${child.actualStart ? ` | 实际：${child.actualStart} 至 ${child.actualEnd || '进行中'}` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xs text-gray-500">${child.manager}</span>
+                                    <span class="text-xs ${childStatusColor} font-medium">${childStatusText}</span>
+                                    <span class="text-xs ${childStatusColor}">${child.progress}%</span>
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function showDetailById(id) {
+            // 查找item
+            let found = null;
+            data.forEach(p => {
+                if (p.id === id) found = p;
+                p.children.forEach(t => {
+                    if (t.id === id) found = t;
+                    t.children.forEach(o => {
+                        if (o.id === id) found = o;
+                    });
+                });
+            });
+            if (found) showDetail(found);
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        function viewFullDetail() {
+            alert('跳转到详细页面');
+            closeModal();
+        }
+
+        // 初始化
+        initDateRange();
+        renderTimelineHeader();
+        render();
+        
+        // 默认滚动到今天
+        setTimeout(goToToday, 100);
+
+        // 更新当前日期显示
+        document.getElementById('currentDate').textContent = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>

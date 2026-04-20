@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 项目超期预警</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .sidebar-item {
+            transition: all 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .sidebar-item.active {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border-right: 3px solid #1890ff;
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .input-field {
+            transition: all 0.3s;
+            border: 1px solid #d9d9d9;
+        }
+
+        .input-field:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 3px rgba(24,144,255,0.1);
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #40a9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24,144,255,0.4);
+        }
+
+        .warning-level {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .level-critical {
+            background-color: #fff1f0;
+            color: #cf1322;
+            border: 1px solid #ffa39e;
+        }
+
+        .level-high {
+            background-color: #fff2e8;
+            color: #fa541c;
+            border: 1px solid #ffbb96;
+        }
+
+        .level-medium {
+            background-color: #fff7e6;
+            color: #faad14;
+            border: 1px solid #ffd591;
+        }
+
+        .level-low {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+
+        .delay-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .delay-over {
+            background-color: #ff4d4f;
+            color: white;
+        }
+
+        .delay-warning {
+            background-color: #faad14;
+            color: white;
+        }
+
+        .delay-safe {
+            background-color: #52c41a;
+            color: white;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s;
+            height: 88px;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #d9d9d9;
+        }
+
+        .stat-card.border-l-4 {
+            border-left-width: 4px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.red {
+            background-color: #fff1f0;
+            color: #ff4d4f;
+        }
+
+        .stat-icon.orange {
+            background-color: #fff7e6;
+            color: #fa8c16;
+        }
+
+        .stat-icon.blue {
+            background-color: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .stat-icon.gray {
+            background-color: #f5f5f5;
+            color: #8c8c8c;
+        }
+
+        .stat-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .stat-title {
+            font-size: 13px;
+            color: #8c8c8c;
+            font-weight: 400;
+        }
+
+        .stat-value-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            line-height: 1;
+            color: #262626;
+        }
+
+        .stat-value.text-red-600 {
+            color: #ff4d4f;
+        }
+
+        .stat-value.text-orange-500 {
+            color: #fa8c16;
+        }
+
+        .stat-value.text-blue-600 {
+            color: #1890ff;
+        }
+
+        .stat-desc {
+            font-size: 12px;
+            color: #bfbfbf;
+        }
+
+        .progress-bar {
+            background-color: #f0f0f0;
+            border-radius: 100px;
+            overflow: hidden;
+            height: 8px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #1890ff, #40a9ff);
+            height: 100%;
+            border-radius: 100px;
+            transition: width 0.6s ease;
+        }
+
+        .timeline-small {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+            white-space: nowrap;
+        }
+
+        .timeline-bar {
+            width: 80px;
+            height: 4px;
+            background: #f0f0f0;
+            border-radius: 2px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .timeline-fill {
+            height: 100%;
+            background: #1890ff;
+            border-radius: 2px;
+        }
+
+        .timeline-fill.delayed {
+            background: #ff4d4f;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            position: relative;
+            border-radius: 8px;
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .data-table {
+            width: 100%;
+            min-width: 1200px;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            white-space: nowrap;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .data-table th {
+            background-color: #fafafa;
+            font-weight: 500;
+            color: #666;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #fafafa;
+        }
+
+        .action-btn {
+            color: #1890ff;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+        }
+
+        .action-btn:hover {
+            color: #40a9ff;
+            background: #f0f7ff;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20 flex-shrink-0">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i>
+                <span>云智工业互联平台</span>
+            </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-home"></i> 首页
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-desktop"></i> 工作台
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-project-diagram"></i> 流程管理
+                </a>
+                <a href="项目列表.html" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600">
+                    <i class="fas fa-tasks"></i> 营销管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-industry"></i> 生产管理
+                </a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
+                    <i class="fas fa-warehouse"></i> 库存管理
+                </a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 text-gray-500 hover:text-blue-600 relative">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            </button>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>admin-admin</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 左侧边栏 -->
+        <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
+            <div class="p-4">
+                <div class="space-y-1">
+                    <a href="项目列表.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-list-ul w-5"></i>
+                        <span>项目列表</span>
+                    </a>
+                    <a href="项目空间.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-cube w-5"></i>
+                        <span>项目空间</span>
+                    </a>
+                    <a href="项目甘特图.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-chart-gantt w-5"></i>
+                        <span>项目甘特图</span>
+                    </a>
+                    <a href="项目超期预警表.html" class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium bg-blue-50 text-blue-600 border-r-2 border-blue-600">
+                        <i class="fas fa-exclamation-triangle w-5"></i>
+                        <span>项目超期预警表</span>
+                    </a>
+                    <a href="项目支出.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-yen-sign w-5"></i>
+                        <span>项目支出</span>
+                    </a>
+                    <a href="项目问题.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-bug w-5"></i>
+                        <span>项目问题</span>
+                    </a>
+                    <a href="项目风险.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-shield-alt w-5"></i>
+                        <span>项目风险</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6 min-w-0">
+
+            <!-- 面包屑 -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                    <span class="cursor-pointer hover:text-blue-600">首页</span>
+                    <i class="fas fa-chevron-right text-xs"></i>
+                    <span class="cursor-pointer hover:text-blue-600">项目管理</span>
+                    <i class="fas fa-chevron-right text-xs"></i>
+                    <span class="text-blue-600 font-medium">项目超期预警</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500">数据更新时间：</span>
+                    <span class="text-sm font-medium text-gray-800">2026-04-17 10:30</span>
+                    <button onclick="refreshData()" class="ml-2 text-blue-600 hover:text-blue-800 text-sm">
+                        <i class="fas fa-sync-alt mr-1"></i>刷新
+                    </button>
+                </div>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="stat-card border-l-4 border-red-500">
+                    <div class="stat-icon red">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">已超期项目</div>
+                        <div class="stat-value-row">
+                            <div class="stat-value text-red-600">3</div>
+                            <span class="stat-desc">需立即处理</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card border-l-4 border-orange-500">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">即将超期 (3 天内)</div>
+                        <div class="stat-value-row">
+                            <div class="stat-value text-orange-500">5</div>
+                            <span class="stat-desc">需重点关注</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card border-l-4 border-blue-500">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">剩余 7 天内</div>
+                        <div class="stat-value-row">
+                            <div class="stat-value text-blue-600">8</div>
+                            <span class="stat-desc">需跟进进度</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card border-l-4 border-gray-300">
+                    <div class="stat-icon gray">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-title">本月已处理</div>
+                        <div class="stat-value-row">
+                            <div class="stat-value" style="color: #595959;">12</div>
+                            <span class="stat-desc">预警已解除</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 筛选区 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-5 mb-4">
+                <div class="grid grid-cols-5 gap-4">
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">预警级别</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>全部级别</option>
+                            <option>严重超期</option>
+                            <option>即将超期</option>
+                            <option>进度滞后</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">项目经理</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>全部负责人</option>
+                            <option>伍红卫</option>
+                            <option>张经理</option>
+                            <option>李工程师</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">项目类型</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>全部类型</option>
+                            <option>服务类</option>
+                            <option>工程类</option>
+                            <option>研发类</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1.5">超期天数</label>
+                        <select class="input-field w-full px-3 py-2 rounded-lg text-sm bg-white">
+                            <option>全部</option>
+                            <option>1-3天</option>
+                            <option>4-7天</option>
+                            <option>7天以上</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button class="btn-primary px-6 py-2 rounded-lg text-sm flex items-center gap-2">
+                            <i class="fas fa-search"></i> 查询
+                        </button>
+                        <button class="px-6 py-2 rounded-lg text-sm border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 transition-colors flex items-center gap-2">
+                            <i class="fas fa-trash-alt"></i> 清空
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100">
+                </div>
+                
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th class="w-10"><input type="checkbox" class="rounded border-gray-300"></th>
+                                <th>项目信息</th>
+                                <th>预警级别</th>
+                                <th>计划时间</th>
+                                <th class="text-center">当前进度</th>
+                                <th class="text-center">剩余/超期</th>
+                                <th>负责人</th>
+                                <th>风险说明</th>
+                                <th class="text-center w-40">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 严重超期 -->
+                            <tr class="hover:bg-red-50 transition-colors bg-red-50/30">
+                                <td class="px-4 py-4"><input type="checkbox" class="rounded border-gray-300"></td>
+                                <td class="px-4 py-4">
+                                    <div class="font-medium text-gray-900 whitespace-nowrap">华南充电器交付项目</div>
+                                    <div class="text-xs text-gray-500 mt-1">XM-20260405-002 | 服务类</div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <span class="warning-level level-critical">
+                                        <i class="fas fa-fire mr-1"></i>严重超期
+                                    </span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="text-sm text-gray-700 whitespace-nowrap">2026-04-05 至 2026-04-15</div>
+                                    <div class="timeline-small">
+                                        <span>已用12天</span>
+                                        <div class="timeline-bar">
+                                            <div class="timeline-fill delayed" style="width: 100%"></div>
+                                        </div>
+                                        <span class="text-red-600 font-medium">超期2天</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <div class="text-lg font-bold text-orange-600">40%</div>
+                                    <div class="text-xs text-gray-500">滞后严重</div>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <span class="delay-tag delay-over">超期 2 天</span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-2 whitespace-nowrap">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs">张</div>
+                                        <div>
+                                            <div class="text-sm font-medium">张经理</div>
+                                            <div class="text-xs text-gray-500">13800138000</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="text-sm text-gray-700 whitespace-nowrap">外壳装配工序延期</div>
+                                    <div class="text-xs text-gray-500 mt-1">物料未到货</div>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button onclick="viewDetail('XM-20260405-002')" class="action-btn" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button onclick="markResolved('XM-20260405-002', '华南充电器交付项目')" class="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors whitespace-nowrap">
+                                            <i class="fas fa-check mr-1"></i>标记解决
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- 即将超期 -->
+                            <tr class="hover:bg-orange-50 transition-colors">
+                                <td class="px-4 py-4"><input type="checkbox" class="rounded border-gray-300"></td>
+                                <td class="px-4 py-4">
+                                    <div class="font-medium text-gray-900 whitespace-nowrap">永城基地扩建项目</div>
+                                    <div class="text-xs text-gray-500 mt-1">XM-20260401-001 | 工程类</div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <span class="warning-level level-high">
+                                        <i class="fas fa-clock mr-1"></i>即将超期
+                                    </span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="text-sm text-gray-700 whitespace-nowrap">2026-04-01 至 2026-04-30</div>
+                                    <div class="timeline-small">
+                                        <span>已用16天</span>
+                                        <div class="timeline-bar">
+                                            <div class="timeline-fill" style="width: 65%"></div>
+                                        </div>
+                                        <span class="text-orange-600 font-medium">剩13天</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <div class="text-lg font-bold text-blue-600">65%</div>
+                                    <div class="text-xs text-gray-500">正常推进</div>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <span class="delay-tag delay-warning">剩余 2 天</span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-2 whitespace-nowrap">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs">伍</div>
+                                        <div>
+                                            <div class="text-sm font-medium">伍红卫</div>
+                                            <div class="text-xs text-gray-500">13800138001</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="text-sm text-gray-700 whitespace-nowrap">土建施工进度偏慢</div>
+                                    <div class="text-xs text-gray-500 mt-1">天气影响</div>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button onclick="viewDetail('XM-20260401-001')" class="action-btn" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button onclick="markResolved('XM-20260401-001', '永城基地扩建项目')" class="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors whitespace-nowrap">
+                                            <i class="fas fa-check mr-1"></i>标记解决
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- 进度滞后 -->
+                            <tr class="hover:bg-yellow-50 transition-colors">
+                                <td class="px-4 py-4"><input type="checkbox" class="rounded border-gray-300"></td>
+                                <td class="px-4 py-4">
+                                    <div class="font-medium text-gray-900 whitespace-nowrap">新能源电池组试制</div>
+                                    <div class="text-xs text-gray-500 mt-1">XM-20260412-003 | 研发类</div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <span class="warning-level level-medium">
+                                        <i class="fas fa-exclamation mr-1"></i>进度滞后
+                                    </span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="text-sm text-gray-700 whitespace-nowrap">2026-04-12 至 2026-05-10</div>
+                                    <div class="timeline-small">
+                                        <span>已用5天</span>
+                                        <div class="timeline-bar">
+                                            <div class="timeline-fill" style="width: 15%"></div>
+                                        </div>
+                                        <span class="text-yellow-600 font-medium">剩23天</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <div class="text-lg font-bold text-yellow-600">10%</div>
+                                    <div class="text-xs text-gray-500">进度偏慢</div>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <span class="delay-tag delay-safe">剩余 23 天</span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-2 whitespace-nowrap">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs">刘</div>
+                                        <div>
+                                            <div class="text-sm font-medium">刘总监</div>
+                                            <div class="text-xs text-gray-500">13800138002</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="text-sm text-gray-700 whitespace-nowrap">样品试制未启动</div>
+                                    <div class="text-xs text-gray-500 mt-1">设备调试中</div>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button onclick="viewDetail('XM-20260412-003')" class="action-btn" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button onclick="markResolved('XM-20260412-003', '新能源电池组试制')" class="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors whitespace-nowrap">
+                                            <i class="fas fa-check mr-1"></i>标记解决
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- 轻微预警 -->
+                            <tr class="hover:bg-blue-50 transition-colors">
+                                <td class="px-4 py-4"><input type="checkbox" class="rounded border-gray-300"></td>
+                                <td class="px-4 py-4">
+                                    <div class="font-medium text-gray-900 whitespace-nowrap">智能仓储系统研发</div>
+                                    <div class="text-xs text-gray-500 mt-1">XM-20260126-004 | 研发类</div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <span class="warning-level level-low">
+                                        <i class="fas fa-info-circle mr-1"></i>轻微预警
+                                    </span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="text-sm text-gray-700 whitespace-nowrap">2026-01-15 至 2026-06-30</div>
+                                    <div class="timeline-small">
+                                        <span>已用82天</span>
+                                        <div class="timeline-bar">
+                                            <div class="timeline-fill" style="width: 35%"></div>
+                                        </div>
+                                        <span class="text-blue-600 font-medium">剩74天</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <div class="text-lg font-bold text-blue-600">35%</div>
+                                    <div class="text-xs text-gray-500">略慢于计划</div>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <span class="delay-tag delay-safe">剩余 74 天</span>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center gap-2 whitespace-nowrap">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs">王</div>
+                                        <div>
+                                            <div class="text-sm font-medium">王架构师</div>
+                                            <div class="text-xs text-gray-500">13800138003</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="text-sm text-gray-700 whitespace-nowrap">需求变更频繁</div>
+                                    <div class="text-xs text-gray-500 mt-1">沟通中</div>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button onclick="viewDetail('XM-20260126-004')" class="action-btn" title="查看详情">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button onclick="markResolved('XM-20260126-004', '智能仓储系统研发')" class="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors whitespace-nowrap">
+                                            <i class="fas fa-check mr-1"></i>标记解决
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 分页 -->
+                <div class="flex items-center justify-end gap-4 px-6 py-4 border-t border-gray-100">
+                    <span class="text-sm text-gray-600">共 16 条</span>
+                    <select class="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:border-blue-500">
+                        <option>10条/页</option>
+                        <option>20条/页</option>
+                        <option>50条/页</option>
+                    </select>
+                    <div class="flex items-center gap-1">
+                        <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-300 text-gray-500 hover:border-blue-500 hover:text-blue-600 disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded bg-blue-600 text-white text-sm">1</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600">2</button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded border border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部提示 -->
+            <div class="mt-4 bg-blue-50 rounded-lg p-4 border border-blue-100 flex items-start gap-3">
+                <i class="fas fa-info-circle text-blue-600 mt-0.5"></i>
+                <div class="text-sm text-blue-800">
+                    <div class="font-medium mb-1">预警规则说明</div>
+                    <div class="text-blue-600/80 text-xs leading-relaxed">
+                        1. 严重超期：已超过计划结束日期且进度低于80%<br>
+                        2. 即将超期：剩余3天内结束但进度未达90%<br>
+                        3. 进度滞后：已用时间占比与进度占比差距超过20%<br>
+                        4. 系统自动每日9:00更新预警状态，请及时关注处理
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 标记解决确认弹窗 -->
+    <div id="resolveModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-lg font-medium text-gray-900">标记为已解决</h3>
+                <button onclick="closeResolveModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="px-6 py-4">
+                <div class="mb-4">
+                    <label class="block text-sm text-gray-600 mb-1">项目名称</label>
+                    <div id="resolveProjectName" class="text-sm font-medium text-gray-900 bg-gray-50 px-3 py-2 rounded"></div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm text-gray-600 mb-1">项目编号</label>
+                    <div id="resolveProjectId" class="text-sm font-medium text-gray-900 bg-gray-50 px-3 py-2 rounded"></div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">解决说明 <span class="text-red-500">*</span></label>
+                    <textarea id="resolveRemark" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" rows="3" placeholder="请输入解决说明，如：已调整计划/已申请延期/已完成交付..."></textarea>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+                <button onclick="closeResolveModal()" class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+                    取消
+                </button>
+                <button onclick="confirmResolve()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-check mr-1"></i>确认标记
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentProjectId = null;
+        let currentProjectName = null;
+
+        function refreshData() {
+            alert('数据已刷新');
+        }
+
+        function exportReport() {
+            alert('正在导出预警报表...');
+        }
+
+        function viewDetail(id) {
+            alert('查看项目详情：' + id + '\n\n可跳转至项目空间查看详细信息');
+        }
+
+        function handleWarning(id) {
+            alert('正在处理项目：' + id + '\n\n可进入项目详情页进行调整计划或申请延期');
+        }
+
+        function markResolved(id, name) {
+            currentProjectId = id;
+            currentProjectName = name;
+            document.getElementById('resolveProjectId').textContent = id;
+            document.getElementById('resolveProjectName').textContent = name;
+            document.getElementById('resolveRemark').value = '';
+            document.getElementById('resolveModal').classList.remove('hidden');
+            document.getElementById('resolveModal').classList.add('flex');
+        }
+
+        function closeResolveModal() {
+            document.getElementById('resolveModal').classList.add('hidden');
+            document.getElementById('resolveModal').classList.remove('flex');
+            currentProjectId = null;
+            currentProjectName = null;
+        }
+
+        function confirmResolve() {
+            const remark = document.getElementById('resolveRemark').value.trim();
+            if (!remark) {
+                alert('请输入解决说明');
+                return;
+            }
+            if (currentProjectId && currentProjectName) {
+                alert('项目 ' + currentProjectName + ' (' + currentProjectId + ') 已标记为已解决\n解决说明：' + remark);
+                closeResolveModal();
+            }
+        }
+
+        // 点击弹窗外部关闭
+        document.getElementById('resolveModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeResolveModal();
+            }
+        });
+
+        // ESC键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeResolveModal();
+            }
+        });
+    </script>
+</body>
+</html>

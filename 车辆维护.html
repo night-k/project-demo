@@ -408,8 +408,8 @@
                 <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
                     <i class="fas fa-industry"></i> 生产管理
                 </a>
-                <a href="#" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600">
-                    <i class="fas fa-wrench"></i> 设备管理
+                <a href="车辆档案.html" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600">
+                    <i class="fas fa-truck"></i> 设备管理
                 </a>
                 <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5">
                     <i class="fas fa-warehouse"></i> 库存管理
@@ -440,28 +440,23 @@
         <!-- 左侧边栏 -->
         <aside class="w-56 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
             <div class="p-4">
-                <div class="text-xs text-gray-400 mb-2 px-4">设备管理</div>
                 <div class="space-y-1">
-                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600">
-                        <i class="fas fa-toolbox w-5"></i>
-                        <span>设备台账</span>
-                    </div>
-                    <div class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium">
+                    <a href="车辆档案.html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
                         <i class="fas fa-car w-5"></i>
+                        <span>车辆档案</span>
+                    </a>
+                    <a href="车辆维护.html" class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 font-medium bg-blue-50 text-blue-600 border-r-2 border-blue-600">
+                        <i class="fas fa-tools w-5"></i>
                         <span>车辆维护</span>
-                    </div>
-                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600">
-                        <i class="fas fa-wrench w-5"></i>
-                        <span>维保管理</span>
-                    </div>
-                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600">
-                        <i class="fas fa-clipboard-check w-5"></i>
-                        <span>巡检管理</span>
-                    </div>
-                    <div class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600">
-                        <i class="fas fa-chart-line w-5"></i>
-                        <span>设备统计</span>
-                    </div>
+                    </a>
+                    <a href="车辆维护(新增).html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-plus-circle w-5"></i>
+                        <span>车辆维护 - 新增</span>
+                    </a>
+                    <a href="加油记录 .html" class="sidebar-item px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600">
+                        <i class="fas fa-gas-pump w-5"></i>
+                        <span>加油记录</span>
+                    </a>
                 </div>
             </div>
         </aside>
