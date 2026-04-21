@@ -577,18 +577,26 @@
 
         .stat-card {
             background: #fff;
-            padding: 16px 20px;
+            padding: 12px 16px;
             border-radius: 8px;
             box-shadow: 0 2px 12px 0 rgba(0,0,0,0.05);
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 12px;
         }
 
         .stat-label {
-            font-size: 13px;
+            font-size: 12px;
             color: #909399;
-            margin-bottom: 8px;
+            margin-bottom: 2px;
         }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #303133;
+            line-height: 1.2;
+        }        }
 
         .stat-value {
             font-size: 24px;
@@ -800,46 +808,45 @@
         <div class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">加油记录</h1>
-                <p class="text-sm text-gray-500 mt-1">记录车辆加油信息，统计油耗数据</p>
             </div>
         </div>
 
         <!-- 统计卡片区域 -->
         <div class="grid grid-cols-4 gap-4 mb-6">
             <div class="stat-card">
-                <div class="stat-icon blue" style="width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; background-color: #e6f7ff; color: #1890ff;">
+                <div class="stat-icon blue" style="width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; background-color: #e6f7ff; color: #1890ff; flex-shrink: 0;">
                     <i class="fas fa-gas-pump"></i>
                 </div>
-                <div class="stat-content" style="flex: 1;">
-                    <div class="stat-title" style="font-size: 14px; color: #666; margin-bottom: 4px;">本月加油总量</div>
-                    <div class="stat-value" style="font-size: 28px; font-weight: 600; color: #262626;">12,580</div>
+                <div class="stat-content" style="min-width: 0;">
+                    <div class="stat-title" style="font-size: 12px; color: #666; margin-bottom: 2px;">本月加油总量</div>
+                    <div class="stat-value" style="font-size: 20px; font-weight: 600; color: #262626;">12,580</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon green" style="width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; background-color: #f6ffed; color: #52c41a;">
+                <div class="stat-icon green" style="width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; background-color: #f6ffed; color: #52c41a; flex-shrink: 0;">
                     <i class="fas fa-yen-sign"></i>
                 </div>
-                <div class="stat-content" style="flex: 1;">
-                    <div class="stat-title" style="font-size: 14px; color: #666; margin-bottom: 4px;">本月加油金额</div>
-                    <div class="stat-value" style="font-size: 28px; font-weight: 600; color: #262626;">98,450</div>
+                <div class="stat-content" style="min-width: 0;">
+                    <div class="stat-title" style="font-size: 12px; color: #666; margin-bottom: 2px;">本月加油金额</div>
+                    <div class="stat-value" style="font-size: 20px; font-weight: 600; color: #262626;">98,450</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon cyan" style="width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; background-color: #e6fffb; color: #13c2c2;">
+                <div class="stat-icon cyan" style="width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; background-color: #e6fffb; color: #13c2c2; flex-shrink: 0;">
                     <i class="fas fa-chart-line"></i>
                 </div>
-                <div class="stat-content" style="flex: 1;">
-                    <div class="stat-title" style="font-size: 14px; color: #666; margin-bottom: 4px;">平均单价</div>
-                    <div class="stat-value" style="font-size: 28px; font-weight: 600; color: #262626;">7.82</div>
+                <div class="stat-content" style="min-width: 0;">
+                    <div class="stat-title" style="font-size: 12px; color: #666; margin-bottom: 2px;">平均单价</div>
+                    <div class="stat-value" style="font-size: 20px; font-weight: 600; color: #262626;">7.82</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon orange" style="width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; background-color: #fff7e6; color: #fa8c16;">
+                <div class="stat-icon orange" style="width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; background-color: #fff7e6; color: #fa8c16; flex-shrink: 0;">
                     <i class="fas fa-list-ol"></i>
                 </div>
-                <div class="stat-content" style="flex: 1;">
-                    <div class="stat-title" style="font-size: 14px; color: #666; margin-bottom: 4px;">加油次数</div>
-                    <div class="stat-value" style="font-size: 28px; font-weight: 600; color: #262626;">156</div>
+                <div class="stat-content" style="min-width: 0;">
+                    <div class="stat-title" style="font-size: 12px; color: #666; margin-bottom: 2px;">加油次数</div>
+                    <div class="stat-value" style="font-size: 20px; font-weight: 600; color: #262626;">156</div>
                 </div>
             </div>
         </div>
