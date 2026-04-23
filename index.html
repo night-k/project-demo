@@ -469,6 +469,36 @@
                 </div>
             </div>
         </div>
+        <div class="glass-card nav-card p-5" onclick="openPage('项目健康度监控.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon purple">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">项目健康度监控</h3>
+                    <p class="text-xs text-gray-500">项目多维度健康监控</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-blue-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card nav-card p-5" onclick="openPage('系统通知.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon cyan">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">系统通知</h3>
+                    <p class="text-xs text-gray-500">系统消息通知中心</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-blue-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 克拉玛依迭代 1.0 -->
@@ -827,6 +857,36 @@
                 </div>
             </div>
         </div>
+        <div class="glass-card nav-card p-5" onclick="openPage('项目健康度监控.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon purple">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">项目健康度监控</h3>
+                    <p class="text-xs text-gray-500">项目多维度健康监控</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-blue-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card nav-card p-5" onclick="openPage('系统通知.html')">
+            <div class="flex items-start gap-4">
+                <div class="nav-icon cyan">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-semibold text-gray-800 mb-1">系统通知</h3>
+                    <p class="text-xs text-gray-500">系统消息通知中心</p>
+                    <div class="mt-3 flex items-center gap-2 text-xs text-blue-600">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span>点击打开</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 <!-- 底部信息 -->
@@ -859,13 +919,13 @@
             var badge = document.getElementById('versionBadge');
             if (badge) {
                 if (tabName === 'all') {
-                    badge.innerHTML = '<i class="fas fa-th mr-2"></i>所有页面 · 23 个';
+                    badge.innerHTML = '<i class="fas fa-th mr-2"></i>所有页面 · 25 个';
                 } else if (tabName === 'v1.0') {
                     badge.innerHTML = '<i class="fas fa-code-branch mr-2"></i>克拉玛依迭代 1.0 · 7 个页面';
                 } else if (tabName === 'v1.1') {
                     badge.innerHTML = '<i class="fas fa-code-branch mr-2"></i>克拉玛依迭代 1.1 · 9 个页面';
-                } else {
-                    badge.innerHTML = '<i class="fas fa-clock mr-2"></i>待规划 · 6 个页面';
+                } else if (tabName === 'pending') {
+                    badge.innerHTML = '<i class="fas fa-clock mr-2"></i>待规划 · 8 个页面';
                 }
             }
         }
