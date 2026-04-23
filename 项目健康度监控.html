@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云智工业互联平台 - 项目健康度仪表盘</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f0f2f5; }
+        .sidebar-item { transition: all 0.3s; }
+        .sidebar-item:hover { background-color: #e6f7ff; color: #1890ff; border-right: 3px solid #1890ff; }
+        .sidebar-item.active { background-color: #e6f7ff; color: #1890ff; border-right: 3px solid #1890ff; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 维度卡片 */
+        .dim-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 16px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.02);
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .dim-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        .dim-card.active { border-color: #1890ff; background: #f0f7ff; }
+        .dim-card .dim-count { font-size: 24px; font-weight: 800; }
+        .dim-card .dim-label { font-size: 13px; color: #64748b; font-weight: 500; }
+        .dim-card .dim-desc { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+        /* 列表滚动容器 */
+        .list-scroll-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            border-radius: 0 0 12px 12px;
+        }
+        .list-scroll-container::-webkit-scrollbar { height: 8px; }
+        .list-scroll-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .list-scroll-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .list-scroll-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* 列表行式布局 */
+        .list-table {
+            min-width: 1050px;
+            width: 100%;
+        }
+        .list-row {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.2s;
+            background: #fff;
+        }
+        .list-row:hover { background: #fafafa; }
+        .list-row:last-child { border-bottom: none; }
+
+        .list-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            min-width: 1050px;
+        }
+
+        .col-project { width: 170px; flex-shrink: 0; }
+        .col-status { width: 50px; flex-shrink: 0; text-align: center; }
+        .col-dim { width: 150px; flex-shrink: 0; text-align: center; }
+        .col-milestone { width: 90px; flex-shrink: 0; text-align: center; }
+        .col-owner { width: 80px; flex-shrink: 0; text-align: center; }
+        .col-action { width: 70px; flex-shrink: 0; text-align: center; }
+
+        /* 健康状态圆点 */
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-dot.excellent { background: #52c41a; box-shadow: 0 0 0 3px rgba(82,196,26,0.2); }
+        .status-dot.good { background: #1890ff; box-shadow: 0 0 0 3px rgba(24,144,255,0.2); }
+        .status-dot.warning { background: #fa8c16; box-shadow: 0 0 0 3px rgba(250,140,22,0.2); }
+        .status-dot.danger { background: #f5222d; box-shadow: 0 0 0 3px rgba(245,34,45,0.2); }
+
+        /* 进度条 */
+        .progress-bar-wrap {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        .progress-bar-fill.green { background: linear-gradient(90deg, #34d399, #10b981); }
+        .progress-bar-fill.orange { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+
+        /* 维度单元格 - 可点击跳转 */
+        .dim-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 4px 8px;
+            border-radius: 6px;
+            position: relative;
+        }
+        .dim-cell:hover {
+            background: #f0f7ff;
+        }
+        .dim-cell:hover .dim-text {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .dim-cell:hover::after {
+            content: "\f35d";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 9px;
+            color: #1890ff;
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            opacity: 0.7;
+        }
+
+        /* 纯文字状态色 */
+        .txt-bad { font-size: 13px; color: #dc2626; font-weight: 500; white-space: nowrap; }
+        .txt-warn { font-size: 13px; color: #d97706; font-weight: 500; white-space: nowrap; }
+        .txt-good { font-size: 13px; color: #059669; font-weight: 500; white-space: nowrap; }
+        .txt-muted { font-size: 13px; color: #9ca3af; white-space: nowrap; }
+        .txt-muted-sub { font-size: 11px; color: #cbd5e1; white-space: nowrap; }
+
+        /* 回款金额 */
+        .amount-good { color: #059669; font-size: 14px; font-weight: 600; }
+        .amount-warn { color: #d97706; font-size: 14px; font-weight: 600; }
+        .amount-bad { color: #dc2626; font-size: 14px; font-weight: 600; }
+
+        /* 里程碑标签 */
+        .milestone-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .milestone-plan { background: #f0f9ff; color: #0284c7; }
+        .milestone-implement { background: #fef3c7; color: #b45309; }
+        .milestone-close { background: #f3e8ff; color: #7c3aed; }
+        .milestone-done { background: #f0fdf4; color: #16a34a; }
+
+        /* 表头可点击提示 */
+        .th-clickable {
+            cursor: pointer;
+            position: relative;
+            padding-right: 14px;
+        }
+        .th-clickable::after {
+            content: "\f35d";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 9px;
+            color: #94a3b8;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+        }
+        .th-clickable:hover::after { opacity: 1; color: #1890ff; }
+
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .filter-select {
+            padding: 6px 28px 6px 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #333;
+            background: #fff;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-select:focus { outline: none; border-color: #1890ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.15); }
+
+        /* 表头图标 */
+        .th-icon { font-size: 14px; margin-right: 4px; }
+        .th-icon.progress { color: #f59e0b; }
+        .th-icon.cost { color: #fbbf24; }
+        .th-icon.payment { color: #34d399; }
+        .th-icon.issue { color: #f87171; }
+        .th-icon.risk { color: #fb923c; }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+    <!-- 顶部导航 -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-2 text-xl font-bold text-blue-600">
+                <i class="fas fa-cloud"></i><span>云智工业互联平台</span>
+            </div>
+            <nav class="flex items-center gap-6 text-sm">
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-home"></i> 首页</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-desktop"></i> 工作台</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-project-diagram"></i> 流程管理</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-cogs"></i> 产品工艺</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-shopping-cart"></i> 销售管理</a>
+                <a href="#" class="flex items-center gap-1 text-blue-600 font-medium py-5 border-b-2 border-blue-600"><i class="fas fa-tasks"></i> 项目管理</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-industry"></i> 生产管理</a>
+                <a href="#" class="flex items-center gap-1 text-gray-600 hover:text-blue-600 py-5"><i class="fas fa-warehouse"></i> 库存管理</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 text-gray-500 hover:text-blue-600 relative"><i class="fas fa-bell"></i><span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span></button>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600"><i class="fas fa-user"></i></div><span>张经理</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 左侧边栏 -->
+        <aside class="w-64 bg-white border-r border-gray-200 overflow-y-auto">
+            <div class="p-4">
+                <div class="mb-6">
+                    <a href="项目列表.html" class="sidebar-item  px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-list-ul w-5"></i>
+                        <span>项目列表</span>
+                    </a>
+                    <a href="项目空间.html" class="sidebar-item  px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-cube w-5"></i>
+                        <span>项目空间</span>
+                    </a>
+                    <a href="项目甘特图.html" class="sidebar-item  px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-chart-gantt w-5"></i>
+                        <span>项目甘特图</span>
+                    </a>
+                    <a href="项目超期预警表.html" class="sidebar-item  px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-exclamation-triangle w-5"></i>
+                        <span>项目超期预警表</span>
+                    </a>
+                    <a href="项目支出.html" class="sidebar-item  px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-yen-sign w-5"></i>
+                        <span>项目支出</span>
+                    </a>
+                    <a href="项目问题.html" class="sidebar-item  px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-bug w-5"></i>
+                        <span>项目问题</span>
+                    </a>
+                    <a href="项目风险.html" class="sidebar-item  px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-shield-alt w-5"></i>
+                        <span>项目风险</span>
+                    </a>
+                    <a href="项目健康度监控.html" class="sidebar-item active px-4 py-3 rounded-lg cursor-pointer flex items-center gap-3 mb-1 font-medium">
+                        <i class="fas fa-heartbeat w-5"></i>
+                        <span>项目健康度监控</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
+            <div class="fade-in">
+                <!-- 筛选栏 -->
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <span class="text-sm text-gray-500 font-medium">负责人</span>
+                        <select class="filter-select" style="min-width: 120px;">
+                            <option>全部负责人</option>
+                            <option>张主管</option>
+                            <option>李队长</option>
+                            <option>王工程师</option>
+                            <option>刘工程师</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <span class="text-sm text-gray-500 font-medium">时间</span>
+                        <select class="filter-select" style="min-width: 100px;">
+                            <option>本月</option>
+                            <option>本季度</option>
+                            <option>本年</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <span class="text-sm text-gray-500 font-medium">问题维度</span>
+                        <select class="filter-select" style="min-width: 120px;">
+                            <option>全部维度</option>
+                            <option>问题待处理</option>
+                            <option>风险未关闭</option>
+                            <option>时间紧张</option>
+                            <option>成本预警</option>
+                            <option>回款逾期</option>
+                        </select>
+                    </div>
+                    <div class="ml-auto flex items-center gap-3">
+                        <button class="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm hover:bg-blue-100 transition-colors flex items-center gap-2"><i class="fas fa-sync-alt"></i> 刷新数据</button>
+                    </div>
+                </div>
+
+                <!-- 维度概览卡片 -->
+                <div class="grid grid-cols-5 gap-4 mb-6">
+                    <div class="dim-card">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="dim-label">问题待处理</span>
+                            <i class="fas fa-bug text-red-400"></i>
+                        </div>
+                        <div class="dim-count text-red-600">8</div>
+                        <div class="dim-desc">含2个高优先级</div>
+                    </div>
+                    <div class="dim-card">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="dim-label">风险未关闭</span>
+                            <i class="fas fa-exclamation-triangle text-orange-400"></i>
+                        </div>
+                        <div class="dim-count text-orange-600">5</div>
+                        <div class="dim-desc">含1个高风险</div>
+                    </div>
+                    <div class="dim-card">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="dim-label">时间紧张</span>
+                            <i class="fas fa-clock text-yellow-400"></i>
+                        </div>
+                        <div class="dim-count text-yellow-600">3</div>
+                        <div class="dim-desc">剩余≤15天</div>
+                    </div>
+                    <div class="dim-card">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="dim-label">成本预警</span>
+                            <i class="fas fa-coins text-amber-400"></i>
+                        </div>
+                        <div class="dim-count text-amber-600">2</div>
+                        <div class="dim-desc">使用率≥90%</div>
+                    </div>
+                    <div class="dim-card">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="dim-label">回款逾期</span>
+                            <i class="fas fa-hand-holding-usd text-green-400"></i>
+                        </div>
+                        <div class="dim-count text-green-600">4</div>
+                        <div class="dim-desc">超应回款节点</div>
+                    </div>
+                </div>
+
+                <!-- 项目明细列表 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <div class="list-scroll-container">
+                        <!-- 列表表头 -->
+                        <div class="list-header">
+                            <div class="col-project">项目名称</div>
+                            <div class="col-status">健康度</div>
+                            <div class="col-dim th-clickable"><i class="fas fa-clock th-icon progress"></i>进度</div>
+                            <div class="col-dim th-clickable"><i class="fas fa-coins th-icon cost"></i>成本</div>
+                            <div class="col-dim th-clickable"><i class="fas fa-hand-holding-usd th-icon payment"></i>回款</div>
+                            <div class="col-dim th-clickable"><i class="fas fa-bug th-icon issue"></i>问题</div>
+                            <div class="col-dim th-clickable"><i class="fas fa-exclamation-triangle th-icon risk"></i>风险</div>
+                            <div class="col-milestone">里程碑</div>
+                            <div class="col-owner">负责人</div>
+                            <div class="col-action">操作</div>
+                        </div>
+
+                        <!-- 列表内容 -->
+                        <div class="list-table">
+                            <!-- 塔里木 - 风险 -->
+                            <div class="list-row">
+                                <div class="col-project">
+                                    <div class="font-medium text-blue-600 cursor-pointer hover:underline">塔里木油田钻井项目</div>
+                                    <div class="text-xs text-gray-400 font-mono mt-1">PRJ-2026-001</div>
+                                </div>
+                                <div class="col-status"><span class="status-dot danger" title="风险"></span></div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('progress', 'PRJ-2026-001')">
+                                        <span class="txt-bad">已逾期15天</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('cost', 'PRJ-2026-001')">
+                                        <span class="txt-bad">超支28%</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('payment', 'PRJ-2026-001')">
+                                        <span class="amount-bad">33万/100万</span>
+                                        <span class="txt-muted-sub">逾期30天</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('issue', 'PRJ-2026-001')">
+                                        <span class="txt-bad">3个待处理</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('risk', 'PRJ-2026-001')">
+                                        <span class="txt-bad">2个未关闭</span>
+                                    </div>
+                                </div>
+                                <div class="col-milestone"><span class="milestone-tag milestone-implement">实施阶段</span></div>
+                                <div class="col-owner"><span class="text-sm text-gray-700">张主管</span></div>
+                                <div class="col-action">
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm px-1 py-1 rounded hover:bg-blue-50 transition-colors">项目空间</button>
+                                </div>
+                            </div>
+
+                            <!-- 长庆 - 风险 -->
+                            <div class="list-row">
+                                <div class="col-project">
+                                    <div class="font-medium text-blue-600 cursor-pointer hover:underline">长庆压裂施工项目</div>
+                                    <div class="text-xs text-gray-400 font-mono mt-1">PRJ-2026-005</div>
+                                </div>
+                                <div class="col-status"><span class="status-dot danger" title="风险"></span></div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('progress', 'PRJ-2026-005')">
+                                        <div style="width:100%">
+                                            <div class="progress-bar-wrap"><div class="progress-bar-fill orange" style="width:92%"></div></div>
+                                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
+                                                <span class="txt-muted-sub">92%</span>
+                                                <span class="txt-warn">剩余5天</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('cost', 'PRJ-2026-005')">
+                                        <span class="txt-bad">超支28%</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('payment', 'PRJ-2026-005')">
+                                        <span class="amount-warn">60万/100万</span>
+                                        <span class="txt-muted-sub">逾期7天</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('issue', 'PRJ-2026-005')">
+                                        <span class="txt-muted">无</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('risk', 'PRJ-2026-005')">
+                                        <span class="txt-warn">1个已关闭</span>
+                                    </div>
+                                </div>
+                                <div class="col-milestone"><span class="milestone-tag milestone-implement">实施阶段</span></div>
+                                <div class="col-owner"><span class="text-sm text-gray-700">李队长</span></div>
+                                <div class="col-action">
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm px-1 py-1 rounded hover:bg-blue-50 transition-colors">项目空间</button>
+                                </div>
+                            </div>
+
+                            <!-- 四川 - 预警 -->
+                            <div class="list-row">
+                                <div class="col-project">
+                                    <div class="font-medium text-blue-600 cursor-pointer hover:underline">四川页岩气开发项目</div>
+                                    <div class="text-xs text-gray-400 font-mono mt-1">PRJ-2026-012</div>
+                                </div>
+                                <div class="col-status"><span class="status-dot warning" title="预警"></span></div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('progress', 'PRJ-2026-012')">
+                                        <div style="width:100%">
+                                            <div class="progress-bar-wrap"><div class="progress-bar-fill orange" style="width:88%"></div></div>
+                                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
+                                                <span class="txt-muted-sub">88%</span>
+                                                <span class="txt-warn">剩余7天</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('cost', 'PRJ-2026-012')">
+                                        <span class="txt-muted">结余9%</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('payment', 'PRJ-2026-012')">
+                                        <span class="amount-warn">40万/100万</span>
+                                        <span class="txt-muted-sub">逾期7天</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('issue', 'PRJ-2026-012')">
+                                        <span class="txt-warn">1个已处理</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('risk', 'PRJ-2026-012')">
+                                        <span class="txt-muted">无未关闭</span>
+                                    </div>
+                                </div>
+                                <div class="col-milestone"><span class="milestone-tag milestone-implement">实施阶段</span></div>
+                                <div class="col-owner"><span class="text-sm text-gray-700">王工程师</span></div>
+                                <div class="col-action">
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm px-1 py-1 rounded hover:bg-blue-50 transition-colors">项目空间</button>
+                                </div>
+                            </div>
+
+                            <!-- 大庆 - 预警 -->
+                            <div class="list-row">
+                                <div class="col-project">
+                                    <div class="font-medium text-blue-600 cursor-pointer hover:underline">大庆油田修井作业</div>
+                                    <div class="text-xs text-gray-400 font-mono mt-1">PRJ-2026-008</div>
+                                </div>
+                                <div class="col-status"><span class="status-dot warning" title="预警"></span></div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('progress', 'PRJ-2026-008')">
+                                        <div style="width:100%">
+                                            <div class="progress-bar-wrap"><div class="progress-bar-fill green" style="width:65%"></div></div>
+                                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
+                                                <span class="txt-muted-sub">65%</span>
+                                                <span class="txt-muted">正常</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('cost', 'PRJ-2026-008')">
+                                        <span class="txt-muted">结余2.5%</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('payment', 'PRJ-2026-008')">
+                                        <span class="amount-warn">55万/100万</span>
+                                        <span class="txt-muted-sub">逾期7天</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('issue', 'PRJ-2026-008')">
+                                        <span class="txt-muted">无</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('risk', 'PRJ-2026-008')">
+                                        <span class="txt-muted">无未关闭</span>
+                                    </div>
+                                </div>
+                                <div class="col-milestone"><span class="milestone-tag milestone-close">收尾阶段</span></div>
+                                <div class="col-owner"><span class="text-sm text-gray-700">刘工程师</span></div>
+                                <div class="col-action">
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm px-1 py-1 rounded hover:bg-blue-50 transition-colors">项目空间</button>
+                                </div>
+                            </div>
+
+                            <!-- 新疆 - 良好 -->
+                            <div class="list-row">
+                                <div class="col-project">
+                                    <div class="font-medium text-blue-600 cursor-pointer hover:underline">新疆天然气勘探项目</div>
+                                    <div class="text-xs text-gray-400 font-mono mt-1">PRJ-2026-015</div>
+                                </div>
+                                <div class="col-status"><span class="status-dot good" title="良好"></span></div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('progress', 'PRJ-2026-015')">
+                                        <div style="width:100%">
+                                            <div class="progress-bar-wrap"><div class="progress-bar-fill green" style="width:55%"></div></div>
+                                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
+                                                <span class="txt-muted-sub">55%</span>
+                                                <span class="txt-good">提前3天</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('cost', 'PRJ-2026-015')">
+                                        <span class="txt-warn">剩余5%</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('payment', 'PRJ-2026-015')">
+                                        <span class="amount-good">80万/100万</span>
+                                        <span class="txt-muted-sub">回款率80%</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('issue', 'PRJ-2026-015')">
+                                        <span class="txt-muted">无</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('risk', 'PRJ-2026-015')">
+                                        <span class="txt-muted">无</span>
+                                    </div>
+                                </div>
+                                <div class="col-milestone"><span class="milestone-tag milestone-plan">规划阶段</span></div>
+                                <div class="col-owner"><span class="text-sm text-gray-700">陈技师</span></div>
+                                <div class="col-action">
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm px-1 py-1 rounded hover:bg-blue-50 transition-colors">项目空间</button>
+                                </div>
+                            </div>
+
+                            <!-- 华北 - 健康 -->
+                            <div class="list-row">
+                                <div class="col-project">
+                                    <div class="font-medium text-blue-600 cursor-pointer hover:underline">华北储气库建设项目</div>
+                                    <div class="text-xs text-gray-400 font-mono mt-1">PRJ-2026-020</div>
+                                </div>
+                                <div class="col-status"><span class="status-dot excellent" title="健康"></span></div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('progress', 'PRJ-2026-020')">
+                                        <div style="width:100%">
+                                            <div class="progress-bar-wrap"><div class="progress-bar-fill green" style="width:48%"></div></div>
+                                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
+                                                <span class="txt-muted-sub">48%</span>
+                                                <span class="txt-good">提前5天</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('cost', 'PRJ-2026-020')">
+                                        <span class="txt-muted">结余13%</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('payment', 'PRJ-2026-020')">
+                                        <span class="amount-good">89万/100万</span>
+                                        <span class="txt-muted-sub">回款率89%</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('issue', 'PRJ-2026-020')">
+                                        <span class="txt-muted">无</span>
+                                    </div>
+                                </div>
+                                <div class="col-dim">
+                                    <div class="dim-cell" onclick="jumpTo('risk', 'PRJ-2026-020')">
+                                        <span class="txt-muted">无</span>
+                                    </div>
+                                </div>
+                                <div class="col-milestone"><span class="milestone-tag milestone-done">项目完成</span></div>
+                                <div class="col-owner"><span class="text-sm text-gray-700">赵工程师</span></div>
+                                <div class="col-action">
+                                    <button class="text-blue-600 hover:text-blue-800 text-sm px-1 py-1 rounded hover:bg-blue-50 transition-colors">项目空间</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 分页 -->
+                    <div class="flex items-center justify-end gap-2 mt-6 pt-4 border-t border-gray-200">
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:border-blue-500 hover:text-blue-500 disabled:opacity-50" disabled>上一页</button>
+                        <button class="px-3 py-1 bg-blue-500 text-white rounded text-sm">1</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:border-blue-500 hover:text-blue-500">2</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:border-blue-500 hover:text-blue-500">3</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:border-blue-500 hover:text-blue-500">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 维度卡片点击筛选
+        document.querySelectorAll('.dim-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.dim-card').forEach(c => c.classList.remove('active'));
+                this.classList.toggle('active');
+            });
+        });
+
+        // 跳转功能
+        function jumpTo(type, projectId) {
+            const routes = {
+                'progress': '项目详情页',
+                'cost': '成本管理页',
+                'payment': '回款管理页',
+                'issue': '问题管理页',
+                'risk': '风险管理页'
+            };
+            alert('即将跳转至：' + routes[type] + '\n项目编号：' + projectId);
+        }
+    </script>
+</body>
+</html>
