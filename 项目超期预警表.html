@@ -168,10 +168,7 @@
             color: #1890ff;
         }
 
-        .stat-icon.gray {
-            background-color: #f5f5f5;
-            color: #8c8c8c;
-        }
+
 
         .stat-content {
             flex: 1;
@@ -439,7 +436,7 @@
             </div>
 
             <!-- 统计卡片 -->
-            <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="grid grid-cols-3 gap-4 mb-6">
                 <div class="stat-card border-l-4 border-red-500">
                     <div class="stat-icon red">
                         <i class="fas fa-exclamation-circle"></i>
@@ -473,18 +470,6 @@
                         <div class="stat-value-row">
                             <div class="stat-value text-blue-600">8</div>
                             <span class="stat-desc">需跟进进度</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="stat-card border-l-4 border-gray-300">
-                    <div class="stat-icon gray">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-title">本月已处理</div>
-                        <div class="stat-value-row">
-                            <div class="stat-value" style="color: #595959;">12</div>
-                            <span class="stat-desc">预警已解除</span>
                         </div>
                     </div>
                 </div>
@@ -553,10 +538,8 @@
                                 <th>预警级别</th>
                                 <th>计划时间</th>
                                 <th class="text-center">当前进度</th>
-                                <th class="text-center">剩余/超期</th>
                                 <th>负责人</th>
-                                <th>风险说明</th>
-                                <th class="text-center w-40">操作</th>
+                                <th class="text-center w-48">操作</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -586,9 +569,6 @@
                                     <div class="text-lg font-bold text-orange-600">40%</div>
                                     <div class="text-xs text-gray-500">滞后严重</div>
                                 </td>
-                                <td class="px-4 py-4 text-center">
-                                    <span class="delay-tag delay-over">超期 2 天</span>
-                                </td>
                                 <td class="px-4 py-4">
                                     <div class="flex items-center gap-2 whitespace-nowrap">
                                         <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs">张</div>
@@ -598,17 +578,16 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-4 py-4">
-                                    <div class="text-sm text-gray-700 whitespace-nowrap">外壳装配工序延期</div>
-                                    <div class="text-xs text-gray-500 mt-1">物料未到货</div>
-                                </td>
                                 <td class="px-4 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
                                         <button onclick="viewDetail('XM-20260405-002')" class="action-btn" title="查看详情">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button onclick="markResolved('XM-20260405-002', '华南充电器交付项目')" class="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors whitespace-nowrap">
-                                            <i class="fas fa-check mr-1"></i>标记解决
+                                        <button onclick="jumpToRisk('XM-20260405-002')" class="px-3 py-1 bg-orange-100 text-orange-600 rounded text-xs hover:bg-orange-200 transition-colors whitespace-nowrap" title="跳转项目风险">
+                                            <i class="fas fa-shield-alt mr-1"></i>风险
+                                        </button>
+                                        <button onclick="jumpToIssue('XM-20260405-002')" class="px-3 py-1 bg-red-100 text-red-600 rounded text-xs hover:bg-red-200 transition-colors whitespace-nowrap" title="跳转项目问题">
+                                            <i class="fas fa-bug mr-1"></i>问题
                                         </button>
                                     </div>
                                 </td>
@@ -640,9 +619,6 @@
                                     <div class="text-lg font-bold text-blue-600">65%</div>
                                     <div class="text-xs text-gray-500">正常推进</div>
                                 </td>
-                                <td class="px-4 py-4 text-center">
-                                    <span class="delay-tag delay-warning">剩余 2 天</span>
-                                </td>
                                 <td class="px-4 py-4">
                                     <div class="flex items-center gap-2 whitespace-nowrap">
                                         <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs">伍</div>
@@ -652,17 +628,16 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-4 py-4">
-                                    <div class="text-sm text-gray-700 whitespace-nowrap">土建施工进度偏慢</div>
-                                    <div class="text-xs text-gray-500 mt-1">天气影响</div>
-                                </td>
                                 <td class="px-4 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
                                         <button onclick="viewDetail('XM-20260401-001')" class="action-btn" title="查看详情">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button onclick="markResolved('XM-20260401-001', '永城基地扩建项目')" class="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors whitespace-nowrap">
-                                            <i class="fas fa-check mr-1"></i>标记解决
+                                        <button onclick="jumpToRisk('XM-20260401-001')" class="px-3 py-1 bg-orange-100 text-orange-600 rounded text-xs hover:bg-orange-200 transition-colors whitespace-nowrap" title="跳转项目风险">
+                                            <i class="fas fa-shield-alt mr-1"></i>风险
+                                        </button>
+                                        <button onclick="jumpToIssue('XM-20260401-001')" class="px-3 py-1 bg-red-100 text-red-600 rounded text-xs hover:bg-red-200 transition-colors whitespace-nowrap" title="跳转项目问题">
+                                            <i class="fas fa-bug mr-1"></i>问题
                                         </button>
                                     </div>
                                 </td>
@@ -694,9 +669,6 @@
                                     <div class="text-lg font-bold text-yellow-600">10%</div>
                                     <div class="text-xs text-gray-500">进度偏慢</div>
                                 </td>
-                                <td class="px-4 py-4 text-center">
-                                    <span class="delay-tag delay-safe">剩余 23 天</span>
-                                </td>
                                 <td class="px-4 py-4">
                                     <div class="flex items-center gap-2 whitespace-nowrap">
                                         <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs">刘</div>
@@ -706,17 +678,16 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-4 py-4">
-                                    <div class="text-sm text-gray-700 whitespace-nowrap">样品试制未启动</div>
-                                    <div class="text-xs text-gray-500 mt-1">设备调试中</div>
-                                </td>
                                 <td class="px-4 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
                                         <button onclick="viewDetail('XM-20260412-003')" class="action-btn" title="查看详情">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button onclick="markResolved('XM-20260412-003', '新能源电池组试制')" class="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors whitespace-nowrap">
-                                            <i class="fas fa-check mr-1"></i>标记解决
+                                        <button onclick="jumpToRisk('XM-20260412-003')" class="px-3 py-1 bg-orange-100 text-orange-600 rounded text-xs hover:bg-orange-200 transition-colors whitespace-nowrap" title="跳转项目风险">
+                                            <i class="fas fa-shield-alt mr-1"></i>风险
+                                        </button>
+                                        <button onclick="jumpToIssue('XM-20260412-003')" class="px-3 py-1 bg-red-100 text-red-600 rounded text-xs hover:bg-red-200 transition-colors whitespace-nowrap" title="跳转项目问题">
+                                            <i class="fas fa-bug mr-1"></i>问题
                                         </button>
                                     </div>
                                 </td>
@@ -748,9 +719,6 @@
                                     <div class="text-lg font-bold text-blue-600">35%</div>
                                     <div class="text-xs text-gray-500">略慢于计划</div>
                                 </td>
-                                <td class="px-4 py-4 text-center">
-                                    <span class="delay-tag delay-safe">剩余 74 天</span>
-                                </td>
                                 <td class="px-4 py-4">
                                     <div class="flex items-center gap-2 whitespace-nowrap">
                                         <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs">王</div>
@@ -760,17 +728,16 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-4 py-4">
-                                    <div class="text-sm text-gray-700 whitespace-nowrap">需求变更频繁</div>
-                                    <div class="text-xs text-gray-500 mt-1">沟通中</div>
-                                </td>
                                 <td class="px-4 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
                                         <button onclick="viewDetail('XM-20260126-004')" class="action-btn" title="查看详情">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button onclick="markResolved('XM-20260126-004', '智能仓储系统研发')" class="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors whitespace-nowrap">
-                                            <i class="fas fa-check mr-1"></i>标记解决
+                                        <button onclick="jumpToRisk('XM-20260126-004')" class="px-3 py-1 bg-orange-100 text-orange-600 rounded text-xs hover:bg-orange-200 transition-colors whitespace-nowrap" title="跳转项目风险">
+                                            <i class="fas fa-shield-alt mr-1"></i>风险
+                                        </button>
+                                        <button onclick="jumpToIssue('XM-20260126-004')" class="px-3 py-1 bg-red-100 text-red-600 rounded text-xs hover:bg-red-200 transition-colors whitespace-nowrap" title="跳转项目问题">
+                                            <i class="fas fa-bug mr-1"></i>问题
                                         </button>
                                     </div>
                                 </td>
@@ -868,6 +835,14 @@
 
         function handleWarning(id) {
             alert('正在处理项目：' + id + '\n\n可进入项目详情页进行调整计划或申请延期');
+        }
+
+        function jumpToRisk(projectId) {
+            window.open('项目风险.html?projectId=' + projectId, '_blank');
+        }
+
+        function jumpToIssue(projectId) {
+            window.open('项目问题.html?projectId=' + projectId, '_blank');
         }
 
         function markResolved(id, name) {
